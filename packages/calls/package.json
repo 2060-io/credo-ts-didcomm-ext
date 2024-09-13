@@ -1,0 +1,43 @@
+{
+  "name": "credo-ts-didcomm-webrtc",
+  "main": "build/index",
+  "types": "build/index",
+  "version": "0.0.1",
+  "files": [
+    "build"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "description": "DIDComm WebRTC extension module for Credo",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/webrtc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/push-notifications"
+  },
+  "scripts": {
+    "sample": "tsnd --respawn samples/sample.ts",
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@hyperledger/aries-askar-nodejs": "^0.2.0",
+    "@credo-ts/askar": "^0.5.1",
+    "@credo-ts/core": "^0.5.1",
+    "@credo-ts/node": "^0.5.1",
+    "ts-node-dev": "^1.1.8"
+  },
+  "peerDependencies": {
+    "@credo-ts/core": "^0.5.1"
+  },
+  "dependencies": {
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
+    "tsyringe": "^4.8.0"
+  }
+}
