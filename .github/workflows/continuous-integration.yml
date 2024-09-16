@@ -112,9 +112,9 @@ jobs:
         continue-on-error: true
         run: |
           echo "Release outputs:"
-          echo "${{ toJson(steps.release.outputs) }}"
+          echo "${{ toJson(steps.release-please.outputs) }}"
           echo "Release created:"
-          echo "${{ toJson(steps.release.outputs.release_created) }}"
+          echo "${{ toJson(steps.release-please.outputs.release_created) }}"
 
   # Initiate release process if release was created
   release-package:
