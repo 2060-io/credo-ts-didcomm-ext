@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "lib": ["ES2021.Promise"],
+    "baseUrl": ".",
+    "paths": {
+      "@2060.io/credo-ts-didcomm-calls": ["packages/calls/src"]
+    },
+    "types": ["jest", "node"]
+  },
+  "include": ["tests", "samples", "**/tests", "**/samples"],
+  "exclude": ["node_modules", "build", "**/build/**"]
+}
