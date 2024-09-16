@@ -1,7 +1,8 @@
-import type { DidCommCallsService } from '../src/DidCommCallsService'
 import type { Agent } from '@credo-ts/core'
 
 import { JsonTransformer } from '@credo-ts/core'
+
+import { DidCommCallsService } from '../src/DidCommCallsService'
 
 import { setupAgent } from './utils/agent'
 
@@ -13,7 +14,7 @@ describe('Didcomm Calls', () => {
     agent = await setupAgent({
       name: 'calls service test',
     })
-    didcommCallsService = agent.dependencyManager.resolve(didcommCallsService)
+    didcommCallsService = agent.dependencyManager.resolve(DidCommCallsService)
   })
 
   afterAll(async () => {
@@ -34,7 +35,8 @@ describe('Didcomm Calls', () => {
         expect.objectContaining({
           '@id': expect.any(String),
           '@type': 'https://didcomm.org/calls/1.0/call-accept',
-          parameters: { param: 'value', '~thread': expect.objectContaining({ thid: '5678-5678-5678-5678' }) },
+          parameters: { param: 'value' },
+          '~thread': expect.objectContaining({ thid: '5678-5678-5678-5678' }),
         }),
       )
     })
