@@ -111,6 +111,7 @@ jobs:
 
   # Initiate release process if release was created
   release-package:
+    if: ${{needs.release-please.outputs.release_created}}
     runs-on: ubuntu-latest
     needs: [release-please]
     strategy:
@@ -132,6 +133,6 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-scripts
 
       - name: Release to NPM
-        run: npm publish ./packages/${{ matrix.package }}
+        run: npm publish ./${{ matrix.package }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
