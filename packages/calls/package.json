@@ -1,5 +1,5 @@
 {
-  "name": "credo-ts-didcomm-webrtc",
+  "name": "@2060.io/credo-ts-didcomm-calls",
   "main": "build/index",
   "types": "build/index",
   "version": "0.0.1",
@@ -11,7 +11,7 @@
   },
   "license": "Apache-2.0",
   "description": "DIDComm WebRTC extension module for Credo",
-  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/webrtc",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/calls",
   "repository": {
     "type": "git",
     "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
