@@ -344,7 +344,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@credo-ts/askar@^0.5.1":
+"@credo-ts/askar@^0.5.10":
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/@credo-ts/askar/-/askar-0.5.11.tgz#bb8fd7ab59219501be8cb194fb29d801065848cb"
   integrity sha512-KIBNOhEqF8mOWuFYEolPo/qU8hrHR+X4othq3WrzRWJoApJKe7OQk9mI6H9yjQ4H3eD2By7oHWEqgZCB4IDcwg==
@@ -356,7 +356,7 @@
     rxjs "^7.8.0"
     tsyringe "^4.8.0"
 
-"@credo-ts/core@0.5.11", "@credo-ts/core@^0.5.1":
+"@credo-ts/core@0.5.11", "@credo-ts/core@^0.5.10":
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/@credo-ts/core/-/core-0.5.11.tgz#529826628cafbac9a4dc1bf1425b3e21e4c394f3"
   integrity sha512-mf/Y5eEf3llGrwJ2VUdlhyxAnBuQtFdBHz2NFFr8FhIHbd8TDzJM0Jl9f+n33uf83WV2nKB/O1VROj+II5JGzQ==
@@ -402,7 +402,7 @@
     web-did-resolver "^2.0.21"
     webcrypto-core "^1.8.0"
 
-"@credo-ts/node@^0.5.1":
+"@credo-ts/node@^0.5.10":
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/@credo-ts/node/-/node-0.5.11.tgz#18fc04cba3e91b81737f1ad83298d74326a8f227"
   integrity sha512-zrm+IujCAkSzSPj3Je5iZCsPkwUC8IDfStuSLJ0wiYjDaXzjYtUGn320bDE13VMJ56i/AdW1rv49/PWSGpebVA==
@@ -649,7 +649,7 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@hyperledger/aries-askar-nodejs@^0.2.0":
+"@hyperledger/aries-askar-nodejs@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@hyperledger/aries-askar-nodejs/-/aries-askar-nodejs-0.2.3.tgz#f939c19047c78b9903b422f992b4f5406ac3aae3"
   integrity sha512-2BnGqK08Y96DEB8tDuXy2x+soetChyMGB0+L1yqdHx1Xv5FvRerYrTXdTjJXTW6ANb48k2Np8WlJ4YNePSo6ww==
