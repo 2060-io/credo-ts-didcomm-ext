@@ -99,7 +99,7 @@ jobs:
 
   release-please:
     runs-on: ubuntu-latest
-    needs: [package-finder]
+    needs: [integration-test, validate]
     steps:
       - uses: googleapis/release-please-action@v4
         id: release-please
@@ -112,7 +112,7 @@ jobs:
   # Initiate release process if release was created
   release-package:
     runs-on: ubuntu-latest
-    needs: [integration-test, validate]
+    needs: [release-please]
     strategy:
       fail-fast: false
       matrix:
