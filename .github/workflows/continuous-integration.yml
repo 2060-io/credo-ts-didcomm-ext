@@ -108,6 +108,13 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs:"
+          echo "${{ toJson(steps.release.outputs) }}"
+          echo "Release created:"
+          echo "${{ toJson(steps.release.outputs.release_created) }}"
 
   # Initiate release process if release was created
   release-package:
