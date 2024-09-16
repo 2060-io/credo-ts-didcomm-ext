@@ -28,4 +28,4 @@
 </p>
 <br />
 
-DIDComm Calls extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git). 
+DIDComm Calls extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git).

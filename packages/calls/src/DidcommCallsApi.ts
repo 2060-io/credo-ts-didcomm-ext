@@ -1,10 +1,4 @@
-import {
-  OutboundMessageContext,
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-} from '@credo-ts/core'
+import { OutboundMessageContext, AgentContext, ConnectionService, injectable, MessageSender } from '@credo-ts/core'
 
 import { DidCommCallsService } from './DidCommCallsService'
 import { DidCommCallType } from './messages/CallOfferMessage'
@@ -46,11 +40,7 @@ export class DidCommCallsApi {
     await this.messageSender.sendMessage(outbound)
   }
 
-  public async accept(options: {
-    connectionId: string
-    threadId?: string
-    parameters: Record<string, unknown>
-  }) {
+  public async accept(options: { connectionId: string; threadId?: string; parameters: Record<string, unknown> }) {
     const { connectionId, threadId, parameters } = options
     const connection = await this.connectionService.getById(this.agentContext, connectionId)
     connection.assertReady()

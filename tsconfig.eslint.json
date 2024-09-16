@@ -2,7 +2,7 @@
   "extends": "./tsconfig.build.json",
 
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "."
   },
   "include": [
     "packages",

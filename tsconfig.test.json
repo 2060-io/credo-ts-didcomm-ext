@@ -4,7 +4,7 @@
     "lib": ["ES2021.Promise"],
     "baseUrl": ".",
     "paths": {
-      "@2060.io/credo-ts-didcomm-calls": ["packages/calls/src"],
+      "@2060.io/credo-ts-didcomm-calls": ["packages/calls/src"]
     },
     "types": ["jest", "node"]
   },
