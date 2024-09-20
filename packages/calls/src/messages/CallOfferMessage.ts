@@ -1,7 +1,7 @@
 import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
 import { IsString } from 'class-validator'
 
-export type DidCommCallType = 'audio' | 'video'
+export type DidCommCallType = 'audio' | 'video' | 'service'
 
 interface CallOfferMessageOptions {
   id?: string
