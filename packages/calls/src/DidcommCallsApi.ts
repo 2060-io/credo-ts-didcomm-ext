@@ -38,6 +38,8 @@ export class DidCommCallsApi {
       connection: connection,
     })
     await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
   }
 
   public async accept(options: { connectionId: string; threadId?: string; parameters: Record<string, unknown> }) {
@@ -52,6 +54,8 @@ export class DidCommCallsApi {
       connection: connection,
     })
     await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
   }
 
   public async reject(options: { connectionId: string; threadId?: string }) {
@@ -66,6 +70,8 @@ export class DidCommCallsApi {
       connection: connection,
     })
     await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
   }
 
   public async hangup(options: { connectionId: string; threadId?: string }) {
@@ -80,5 +86,7 @@ export class DidCommCallsApi {
       connection: connection,
     })
     await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
   }
 }
