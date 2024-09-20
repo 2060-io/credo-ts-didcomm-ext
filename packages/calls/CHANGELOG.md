@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.2...@2060.io/credo-ts-didcomm-calls@v0.0.3) (2024-09-20)
+
+
+### Features
+
+* add 'service' call type ([93d81d4](https://github.com/2060-io/credo-ts-didcomm-ext/commit/93d81d4ec678c36a766e3bc469e9bfb6aedb0b98))
+
+
+### Bug Fixes
+
+* return messageId in API calls ([0d8519b](https://github.com/2060-io/credo-ts-didcomm-ext/commit/0d8519bc09b28a2325be6d27253dfeb96b5237aa))
+
 ## [0.0.2](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls-v0.0.1...@2060.io/credo-ts-didcomm-calls@v0.0.2) (2024-09-16)
 
 
