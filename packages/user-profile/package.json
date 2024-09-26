@@ -1,5 +1,5 @@
 {
-  "name": "@2060.io/credo-ts-user-profile",
+  "name": "@2060.io/credo-ts-didcomm-user-profile",
   "main": "build/index",
   "types": "build/index",
   "version": "0.0.1",

@@ -1,4 +1,4 @@
-import type { ConnectionProfileKey } from '../messages'
+import type { UserProfileKey } from '../messages'
 import type { UserProfileData } from '../model'
 import type { UserProfileRecord } from '../repository'
 import type { BaseEvent, ConnectionRecord } from '@credo-ts/core'
@@ -13,7 +13,7 @@ export interface UserProfileRequestedEvent extends BaseEvent {
   type: ProfileEventTypes.UserProfileRequested
   payload: {
     connection: ConnectionRecord
-    query?: ConnectionProfileKey[]
+    query?: UserProfileKey[]
   }
 }
 

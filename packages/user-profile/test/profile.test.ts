@@ -8,6 +8,7 @@ import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
 
 import { UserProfileModule } from '../src/UserProfileModule'
+import { getConnectionProfile } from '../src/model'
 import { ProfileEventTypes } from '../src/services'
 
 import { SubjectInboundTransport } from './transport/SubjectInboundTransport'
@@ -152,6 +153,7 @@ describe('profile test', () => {
       profileData: {
         displayIcon: { base64: 'base64' },
         organizationDid: 'orgDid',
+        whatever: 'I want',
       },
       sendBackYours: false,
     })
@@ -161,6 +163,15 @@ describe('profile test', () => {
     expect(profile).toEqual(
       expect.objectContaining({
         organizationDid: 'orgDid',
+        whatever: 'I want',
+        displayIcon: { base64: 'base64' },
+      }),
+    )
+
+    expect(getConnectionProfile(await aliceAgent.connections.getById(aliceConnectionRecord.id))).toEqual(
+      expect.objectContaining({
+        organizationDid: 'orgDid',
+        whatever: 'I want',
         displayIcon: { base64: 'base64' },
       }),
     )

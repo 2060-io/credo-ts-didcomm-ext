@@ -47,7 +47,7 @@ export class UserProfileApi {
    */
   public async sendUserProfile(options: {
     connectionId: string
-    profileData?: Partial<UserProfileData>
+    profileData?: Partial<UserProfileData> | Record<string, unknown>
     sendBackYours?: boolean
   }) {
     const { connectionId, profileData, sendBackYours } = options
