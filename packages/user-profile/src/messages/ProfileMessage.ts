@@ -2,13 +2,21 @@ import { AgentMessage, Attachment, IsValidMessageType, parseMessageType } from '
 import { Expose } from 'class-transformer'
 import { IsBoolean, IsOptional } from 'class-validator'
 
-import { UserProfile, UserProfileData } from '../model'
+import { PictureData, UserProfileData } from '../model'
 
 export interface ProfileMessageOptions {
   id?: string
-  profile: Partial<UserProfileData>
+  profile: Partial<UserProfileData> | Record<string, unknown>
   threadId?: string
   sendBackYours?: boolean
+}
+
+class ProfileForExchange {
+  public displayName?: string
+  public displayPicture?: string
+  public displayIcon?: string
+  public description?: string
+  public preferredLanguage?: string
 }
 
 export class ProfileMessage extends AgentMessage {
@@ -27,14 +35,15 @@ export class ProfileMessage extends AgentMessage {
       }
 
       if (options.profile.displayPicture) {
+        const pictureData = options.profile.displayPicture as PictureData
         // If there is a display picture, we need to add an attachment including picture data
         this.addAppendedAttachment(
           new Attachment({
             id: 'displayPicture',
-            mimeType: options.profile.displayPicture.mimeType,
+            mimeType: pictureData.mimeType,
             data: {
-              base64: options.profile.displayPicture.base64,
-              links: options.profile.displayPicture.links,
+              base64: pictureData.base64,
+              links: pictureData.links,
             },
           }),
         )
@@ -42,13 +51,14 @@ export class ProfileMessage extends AgentMessage {
 
       if (options.profile.displayIcon) {
         // If there is a display icon, we need to add an attachment including picture data
+        const pictureData = options.profile.displayIcon as PictureData
         this.addAppendedAttachment(
           new Attachment({
             id: 'displayIcon',
-            mimeType: options.profile.displayIcon.mimeType,
+            mimeType: pictureData.mimeType,
             data: {
-              base64: options.profile.displayIcon.base64,
-              links: options.profile.displayIcon.links,
+              base64: pictureData.base64,
+              links: pictureData.links,
             },
           }),
         )
@@ -62,7 +72,7 @@ export class ProfileMessage extends AgentMessage {
   public readonly type = ProfileMessage.type.messageTypeUri
   public static readonly type = parseMessageType('https://didcomm.org/user-profile/1.0/profile')
 
-  public profile!: UserProfile
+  public profile!: ProfileForExchange | Record<string, unknown>
 
   @IsOptional()
   @IsBoolean()

@@ -12,6 +12,7 @@ export class UserProfileRecord extends BaseRecord implements UserProfileStorageP
   public displayName?: string
   public displayPicture?: PictureData
   public description?: string
+  public preferredLanguage?: string
 
   public static readonly type = 'UserProfileRecord'
   public readonly type = UserProfileRecord.type
@@ -25,6 +26,7 @@ export class UserProfileRecord extends BaseRecord implements UserProfileStorageP
       this.displayName = props.displayName
       this.displayPicture = props.displayPicture
       this.description = props.description
+      this.preferredLanguage = props.preferredLanguage
     }
   }
 

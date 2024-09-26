@@ -1,14 +1,14 @@
 import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
 
-import { UserProfile } from '../model'
+import { UserProfileData } from '../model'
+
+export type UserProfileKey = string | keyof UserProfileData
 
 export interface GetProfileMessageOptions {
   id?: string
   threadId?: string
-  query?: ConnectionProfileKey[]
+  query?: UserProfileKey[]
 }
-
-export type ConnectionProfileKey = keyof UserProfile
 
 export class RequestProfileMessage extends AgentMessage {
   public constructor(options?: GetProfileMessageOptions) {
@@ -27,5 +27,5 @@ export class RequestProfileMessage extends AgentMessage {
   public readonly type = RequestProfileMessage.type.messageTypeUri
   public static readonly type = parseMessageType('https://didcomm.org/user-profile/1.0/request-profile')
 
-  public query?: ConnectionProfileKey[]
+  public query?: UserProfileKey[]
 }
