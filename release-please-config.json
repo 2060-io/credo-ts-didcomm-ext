@@ -9,6 +9,9 @@
     "packages/calls": {
       "release-type": "node"
     },
+    "packages/mrtd": {
+      "release-type": "node"
+    },
     "packages/user-profile": {
       "release-type": "node"
     }
