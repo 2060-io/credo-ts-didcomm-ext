@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.5...@2060.io/credo-ts-didcomm-user-profile@v0.0.6) (2024-09-30)
+
+
+### Features
+
+* **user-profile:** parameters in ConnectionProfileUpdated ([#31](https://github.com/2060-io/credo-ts-didcomm-ext/issues/31)) ([56d393d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/56d393dcfc393e65c2ac69ba2b3797566b30ada7))
+
 ## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.4...@2060.io/credo-ts-didcomm-user-profile@v0.0.5) (2024-09-30)
 
 
