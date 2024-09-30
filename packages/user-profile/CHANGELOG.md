@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.3...@2060.io/credo-ts-didcomm-user-profile@v0.0.4) (2024-09-30)
+
+
+### Bug Fixes
+
+* **user-profile:** add preferredLanguage and displayIcon to responses ([#27](https://github.com/2060-io/credo-ts-didcomm-ext/issues/27)) ([accca1d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/accca1d3bd3d6f7577df2a70b7a60aea4388e3a9))
+
 ## [0.0.3](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile-v0.0.2...@2060.io/credo-ts-didcomm-user-profile@v0.0.3) (2024-09-26)
 
 
