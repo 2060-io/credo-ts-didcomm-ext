@@ -130,6 +130,9 @@ export class UserProfileService {
       payload: {
         connection,
         profile: getConnectionProfile(connection) ?? {},
+        sendBackYoursRequested: messageContext.message.sendBackYours,
+        threadId: messageContext.message.threadId,
+        parentThreadId: messageContext.message.thread?.parentThreadId,
       },
     })
     const config = messageContext.agentContext.dependencyManager.resolve(UserProfileModuleConfig)

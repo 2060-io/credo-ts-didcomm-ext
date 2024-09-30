@@ -32,5 +32,8 @@ export interface ConnectionProfileUpdatedEvent extends BaseEvent {
   payload: {
     profile: UserProfileData
     connection: ConnectionRecord
+    sendBackYoursRequested?: boolean
+    threadId?: string
+    parentThreadId?: string
   }
 }
