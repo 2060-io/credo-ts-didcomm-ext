@@ -47,10 +47,12 @@ export class UserProfileApi {
    */
   public async sendUserProfile(options: {
     connectionId: string
+    threadId?: string
+    parentThreadId?: string
     profileData?: Partial<UserProfileData> | Record<string, unknown>
     sendBackYours?: boolean
   }) {
-    const { connectionId, profileData, sendBackYours } = options
+    const { connectionId, profileData, sendBackYours, threadId, parentThreadId } = options
     const connection = await this.agentContext.dependencyManager.resolve(ConnectionsApi).getById(connectionId)
 
     const myProfile = await this.userProfileService.getUserProfile(this.agentContext)
@@ -62,6 +64,8 @@ export class UserProfileApi {
         description: myProfile.description,
         preferredLanguage: myProfile.preferredLanguage,
       },
+      threadId,
+      parentThreadId,
       sendBackYours,
     })
 

@@ -8,6 +8,7 @@ export interface ProfileMessageOptions {
   id?: string
   profile: Partial<UserProfileData> | Record<string, unknown>
   threadId?: string
+  parentThreadId?: string
   sendBackYours?: boolean
 }
 
@@ -27,6 +28,7 @@ export class ProfileMessage extends AgentMessage {
       this.id = options.id ?? this.generateId()
       this.setThread({
         threadId: options.threadId,
+        parentThreadId: options.parentThreadId,
       })
       this.profile = {
         ...options.profile,
