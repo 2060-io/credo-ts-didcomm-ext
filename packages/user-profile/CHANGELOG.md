@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.4...@2060.io/credo-ts-didcomm-user-profile@v0.0.5) (2024-09-30)
+
+
+### Features
+
+* **user-profile:** support thread for profile message in API ([#29](https://github.com/2060-io/credo-ts-didcomm-ext/issues/29)) ([85c1600](https://github.com/2060-io/credo-ts-didcomm-ext/commit/85c16006705c0707d44959583d1e77cdc1f5dcd6))
+
 ## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.3...@2060.io/credo-ts-didcomm-user-profile@v0.0.4) (2024-09-30)
 
 
