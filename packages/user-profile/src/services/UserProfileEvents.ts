@@ -14,6 +14,8 @@ export interface UserProfileRequestedEvent extends BaseEvent {
   payload: {
     connection: ConnectionRecord
     query?: UserProfileKey[]
+    threadId: string
+    parentThreadId?: string
   }
 }
 

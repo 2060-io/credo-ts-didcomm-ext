@@ -158,6 +158,8 @@ export class UserProfileService {
       payload: {
         connection,
         query: messageContext.message.query,
+        threadId: messageContext.message.threadId,
+        parentThreadId: messageContext.message.thread?.parentThreadId,
       },
     })
 
