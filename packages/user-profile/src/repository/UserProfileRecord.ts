@@ -11,6 +11,7 @@ export interface UserProfileStorageProps extends UserProfileData {
 export class UserProfileRecord extends BaseRecord implements UserProfileStorageProps {
   public displayName?: string
   public displayPicture?: PictureData
+  public displayIcon?: PictureData
   public description?: string
   public preferredLanguage?: string
 
@@ -25,6 +26,7 @@ export class UserProfileRecord extends BaseRecord implements UserProfileStorageP
       this.createdAt = props.createdAt ?? new Date()
       this.displayName = props.displayName
       this.displayPicture = props.displayPicture
+      this.displayIcon = props.displayIcon
       this.description = props.description
       this.preferredLanguage = props.preferredLanguage
     }

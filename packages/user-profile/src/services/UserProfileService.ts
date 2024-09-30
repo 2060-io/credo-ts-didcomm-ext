@@ -41,6 +41,7 @@ export class UserProfileService {
     const previousUserProfileData = {
       displayName: userProfile.displayName,
       displayPicture: userProfile.displayPicture,
+      preferredLanguage: userProfile.preferredLanguage,
     }
 
     Object.assign(userProfile, props)
@@ -180,7 +181,9 @@ export class UserProfileService {
     const profile: UserProfileData = {
       displayName: userProfile.displayName,
       displayPicture: userProfile.displayPicture,
+      displayIcon: userProfile.displayIcon,
       description: userProfile.description,
+      preferredLanguage: userProfile.preferredLanguage,
     }
 
     const message = this.createProfileMessage({

@@ -58,7 +58,9 @@ export class UserProfileApi {
       profile: profileData ?? {
         displayName: myProfile.displayName,
         displayPicture: myProfile.displayPicture,
+        displayIcon: myProfile.displayIcon,
         description: myProfile.description,
+        preferredLanguage: myProfile.preferredLanguage,
       },
       sendBackYours,
     })
@@ -90,7 +92,9 @@ export class UserProfileApi {
     return {
       displayName: userProfile.displayName,
       displayPicture: userProfile.displayPicture,
+      displayIcon: userProfile.displayIcon,
       description: userProfile.description,
+      preferredLanguage: userProfile.preferredLanguage,
     }
   }
 }
