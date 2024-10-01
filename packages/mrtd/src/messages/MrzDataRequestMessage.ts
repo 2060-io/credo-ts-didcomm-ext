@@ -5,7 +5,7 @@ interface MrzRequestOptions {
   parentThreadId?: string
 }
 
-export class MrzRequestMessage extends AgentMessage {
+export class MrzDataRequestMessage extends AgentMessage {
   public constructor(options: MrzRequestOptions) {
     super()
 
@@ -17,7 +17,7 @@ export class MrzRequestMessage extends AgentMessage {
     }
   }
 
-  @IsValidMessageType(MrzRequestMessage.type)
-  public static readonly type = parseMessageType('https://didcomm.org/mrtd/1.0/mrz-request')
-  public readonly type = MrzRequestMessage.type.messageTypeUri
+  @IsValidMessageType(MrzDataRequestMessage.type)
+  public static readonly type = parseMessageType('https://didcomm.org/mrtd/1.0/mrz-data-request')
+  public readonly type = MrzDataRequestMessage.type.messageTypeUri
 }

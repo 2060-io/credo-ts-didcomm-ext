@@ -1,2 +1,2 @@
 export { MrzDataMessage } from './MrzDataMessage'
-export { MrzRequestMessage } from './MrzRequestMessage'
+export { MrzDataRequestMessage } from './MrzDataRequestMessage'

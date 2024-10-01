@@ -3,7 +3,7 @@ import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/co
 interface MrzMessageOptions {
   id?: string
   threadId?: string
-  mrz: string
+  mrzData: string | string[]
 }
 
 export class MrzDataMessage extends AgentMessage {
@@ -12,12 +12,12 @@ export class MrzDataMessage extends AgentMessage {
 
     if (options) {
       this.id = options.id ?? this.generateId()
-      this.mrzData = options.mrz
+      this.mrzData = options.mrzData
       this.setThread({ threadId: options.threadId })
     }
   }
 
-  public mrzData!: string
+  public mrzData!: string | string[]
 
   @IsValidMessageType(MrzDataMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/mrtd/1.0/mrz-data')

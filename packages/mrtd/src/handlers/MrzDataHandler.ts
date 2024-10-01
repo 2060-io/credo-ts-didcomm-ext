@@ -1,3 +1,4 @@
+import type { DidCommMrtdService } from '../DidCommMrtdService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
 import { MrzDataMessage } from '../messages'
@@ -8,7 +9,13 @@ import { MrzDataMessage } from '../messages'
 export class MrzDataHandler implements MessageHandler {
   public supportedMessages = [MrzDataMessage]
 
+  private mrtdService: DidCommMrtdService
+
+  public constructor(mrtdService: DidCommMrtdService) {
+    this.mrtdService = mrtdService
+  }
+
   public async handle(inboundMessage: MessageHandlerInboundMessage<MrzDataHandler>) {
-    inboundMessage.assertReadyConnection()
+    await this.mrtdService.processMrzData(inboundMessage)
   }
 }
