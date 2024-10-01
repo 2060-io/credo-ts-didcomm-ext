@@ -1,0 +1,5 @@
+export { DidCommMrtdApi } from './DidCommMrtdApi'
+export { DidCommMrtdModule } from './DidCommMrtdModule'
+export { DidCommMrtdService } from './DidCommMrtdService'
+export * from './models'
+export * from './messages'
