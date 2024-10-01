@@ -10,7 +10,7 @@ export interface MrzDataReceivedEvent extends BaseEvent {
   type: MrtdEventTypes.MrzDataReceived
   payload: {
     connection: ConnectionRecord
-    mrzData?: MrzData
+    mrzData: MrzData
     threadId: string
   }
 }
