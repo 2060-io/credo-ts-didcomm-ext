@@ -6,7 +6,7 @@
     height="250px"
   />
 </p>
-<h1 align="center"><b>Credo extension module for DIDComm Calls</b></h1>
+<h1 align="center"><b>Credo extension module for DIDComm Machine Readable Travel Documents</b></h1>
 <p align="center">
   <a
     href="https://raw.githubusercontent.com/openwallet-foundation/credo-ts-ext/main/LICENSE"
@@ -19,13 +19,13 @@
       alt="typescript"
       src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg"
   /></a>
-    <a href="https://www.npmjs.com/package/@2060.io/credo-ts-didcomm-calls"
+    <a href="https://www.npmjs.com/package/@2060.io/credo-ts-didcomm-mrtd"
     ><img
-      alt="@2060.io/credo-ts-didcomm-calls version"
-      src="https://img.shield.io/npm/v/@2060.io/credo-ts-didcomm-calls"
+      alt="@2060.io/credo-ts-didcomm-mrtd version"
+      src="https://img.shield.io/npm/v/@2060.io/credo-ts-didcomm-mrtd"
   /></a>
 
 </p>
 <br />
 
-DIDComm Calls extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git).
+DIDComm MRTD (Machine Readable Travel Documents) extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git).
