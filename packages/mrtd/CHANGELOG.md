@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.3...@2060.io/credo-ts-didcomm-mrtd@v0.0.4) (2024-10-09)
+
+
+### Features
+
+* initial eMRTD data messages ([3bba3fa](https://github.com/2060-io/credo-ts-didcomm-ext/commit/3bba3fa71d7eed5fe37c172ae611ee607a611c08))
+
+
+### Bug Fixes
+
+* handler type ([737bb4d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/737bb4dcb80e1f50440d81068d56dfad723a8359))
+
 ## [0.0.3](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.2...@2060.io/credo-ts-didcomm-mrtd@v0.0.3) (2024-10-01)
 
 
