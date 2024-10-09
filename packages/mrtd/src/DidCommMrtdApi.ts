@@ -60,4 +60,36 @@ export class DidCommMrtdApi {
 
     return { messageId: message.id }
   }
+
+  public async sendEMrtdData(options: { connectionId: string; dataGroups: Record<string, string>; threadId?: string }) {
+    const { connectionId, dataGroups, threadId } = options
+    const connection = await this.connectionService.getById(this.agentContext, connectionId)
+    connection.assertReady()
+
+    const message = this.didcommMrtdService.createEMrtdData({ dataGroups, threadId })
+
+    const outbound = new OutboundMessageContext(message, {
+      agentContext: this.agentContext,
+      connection: connection,
+    })
+    await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
+  }
+
+  public async requestEMrtdData(options: { connectionId: string; parentThreadId?: string }) {
+    const { connectionId, parentThreadId } = options
+    const connection = await this.connectionService.getById(this.agentContext, connectionId)
+    connection.assertReady()
+
+    const message = this.didcommMrtdService.createEMrtdDataRequest({ parentThreadId })
+
+    const outbound = new OutboundMessageContext(message, {
+      agentContext: this.agentContext,
+      connection: connection,
+    })
+    await this.messageSender.sendMessage(outbound)
+
+    return { messageId: message.id }
+  }
 }

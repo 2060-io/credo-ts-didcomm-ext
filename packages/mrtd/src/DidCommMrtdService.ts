@@ -48,6 +48,16 @@ export class DidCommMrtdService {
     })
   }
 
+  public createEMrtdData(options: { dataGroups: Record<string, string>; threadId?: string }) {
+    const { dataGroups, threadId } = options
+    return new EMrtdDataMessage({ dataGroups, threadId })
+  }
+
+  public createEMrtdDataRequest(options: { parentThreadId?: string }) {
+    const { parentThreadId } = options
+    return new EMrtdDataRequestMessage({ parentThreadId })
+  }
+
   public async processMrzDataRequest(messageContext: InboundMessageContext<MrzDataRequestMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
