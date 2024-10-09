@@ -16,6 +16,6 @@ export class MrzDataHandler implements MessageHandler {
   }
 
   public async handle(inboundMessage: MessageHandlerInboundMessage<MrzDataHandler>) {
-    await this.mrtdService.processEMrtdData(inboundMessage)
+    await this.mrtdService.processMrzData(inboundMessage)
   }
 }
