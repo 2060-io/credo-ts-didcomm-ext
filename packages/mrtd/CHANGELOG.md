@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.4...@2060.io/credo-ts-didcomm-mrtd@v0.0.5) (2024-10-09)
+
+
+### Features
+
+* API methods for eMRTD data ([b744460](https://github.com/2060-io/credo-ts-didcomm-ext/commit/b744460cee611eed248dd9972e62b8c549ff1bc7))
+
 ## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.3...@2060.io/credo-ts-didcomm-mrtd@v0.0.4) (2024-10-09)
 
 
