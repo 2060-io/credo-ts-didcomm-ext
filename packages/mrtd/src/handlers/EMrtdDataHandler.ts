@@ -1,13 +1,13 @@
 import type { DidCommMrtdService } from '../DidCommMrtdService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
-import { MrzDataMessage } from '../messages'
+import { EMrtdDataMessage } from '../messages'
 
 /**
- * Handler for incoming mrz messages
+ * Handler for incoming mrtd-data messages
  */
-export class MrzDataHandler implements MessageHandler {
-  public supportedMessages = [MrzDataMessage]
+export class EMrtdDataHandler implements MessageHandler {
+  public supportedMessages = [EMrtdDataMessage]
 
   private mrtdService: DidCommMrtdService
 
@@ -15,7 +15,7 @@ export class MrzDataHandler implements MessageHandler {
     this.mrtdService = mrtdService
   }
 
-  public async handle(inboundMessage: MessageHandlerInboundMessage<MrzDataHandler>) {
+  public async handle(inboundMessage: MessageHandlerInboundMessage<EMrtdDataHandler>) {
     await this.mrtdService.processEMrtdData(inboundMessage)
   }
 }

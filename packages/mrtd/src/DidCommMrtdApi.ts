@@ -1,7 +1,7 @@
 import { OutboundMessageContext, AgentContext, ConnectionService, injectable, MessageSender } from '@credo-ts/core'
 
 import { DidCommMrtdService } from './DidCommMrtdService'
-import { MrzDataHandler, MrzDataRequestHandler } from './handlers'
+import { EMrtdDataHandler, EMrtdDataRequestHandler, MrzDataHandler, MrzDataRequestHandler } from './handlers'
 
 @injectable()
 export class DidCommMrtdApi {
@@ -24,6 +24,8 @@ export class DidCommMrtdApi {
     this.agentContext.dependencyManager.registerMessageHandlers([
       new MrzDataHandler(this.didcommMrtdService),
       new MrzDataRequestHandler(this.didcommMrtdService),
+      new EMrtdDataHandler(this.didcommMrtdService),
+      new EMrtdDataRequestHandler(this.didcommMrtdService),
     ])
   }
 

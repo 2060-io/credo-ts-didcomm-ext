@@ -17,7 +17,12 @@ export class DidCommMrtdModule implements Module {
     featureRegistry.register(
       new Protocol({
         id: 'https://didcomm.org/mrtd/1.0',
-        roles: [DidCommMrtdRole.MrzRequester, DidCommMrtdRole.MrzResponder],
+        roles: [
+          DidCommMrtdRole.MrzRequester,
+          DidCommMrtdRole.MrzResponder,
+          DidCommMrtdRole.EMrtdDataRequester,
+          DidCommMrtdRole.EMrtdDataResponder,
+        ],
       }),
     )
   }

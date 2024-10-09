@@ -2,8 +2,14 @@ import { EventEmitter, InboundMessageContext } from '@credo-ts/core'
 import * as Mrz from 'mrz'
 import { Lifecycle, scoped } from 'tsyringe'
 
-import { MrtdEventTypes, MrzDataReceivedEvent, MrzDataRequestedEvent } from './DidCommMrtdEvents'
-import { MrzDataMessage, MrzDataRequestMessage } from './messages'
+import {
+  EMrtdDataReceivedEvent,
+  EMtdDataRequestedEvent,
+  MrtdEventTypes,
+  MrzDataReceivedEvent,
+  MrzDataRequestedEvent,
+} from './DidCommMrtdEvents'
+import { EMrtdDataMessage, EMrtdDataRequestMessage, MrzDataMessage, MrzDataRequestMessage } from './messages'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -49,6 +55,46 @@ export class DidCommMrtdService {
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
     eventEmitter.emit<MrzDataRequestedEvent>(agentContext, {
       type: MrtdEventTypes.MrzDataRequested,
+      payload: {
+        connection,
+        parentThreadId: message.thread?.parentThreadId,
+        threadId: message.threadId,
+      },
+    })
+  }
+
+  public async processEMrtdData(messageContext: InboundMessageContext<EMrtdDataMessage>) {
+    const connection = messageContext.assertReadyConnection()
+    const { agentContext, message } = messageContext
+
+    /*let parsed
+    try {
+      const parseResult = Mrz.parse(message.mrzData)
+
+      parsed = { valid: parseResult.valid, fields: parseResult.fields, format: parseResult.format }
+    } catch (error) {
+      // Unsupported format. Send raw data anyway
+      parsed = { valid: false, fields: {} }
+    }*/
+
+    const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
+    eventEmitter.emit<EMrtdDataReceivedEvent>(agentContext, {
+      type: MrtdEventTypes.EMrtdDataReceived,
+      payload: {
+        connection,
+        dataGroups: message.dataGroups,
+        threadId: message.threadId,
+      },
+    })
+  }
+
+  public async processEMrtdDataRequest(messageContext: InboundMessageContext<EMrtdDataRequestMessage>) {
+    const connection = messageContext.assertReadyConnection()
+    const { agentContext, message } = messageContext
+
+    const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
+    eventEmitter.emit<EMtdDataRequestedEvent>(agentContext, {
+      type: MrtdEventTypes.EMrtdDataRequested,
       payload: {
         connection,
         parentThreadId: message.thread?.parentThreadId,
