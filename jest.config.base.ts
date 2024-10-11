@@ -14,6 +14,9 @@ const config: Config.InitialOptions = {
       },
     ],
   },
+  moduleNameMapper: {
+    '@li0ard/tsemrtd': '<rootDir>/esm/bundle.js',
+  },
 }
 
 export default config

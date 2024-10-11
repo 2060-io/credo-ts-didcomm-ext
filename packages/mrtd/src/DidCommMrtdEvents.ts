@@ -1,4 +1,4 @@
-import type { MrzData } from './models/MrzData'
+import type { MrzData, EMrtdData } from './models'
 import type { BaseEvent, ConnectionRecord } from '@credo-ts/core'
 
 export enum MrtdEventTypes {
@@ -30,7 +30,7 @@ export interface EMrtdDataReceivedEvent extends BaseEvent {
   type: MrtdEventTypes.EMrtdDataReceived
   payload: {
     connection: ConnectionRecord
-    dataGroups: Record<string, string>
+    dataGroups: EMrtdData
     threadId: string
   }
 }
