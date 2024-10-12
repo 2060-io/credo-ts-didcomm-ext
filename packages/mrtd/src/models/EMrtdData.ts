@@ -1,4 +1,4 @@
-import { tsemrtd } from '../../esm'
+import { tsemrtd } from '../esm'
 
 import { EMrtdDataGroup } from './EMrtdDataGroup'
 

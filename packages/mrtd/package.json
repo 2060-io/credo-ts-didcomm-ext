@@ -18,7 +18,7 @@
     "directory": "packages/mrtd"
   },
   "scripts": {
-    "deps": "rm -f esm/bundle.js && esbuild --platform=node esm/index.ts --bundle --outfile=esm/bundle.js",
+    "deps": "rm -f src/esm/bundle.js && esbuild --platform=node src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
     "build": "yarn run clean && yarn run compile && yarn run deps",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",

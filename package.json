@@ -18,7 +18,7 @@
     "format": "yarn prettier --write",
     "check-format": "yarn prettier --list-different",
     "test": "yarn workspaces run test",
-    "lint": "eslint --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore --ignore-pattern '**/esm/' .",
     "validate": "yarn lint && yarn check-types && yarn check-format"
   },
   "devDependencies": {
