@@ -17,6 +17,7 @@ import { EMrtdDataMessage } from '../src/messages'
 import { setupAgent } from './utils/agent'
 
 const passport = {}
+const isPassportEmpty = !passport || (passport && Object.keys(passport).length === 0)
 
 describe('Didcomm MRTD', () => {
   let agent: Agent
@@ -60,13 +61,7 @@ describe('Didcomm MRTD', () => {
     test('Should create a valid https://didcomm.org/mrtd/1.0/emrtd-data message ', async () => {
       const message = didcommMrtdService.createEMrtdData({
         threadId: '5678-5678-5678-5678',
-        dataGroups: {
-          COM: 'Something',
-          DG1: 'Something',
-          DG2: 'Something',
-          DG11: 'Something',
-          SOD: 'Something',
-        },
+        dataGroups: passport,
       })
 
       const jsonMessage = JsonTransformer.toJSON(message)
@@ -75,13 +70,15 @@ describe('Didcomm MRTD', () => {
         expect.objectContaining({
           '@id': expect.any(String),
           '@type': 'https://didcomm.org/mrtd/1.0/emrtd-data',
-          dataGroups: {
-            COM: expect.any(String),
-            DG1: expect.any(String),
-            DG2: expect.any(String),
-            DG11: expect.any(String),
-            SOD: expect.any(String),
-          },
+          dataGroups: isPassportEmpty
+            ? {}
+            : {
+                COM: expect.any(String),
+                DG1: expect.any(String),
+                DG2: expect.any(String),
+                DG11: expect.any(String),
+                SOD: expect.any(String),
+              },
           '~thread': expect.objectContaining({ thid: '5678-5678-5678-5678' }),
         }),
       )
@@ -140,24 +137,22 @@ describe('Didcomm MRTD', () => {
       await didcommMrtdService.processEMrtdData(inboundMessageContext)
 
       const payload = (await eventPayload) as Payload
-      const fieldsValidation = payload.dataGroups.parsed.fields
 
       const expectedFields = {
         COM: expect.any(String),
+        DG1: expect.any(String),
         DG2: expect.any(String),
         DG11: expect.any(String),
         SOD: expect.any(String),
       }
 
-      const isFieldsEmpty = fieldsValidation && Object.keys(fieldsValidation).length === 0
-
       expect(payload).toEqual({
         connection: mockConnectionRecord,
         dataGroups: {
-          raw: isFieldsEmpty ? {} : expectedFields,
+          raw: isPassportEmpty ? {} : expectedFields,
           parsed: {
             valid: true,
-            fields: isFieldsEmpty ? {} : expectedFields,
+            fields: isPassportEmpty ? {} : expectedFields,
           },
         },
         threadId: '5678-5678-5678-5678',
