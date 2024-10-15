@@ -16,7 +16,7 @@ import { EMrtdDataMessage } from '../src/messages'
 
 import { setupAgent } from './utils/agent'
 
-const passport = {}
+const passport = {} // For testing purposes, replace this value with a JSON file that contains the attributes: COM, DG1, DG2, DG11, and SOD.
 const isPassportEmpty = !passport || (passport && Object.keys(passport).length === 0)
 
 describe('Didcomm MRTD', () => {
