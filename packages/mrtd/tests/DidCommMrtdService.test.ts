@@ -10,11 +10,11 @@ import {
   JsonTransformer,
 } from '@credo-ts/core'
 
-import { MrtdEventTypes } from '../build'
 import { DidCommMrtdService } from '../src/DidCommMrtdService'
 import { EMrtdDataMessage } from '../src/messages'
 
 import { setupAgent } from './utils/agent'
+import { MrtdEventTypes } from '../src/DidCommMrtdEvents'
 
 const passport = {}
 
