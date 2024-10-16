@@ -1,13 +1,13 @@
 import type { DidCommMrtdService } from '../DidCommMrtdService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
-import { MrzDataRequestMessage } from '../messages'
+import { EMrtdDataRequestMessage } from '../messages'
 
 /**
  * Handler for incoming emrtd-data-request messages
  */
 export class EMrtdDataRequestHandler implements MessageHandler {
-  public supportedMessages = [MrzDataRequestMessage]
+  public supportedMessages = [EMrtdDataRequestMessage]
 
   private mrtdService: DidCommMrtdService
 
