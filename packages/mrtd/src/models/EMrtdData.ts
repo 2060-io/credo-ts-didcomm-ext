@@ -9,7 +9,7 @@ export type EMrtdData = {
 
 export type ParsedEMrtdData = Partial<Record<EMrtdDataGroup, string | null>>
 
-export function EMrtdParse(input: Record<string, string>): ParsedEMrtdData {
+export function parseEMrtdData(input: Record<string, string>): ParsedEMrtdData {
   const parsedData: ParsedEMrtdData = {}
 
   for (const [key, value] of Object.entries(input)) {

@@ -10,7 +10,7 @@ import {
   MrzDataRequestedEvent,
 } from './DidCommMrtdEvents'
 import { EMrtdDataMessage, EMrtdDataRequestMessage, MrzDataMessage, MrzDataRequestMessage } from './messages'
-import { EMrtdParse } from './models'
+import { parseEMrtdData } from './models'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -80,7 +80,7 @@ export class DidCommMrtdService {
 
     let parsed
     try {
-      const parseResult = EMrtdParse(message.dataGroups)
+      const parseResult = parseEMrtdData(message.dataGroups)
 
       parsed = { valid: true, fields: parseResult }
     } catch (error) {
