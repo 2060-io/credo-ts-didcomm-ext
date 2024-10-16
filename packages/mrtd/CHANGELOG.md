@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.5...@2060.io/credo-ts-didcomm-mrtd@v0.0.6) (2024-10-16)
+
+
+### Bug Fixes
+
+* **mrtd:** emrtd-data-request message type in handler ([#42](https://github.com/2060-io/credo-ts-didcomm-ext/issues/42)) ([0be6a0c](https://github.com/2060-io/credo-ts-didcomm-ext/commit/0be6a0ce30f9e8fa554cf7df4dfbff556fde4d1c))
+
 ## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.4...@2060.io/credo-ts-didcomm-mrtd@v0.0.5) (2024-10-09)
 
 
