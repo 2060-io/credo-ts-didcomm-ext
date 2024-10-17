@@ -1,0 +1,15 @@
+export enum EMrtdDataGroup {
+  COM = 'COM',
+  DG1 = 'DG1',
+  DG2 = 'DG2',
+  DG3 = 'DG3',
+  DG4 = 'DG4',
+  DG5 = 'DG5',
+  DG7 = 'DG7',
+  DG11 = 'DG11',
+  DG12 = 'DG12',
+  DG14 = 'DG14',
+  DG15 = 'DG15',
+  SOD = 'SOD',
+  PKD = 'PKD',
+}
