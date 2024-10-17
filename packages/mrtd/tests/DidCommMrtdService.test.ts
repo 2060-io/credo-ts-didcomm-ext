@@ -1,3 +1,4 @@
+import type { EMrtdDataReceivedEvent } from '../src/DidCommMrtdEvents'
 import type { Agent } from '@credo-ts/core'
 
 import {
@@ -17,6 +18,7 @@ import { EMrtdDataMessage } from '../src/messages'
 import { setupAgent } from './utils/agent'
 
 const passport = {} // For testing purposes, replace this value with a JSON file that contains the attributes: COM, DG1, DG2, DG11, and SOD.
+
 const isPassportEmpty = !passport || (passport && Object.keys(passport).length === 0)
 
 describe('Didcomm MRTD', () => {
@@ -87,30 +89,6 @@ describe('Didcomm MRTD', () => {
 
   describe('EMRTD Data process message', () => {
     test('Should create a valid https://didcomm.org/mrtd/1.0/emrtd-data message ', async () => {
-      interface Payload {
-        connection: typeof mockConnectionRecord
-        dataGroups: {
-          raw: {
-            COM: string
-            DG1: string
-            DG2: string
-            DG11: string
-            SOD: string
-          }
-          parsed: {
-            valid: boolean
-            fields: {
-              COM?: string
-              DG1?: string
-              DG2?: string
-              DG11?: string
-              SOD?: string
-            }
-          }
-        }
-        threadId: string
-      }
-
       const emrtdDataMessage = new EMrtdDataMessage({
         threadId: '5678-5678-5678-5678',
         dataGroups: passport,
@@ -128,31 +106,37 @@ describe('Didcomm MRTD', () => {
       })
 
       const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
-      const eventPayload = new Promise((resolve) => {
-        eventEmitter.on(MrtdEventTypes.EMrtdDataReceived, (event) => {
-          resolve(event.payload)
+      const event = new Promise((resolve) => {
+        eventEmitter.on(MrtdEventTypes.EMrtdDataReceived, (event: EMrtdDataReceivedEvent) => {
+          resolve(event)
         })
       })
 
       await didcommMrtdService.processEMrtdData(inboundMessageContext)
 
-      const payload = (await eventPayload) as Payload
+      const payload = ((await event) as EMrtdDataReceivedEvent).payload
 
-      const expectedFields = {
+      const expectedRaw = expect.objectContaining({
         COM: expect.any(String),
         DG1: expect.any(String),
         DG2: expect.any(String),
-        DG11: expect.any(String),
         SOD: expect.any(String),
-      }
+      })
+
+      const expectedFields = expect.objectContaining({
+        com: expect.any(Object),
+        mrzData: expect.any(String),
+        images: expect.any(Array),
+        securityObjectOfDocument: expect.any(Object),
+      })
 
       expect(payload).toEqual({
         connection: mockConnectionRecord,
         dataGroups: {
-          raw: isPassportEmpty ? {} : expectedFields,
+          raw: isPassportEmpty ? {} : expectedRaw,
           parsed: {
-            valid: true,
-            fields: isPassportEmpty ? {} : expectedFields,
+            valid: isPassportEmpty ? false : true,
+            fields: isPassportEmpty ? undefined : expectedFields,
           },
         },
         threadId: '5678-5678-5678-5678',

@@ -85,7 +85,7 @@ export class DidCommMrtdService {
       parsed = { valid: true, fields: parseResult }
     } catch (error) {
       // Unsupported format. Send raw data anyway
-      parsed = { valid: false, fields: {} }
+      parsed = { valid: false }
     }
 
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
@@ -93,7 +93,7 @@ export class DidCommMrtdService {
       type: MrtdEventTypes.EMrtdDataReceived,
       payload: {
         connection,
-        dataGroups: { raw: message.dataGroups, parsed: parsed },
+        dataGroups: { raw: message.dataGroups, parsed },
         threadId: message.threadId,
       },
     })
