@@ -10,6 +10,7 @@ import {
   MrzDataRequestedEvent,
 } from './DidCommMrtdEvents'
 import { EMrtdDataMessage, EMrtdDataRequestMessage, MrzDataMessage, MrzDataRequestMessage } from './messages'
+import { parseEMrtdData } from './models'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -77,22 +78,22 @@ export class DidCommMrtdService {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 
-    /*let parsed
+    let parsed
     try {
-      const parseResult = Mrz.parse(message.mrzData)
+      const parseResult = parseEMrtdData(message.dataGroups)
 
-      parsed = { valid: parseResult.valid, fields: parseResult.fields, format: parseResult.format }
+      parsed = { valid: true, fields: parseResult }
     } catch (error) {
       // Unsupported format. Send raw data anyway
-      parsed = { valid: false, fields: {} }
-    }*/
+      parsed = { valid: false }
+    }
 
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
     eventEmitter.emit<EMrtdDataReceivedEvent>(agentContext, {
       type: MrtdEventTypes.EMrtdDataReceived,
       payload: {
         connection,
-        dataGroups: message.dataGroups,
+        dataGroups: { raw: message.dataGroups, parsed },
         threadId: message.threadId,
       },
     })
