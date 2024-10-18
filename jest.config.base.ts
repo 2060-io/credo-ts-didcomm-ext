@@ -13,7 +13,7 @@ const config: Config.InitialOptions = {
         isolatedModules: true,
       },
     ],
-  }
+  },
 }
 
 export default config
