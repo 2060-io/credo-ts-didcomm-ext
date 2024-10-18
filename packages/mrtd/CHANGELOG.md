@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.6...@2060.io/credo-ts-didcomm-mrtd@v0.0.7) (2024-10-18)
+
+
+### Features
+
+* **mrtd:** data parsing using @li0ard/tsemrtd ([#41](https://github.com/2060-io/credo-ts-didcomm-ext/issues/41)) ([ab0fb73](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ab0fb73056a3d957d852370ad3501adbbf9b8798))
+
 ## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.5...@2060.io/credo-ts-didcomm-mrtd@v0.0.6) (2024-10-16)
 
 
