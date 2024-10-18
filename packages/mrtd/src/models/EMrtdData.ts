@@ -10,8 +10,9 @@ import type {
   DecodedSecurtyObjectOfDocument,
 } from '@li0ard/tsemrtd/dist/consts/interfaces'
 import type { SubjectPublicKeyInfo } from '@peculiar/asn1-x509'
+import type tsemrtd from '@li0ard/tsemrtd'
 
-import { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } from '../esm'
+const { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } = require('../esm/bundle.js') as typeof tsemrtd
 
 import { EMrtdDataGroup } from './EMrtdDataGroup'
 

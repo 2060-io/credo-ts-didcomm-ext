@@ -19,7 +19,9 @@
   },
   "scripts": {
     "deps": "rm -f src/esm/bundle.js && esbuild --platform=node src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
-    "build": "yarn run clean && yarn run compile && yarn run deps",
+    "prebuild": "yarn run deps",
+    "copy-esm": "cp src/esm/bundle.js build/esm/",
+    "build": "yarn run clean && yarn run compile && yarn run copy-esm",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn run build",
