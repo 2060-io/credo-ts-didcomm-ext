@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.7...@2060.io/credo-ts-didcomm-mrtd@v0.0.8) (2024-10-18)
+
+
+### Bug Fixes
+
+* esm in version 0.0.7 ([#45](https://github.com/2060-io/credo-ts-didcomm-ext/issues/45)) ([ce4f5c4](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ce4f5c442530b10755a3aef6f58a48b2fbe09339))
+
 ## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.6...@2060.io/credo-ts-didcomm-mrtd@v0.0.7) (2024-10-18)
 
 
