@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.4...@2060.io/credo-ts-didcomm-calls@v0.0.5) (2024-11-27)
+
+
+### Features
+
+* **calls:** add offer description and rename callStartType ([#50](https://github.com/2060-io/credo-ts-didcomm-ext/issues/50)) ([7b25a58](https://github.com/2060-io/credo-ts-didcomm-ext/commit/7b25a58015bc648800423583249792374b2fe8d5))
+
 ## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.3...@2060.io/credo-ts-didcomm-calls@v0.0.4) (2024-09-24)
 
 
