@@ -78,5 +78,4 @@ describe('Didcomm Calls', () => {
       )
     })
   })
-
 })
