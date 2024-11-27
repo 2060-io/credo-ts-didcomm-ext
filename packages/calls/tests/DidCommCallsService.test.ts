@@ -22,6 +22,25 @@ describe('Didcomm Calls', () => {
     await agent.wallet.delete()
   })
 
+  describe('Offer message', () => {
+    test('Should create a valid https://didcomm.org/calls/1.0/call-offer message ', async () => {
+      const message = didcommCallsService.createOffer({
+        callType: 'video',
+        parameters: { param: 'value' },
+      })
+
+      const jsonMessage = JsonTransformer.toJSON(message)
+
+      expect(jsonMessage).toEqual(
+        expect.objectContaining({
+          '@id': expect.any(String),
+          '@type': 'https://didcomm.org/calls/1.0/call-offer',
+          callType: 'video',
+          parameters: { param: 'value' },
+        }),
+      )
+    })
+  })
   describe('Accept message', () => {
     test('Should create a valid https://didcomm.org/calls/1.0/call-accept message ', async () => {
       const message = didcommCallsService.createAccept({
@@ -36,6 +55,24 @@ describe('Didcomm Calls', () => {
           '@id': expect.any(String),
           '@type': 'https://didcomm.org/calls/1.0/call-accept',
           parameters: { param: 'value' },
+          '~thread': expect.objectContaining({ thid: '5678-5678-5678-5678' }),
+        }),
+      )
+    })
+  })
+
+  describe('Reject message', () => {
+    test('Should create a valid https://didcomm.org/calls/1.0/call-reject message ', async () => {
+      const message = didcommCallsService.createReject({
+        threadId: '5678-5678-5678-5678',
+      })
+
+      const jsonMessage = JsonTransformer.toJSON(message)
+
+      expect(jsonMessage).toEqual(
+        expect.objectContaining({
+          '@id': expect.any(String),
+          '@type': 'https://didcomm.org/calls/1.0/call-reject',
           '~thread': expect.objectContaining({ thid: '5678-5678-5678-5678' }),
         }),
       )
