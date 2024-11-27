@@ -4,12 +4,19 @@ import { Lifecycle, scoped } from 'tsyringe'
 
 import {
   EMrtdDataReceivedEvent,
-  EMtdDataRequestedEvent,
+  EMrtdDataRequestedEvent,
   MrtdEventTypes,
+  MrtdProblemReportEvent,
   MrzDataReceivedEvent,
   MrzDataRequestedEvent,
 } from './DidCommMrtdEvents'
-import { EMrtdDataMessage, EMrtdDataRequestMessage, MrzDataMessage, MrzDataRequestMessage } from './messages'
+import {
+  EMrtdDataMessage,
+  EMrtdDataRequestMessage,
+  MrtdProblemReportMessage,
+  MrzDataMessage,
+  MrzDataRequestMessage,
+} from './messages'
 import { parseEMrtdData } from './models'
 
 @scoped(Lifecycle.ContainerScoped)
@@ -104,10 +111,37 @@ export class DidCommMrtdService {
     const { agentContext, message } = messageContext
 
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
-    eventEmitter.emit<EMtdDataRequestedEvent>(agentContext, {
+    eventEmitter.emit<EMrtdDataRequestedEvent>(agentContext, {
       type: MrtdEventTypes.EMrtdDataRequested,
       payload: {
         connection,
+        parentThreadId: message.thread?.parentThreadId,
+        threadId: message.threadId,
+      },
+    })
+  }
+
+  public async createProblemReport(options: { parentThreadId: string; reason: string }) {
+    const message = new MrtdProblemReportMessage({
+      description: {
+        en: '',
+        code: options.reason,
+      },
+    })
+    message.setThread({ parentThreadId: options.parentThreadId })
+    return message
+  }
+
+  public async processProblemReport(messageContext: InboundMessageContext<MrtdProblemReportMessage>) {
+    const connection = messageContext.assertReadyConnection()
+    const { agentContext, message } = messageContext
+
+    const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
+    eventEmitter.emit<MrtdProblemReportEvent>(agentContext, {
+      type: MrtdEventTypes.MrtdProblemReport,
+      payload: {
+        connection,
+        description: message.description,
         parentThreadId: message.thread?.parentThreadId,
         threadId: message.threadId,
       },
