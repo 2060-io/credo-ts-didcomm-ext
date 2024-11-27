@@ -7,7 +7,8 @@ interface CallOfferMessageOptions {
   id?: string
   callType: DidCommCallType
   offerExpirationTime?: Date
-  callStartTime?: Date
+  offerStartTime?: Date
+  description?: string
   parameters: Record<string, unknown>
 }
 
@@ -18,8 +19,9 @@ export class CallOfferMessage extends AgentMessage {
     if (options) {
       this.id = options.id ?? this.generateId()
       this.callType = options.callType
+      this.description = options.description
       this.offerExpirationTime = options.offerExpirationTime
-      this.callStartTime = options.callStartTime
+      this.offerStartTime = options.offerStartTime
       this.parameters = options.parameters
     }
   }
@@ -29,7 +31,9 @@ export class CallOfferMessage extends AgentMessage {
 
   public offerExpirationTime?: Date | null
 
-  public callStartTime?: Date | null
+  public offerStartTime?: Date | null
+
+  public description?: string
 
   public parameters!: Record<string, unknown>
 
