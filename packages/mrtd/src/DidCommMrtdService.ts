@@ -37,7 +37,7 @@ export class DidCommMrtdService {
 
     let parsed
     try {
-      const parseResult = Mrz.parse(message.mrzData)
+      const parseResult = Mrz.parse(message.mrzData, { autocorrect: true })
 
       parsed = { valid: parseResult.valid, fields: parseResult.fields, format: parseResult.format }
     } catch (error) {
