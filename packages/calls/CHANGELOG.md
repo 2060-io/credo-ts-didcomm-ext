@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.7...@2060.io/credo-ts-didcomm-calls@v0.0.8) (2024-12-02)
+
+
+### Bug Fixes
+
+* **calls:** snake_case parameters and time serialization ([#57](https://github.com/2060-io/credo-ts-didcomm-ext/issues/57)) ([ff96e56](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ff96e562849ad4462bd275eb9df8878a65085da8))
+
 ## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.6...@2060.io/credo-ts-didcomm-calls@v0.0.7) (2024-12-02)
 
 
