@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.6...@2060.io/credo-ts-didcomm-calls@v0.0.7) (2024-12-02)
+
+
+### Features
+
+* **calls:** add new params to callOffer ([#55](https://github.com/2060-io/credo-ts-didcomm-ext/issues/55)) ([c5aca5d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/c5aca5d575b93ba8cbef31f1f435ea195bda7a2f))
+
 ## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.5...@2060.io/credo-ts-didcomm-calls@v0.0.6) (2024-11-27)
 
 
