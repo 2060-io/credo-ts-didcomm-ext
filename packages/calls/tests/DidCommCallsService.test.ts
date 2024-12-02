@@ -27,6 +27,8 @@ describe('Didcomm Calls', () => {
       const message = didcommCallsService.createOffer({
         callType: 'video',
         description: 'new Call Offer',
+        offerStartTime: new Date('2024-12-02T01:26:02Z'),
+        offerExpirationTime: new Date('2024-12-02T01:26:03.070Z'),
         parameters: { param: 'value' },
       })
 
@@ -36,7 +38,10 @@ describe('Didcomm Calls', () => {
         expect.objectContaining({
           '@id': expect.any(String),
           '@type': 'https://didcomm.org/calls/1.0/call-offer',
-          callType: 'video',
+          description: 'new Call Offer',
+          call_type: 'video',
+          offer_start_time: '2024-12-02T01:26:02.000Z',
+          offer_expiration_time: '2024-12-02T01:26:03.070Z',
           parameters: { param: 'value' },
         }),
       )
