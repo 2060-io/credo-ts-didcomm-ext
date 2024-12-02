@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.8...@2060.io/credo-ts-didcomm-calls@v0.0.9) (2024-12-02)
+
+
+### Bug Fixes
+
+* add optional decorator to call offer date parameters ([#59](https://github.com/2060-io/credo-ts-didcomm-ext/issues/59)) ([0071ce9](https://github.com/2060-io/credo-ts-didcomm-ext/commit/0071ce9e6d97f3e71373f8668a026b1c24ab0d43))
+
 ## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.7...@2060.io/credo-ts-didcomm-calls@v0.0.8) (2024-12-02)
 
 
