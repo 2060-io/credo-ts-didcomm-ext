@@ -26,6 +26,7 @@ describe('Didcomm Calls', () => {
     test('Should create a valid https://didcomm.org/calls/1.0/call-offer message ', async () => {
       const message = didcommCallsService.createOffer({
         callType: 'video',
+        description: 'new Call Offer',
         parameters: { param: 'value' },
       })
 

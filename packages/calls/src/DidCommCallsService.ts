@@ -7,9 +7,14 @@ import { CallRejectMessage } from './messages/CallRejectMessage'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommCallsService {
-  public createOffer(options: { callType: DidCommCallType; parameters: Record<string, unknown> }) {
-    const { callType, parameters } = options
-    return new CallOfferMessage({ callType, parameters })
+  public createOffer(options: {
+    callType: DidCommCallType
+    offerExpirationTime?: Date
+    description: string
+    parameters: Record<string, unknown>
+  }) {
+    const { callType, offerExpirationTime, description, parameters } = options
+    return new CallOfferMessage({ callType, offerExpirationTime, description, parameters })
   }
 
   public createAccept(options: { threadId?: string; parameters: Record<string, unknown> }) {
