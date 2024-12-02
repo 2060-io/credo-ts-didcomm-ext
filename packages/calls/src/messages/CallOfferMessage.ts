@@ -1,7 +1,7 @@
 import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
 import { DateTransformer } from '@credo-ts/core/build/utils/transformers'
 import { Expose } from 'class-transformer'
-import { IsDate, IsString } from 'class-validator'
+import { IsDate, IsOptional, IsString } from 'class-validator'
 
 export type DidCommCallType = 'audio' | 'video' | 'service'
 
@@ -33,11 +33,13 @@ export class CallOfferMessage extends AgentMessage {
   public callType!: string
 
   @IsDate()
+  @IsOptional()
   @Expose({ name: 'offer_expiration_time' })
   @DateTransformer()
   public offerExpirationTime?: Date | null
 
   @IsDate()
+  @IsOptional()
   @DateTransformer()
   @Expose({ name: 'offer_start_time' })
   public offerStartTime?: Date | null
