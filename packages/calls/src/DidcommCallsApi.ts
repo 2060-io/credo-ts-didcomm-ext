@@ -26,14 +26,21 @@ export class DidCommCallsApi {
     connectionId: string
     callType: DidCommCallType
     offerExpirationTime?: Date
+    offerStartTime?: Date
     description: string
     parameters: Record<string, unknown>
   }) {
-    const { connectionId, callType, offerExpirationTime, description, parameters } = options
+    const { connectionId, callType, offerExpirationTime, offerStartTime, description, parameters } = options
     const connection = await this.connectionService.getById(this.agentContext, connectionId)
     connection.assertReady()
 
-    const message = this.didcommCallsService.createOffer({ callType, offerExpirationTime, description, parameters })
+    const message = this.didcommCallsService.createOffer({
+      callType,
+      offerExpirationTime,
+      offerStartTime,
+      description,
+      parameters,
+    })
 
     const outbound = new OutboundMessageContext(message, {
       agentContext: this.agentContext,

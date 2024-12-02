@@ -10,11 +10,12 @@ export class DidCommCallsService {
   public createOffer(options: {
     callType: DidCommCallType
     offerExpirationTime?: Date
+    offerStartTime?: Date
     description: string
     parameters: Record<string, unknown>
   }) {
-    const { callType, offerExpirationTime, description, parameters } = options
-    return new CallOfferMessage({ callType, offerExpirationTime, description, parameters })
+    const { callType, offerExpirationTime, offerStartTime, description, parameters } = options
+    return new CallOfferMessage({ callType, offerExpirationTime, offerStartTime, description, parameters })
   }
 
   public createAccept(options: { threadId?: string; parameters: Record<string, unknown> }) {
