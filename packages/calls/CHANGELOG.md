@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.7...@2060.io/credo-ts-didcomm-calls@v0.0.8) (2024-12-02)
+
+
+### Bug Fixes
+
+* **calls:** snake_case parameters and time serialization ([#57](https://github.com/2060-io/credo-ts-didcomm-ext/issues/57)) ([ff96e56](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ff96e562849ad4462bd275eb9df8878a65085da8))
+
+## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.6...@2060.io/credo-ts-didcomm-calls@v0.0.7) (2024-12-02)
+
+
+### Features
+
+* **calls:** add new params to callOffer ([#55](https://github.com/2060-io/credo-ts-didcomm-ext/issues/55)) ([c5aca5d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/c5aca5d575b93ba8cbef31f1f435ea195bda7a2f))
+
+## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.5...@2060.io/credo-ts-didcomm-calls@v0.0.6) (2024-11-27)
+
+
+### Bug Fixes
+
+* **calls:** add test ([#53](https://github.com/2060-io/credo-ts-didcomm-ext/issues/53)) ([fc2c592](https://github.com/2060-io/credo-ts-didcomm-ext/commit/fc2c592a1a62c463b615a048f162ab70037359cf))
+
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.4...@2060.io/credo-ts-didcomm-calls@v0.0.5) (2024-11-27)
+
+
+### Features
+
+* **calls:** add offer description and rename callStartType ([#50](https://github.com/2060-io/credo-ts-didcomm-ext/issues/50)) ([7b25a58](https://github.com/2060-io/credo-ts-didcomm-ext/commit/7b25a58015bc648800423583249792374b2fe8d5))
+
 ## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.3...@2060.io/credo-ts-didcomm-calls@v0.0.4) (2024-09-24)
 
 
