@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.9](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.8...@2060.io/credo-ts-didcomm-mrtd@v0.0.9) (2024-12-02)
+
+
+### Features
+
+* **mrtd:** auto-correct MRZ ([#47](https://github.com/2060-io/credo-ts-didcomm-ext/issues/47)) ([42058a4](https://github.com/2060-io/credo-ts-didcomm-ext/commit/42058a4b65d14414243cbd7edb0aac17ee5179a0))
+* **mrtd:** capabilities and problem report ([#52](https://github.com/2060-io/credo-ts-didcomm-ext/issues/52)) ([2f27256](https://github.com/2060-io/credo-ts-didcomm-ext/commit/2f2725630b8ecbdf85e49de210216ae7d2208c89))
+
 ## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.7...@2060.io/credo-ts-didcomm-mrtd@v0.0.8) (2024-10-18)
 
 
