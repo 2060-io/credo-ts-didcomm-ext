@@ -1,4 +1,6 @@
 export enum MrtdProblemReportReason {
-  Refused = 'e.p.refused',
-  Timeout = 'e.p.timeout',
+  MrzRefused = 'e.p.mrz-refused',
+  EmrtdRefused = 'e.p.emrtd-refused',
+  MrzTimeout = 'e.p.mrz-timeout',
+  EmrtdTimeout = 'e.p.emrtd-timeout',
 }
