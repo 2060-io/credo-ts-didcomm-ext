@@ -11,7 +11,7 @@ export class DidCommCallsService {
     callType: DidCommCallType
     offerExpirationTime?: Date
     offerStartTime?: Date
-    description: string
+    description?: string
     parameters: Record<string, unknown>
   }) {
     const { callType, offerExpirationTime, offerStartTime, description, parameters } = options

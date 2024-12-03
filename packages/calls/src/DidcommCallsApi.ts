@@ -27,7 +27,7 @@ export class DidCommCallsApi {
     callType: DidCommCallType
     offerExpirationTime?: Date
     offerStartTime?: Date
-    description: string
+    description?: string
     parameters: Record<string, unknown>
   }) {
     const { connectionId, callType, offerExpirationTime, offerStartTime, description, parameters } = options
