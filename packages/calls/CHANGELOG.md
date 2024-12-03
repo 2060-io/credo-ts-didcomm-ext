@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.10](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.9...@2060.io/credo-ts-didcomm-calls@v0.0.10) (2024-12-03)
+
+
+### Bug Fixes
+
+* **calls:** description optional and null types ([#62](https://github.com/2060-io/credo-ts-didcomm-ext/issues/62)) ([b0a53db](https://github.com/2060-io/credo-ts-didcomm-ext/commit/b0a53db9706f583238d886d5bbcaa27cd69f7ae7))
+
 ## [0.0.9](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.8...@2060.io/credo-ts-didcomm-calls@v0.0.9) (2024-12-02)
 
 
