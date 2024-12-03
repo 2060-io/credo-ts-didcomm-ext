@@ -36,13 +36,13 @@ export class CallOfferMessage extends AgentMessage {
   @IsOptional()
   @Expose({ name: 'offer_expiration_time' })
   @DateTransformer()
-  public offerExpirationTime?: Date | null
+  public offerExpirationTime?: Date
 
   @IsDate()
   @IsOptional()
   @DateTransformer()
   @Expose({ name: 'offer_start_time' })
-  public offerStartTime?: Date | null
+  public offerStartTime?: Date
 
   public description?: string
 
