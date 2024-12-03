@@ -44,6 +44,7 @@ export class CallOfferMessage extends AgentMessage {
   @Expose({ name: 'offer_start_time' })
   public offerStartTime?: Date
 
+  @IsOptional()
   public description?: string
 
   public parameters!: Record<string, unknown>
