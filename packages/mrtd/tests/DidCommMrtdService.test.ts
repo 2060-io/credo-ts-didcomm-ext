@@ -1,4 +1,5 @@
-import type { EMrtdDataReceivedEvent } from '../src/DidCommMrtdEvents'
+import type { EMrtdDataReceivedEvent, MrtdProblemReportEvent } from '../src/DidCommMrtdEvents'
+import type { MrtdProblemReportMessage } from '../src/messages'
 import type { Agent } from '@credo-ts/core'
 
 import {
@@ -14,6 +15,7 @@ import {
 import { MrtdEventTypes } from '../src/DidCommMrtdEvents'
 import { DidCommMrtdService } from '../src/DidCommMrtdService'
 import { EMrtdDataMessage } from '../src/messages'
+import { MrtdProblemReportReason } from '../src/models'
 
 import { setupAgent } from './utils/agent'
 
@@ -140,6 +142,47 @@ describe('Didcomm MRTD', () => {
           },
         },
         threadId: '5678-5678-5678-5678',
+      })
+    })
+  })
+
+  describe('EMRTD Data process message', () => {
+    test('Should create a valid https://didcomm.org/mrtd/1.0/problem-report message ', async () => {
+      const mrtdProblemReportMessage = didcommMrtdService.createProblemReport({
+        parentThreadId: '5678-5678-5678-5678',
+        reason: MrtdProblemReportReason.EmrtdRefused,
+      })
+
+      const mockConnectionRecord = new ConnectionRecord({
+        id: 'mockConnectionId',
+        state: DidExchangeState.Completed,
+        role: DidExchangeRole.Responder,
+      })
+
+      const inboundMessageContext = new InboundMessageContext<MrtdProblemReportMessage>(
+        await mrtdProblemReportMessage,
+        {
+          agentContext: agentContext,
+          connection: mockConnectionRecord,
+        },
+      )
+
+      const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
+      const event = new Promise((resolve) => {
+        eventEmitter.on(MrtdEventTypes.MrtdProblemReport, (event: MrtdProblemReportEvent) => {
+          resolve(event)
+        })
+      })
+
+      await didcommMrtdService.processProblemReport(inboundMessageContext)
+
+      const payload = ((await event) as MrtdProblemReportEvent).payload
+
+      expect(payload).toEqual({
+        connection: mockConnectionRecord,
+        description: { en: '', code: 'e.p.emrtd-refused' },
+        parentThreadId: '5678-5678-5678-5678',
+        threadId: expect.any(String),
       })
     })
   })
