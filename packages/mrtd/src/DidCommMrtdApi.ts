@@ -9,7 +9,13 @@ import {
 } from '@credo-ts/core'
 
 import { DidCommMrtdService } from './DidCommMrtdService'
-import { EMrtdDataHandler, EMrtdDataRequestHandler, MrzDataHandler, MrzDataRequestHandler } from './handlers'
+import {
+  EMrtdDataHandler,
+  EMrtdDataRequestHandler,
+  MrtdProblemReportHandler,
+  MrzDataHandler,
+  MrzDataRequestHandler,
+} from './handlers'
 import { Capability } from './models/Capability'
 import { MrtdProblemReportReason } from './models/ProblemReportReason'
 
@@ -36,6 +42,7 @@ export class DidCommMrtdApi {
       new MrzDataRequestHandler(this.didcommMrtdService),
       new EMrtdDataHandler(this.didcommMrtdService),
       new EMrtdDataRequestHandler(this.didcommMrtdService),
+      new MrtdProblemReportHandler(this.didcommMrtdService),
     ])
   }
 
