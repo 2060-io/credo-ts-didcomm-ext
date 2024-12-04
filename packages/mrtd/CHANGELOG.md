@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.10](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.9...@2060.io/credo-ts-didcomm-mrtd@v0.0.10) (2024-12-04)
+
+
+### Bug Fixes
+
+* **mrtd:** missing problem report handler registration ([#64](https://github.com/2060-io/credo-ts-didcomm-ext/issues/64)) ([e6240ac](https://github.com/2060-io/credo-ts-didcomm-ext/commit/e6240aceb6d21a724158876028075870d9a906fe))
+
 ## [0.0.9](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.8...@2060.io/credo-ts-didcomm-mrtd@v0.0.9) (2024-12-02)
 
 
