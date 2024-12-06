@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.11](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.10...@2060.io/credo-ts-didcomm-mrtd@v0.0.11) (2024-12-06)
+
+
+### Bug Fixes
+
+* **mrtd:** return disclosures for sync requests ([#66](https://github.com/2060-io/credo-ts-didcomm-ext/issues/66)) ([9095cd7](https://github.com/2060-io/credo-ts-didcomm-ext/commit/9095cd7ca5dee4a2252a50271c1fd1ea7753773b))
+
 ## [0.0.10](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.9...@2060.io/credo-ts-didcomm-mrtd@v0.0.10) (2024-12-04)
 
 
