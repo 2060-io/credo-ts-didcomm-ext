@@ -6,6 +6,7 @@ import {
   MessageSender,
   FeatureRegistry,
   DiscoverFeaturesApi,
+  Feature,
 } from '@credo-ts/core'
 
 import { DidCommMrtdService } from './DidCommMrtdService'
@@ -17,6 +18,7 @@ import {
   MrzDataRequestHandler,
 } from './handlers'
 import { Capability } from './models/Capability'
+import { MrtdCapabilities } from './models/MrtdCapabilities'
 import { MrtdProblemReportReason } from './models/ProblemReportReason'
 
 @injectable()
@@ -139,9 +141,20 @@ export class DidCommMrtdApi {
    * a DIDComm connection queries using Discover Fatures protocol
    * @param options: eMrtdReadSupported: boolean indicating if the device supports eMRTD reading
    */
-  public async setEMrtdCapabilities(options: { eMrtdReadSupported: boolean }) {
+  public async setMrtdCapabilities(options: { eMrtdReadSupported: boolean }) {
     const featureRegistry = this.agentContext.dependencyManager.resolve(FeatureRegistry)
-    featureRegistry.register(new Capability({ id: 'mrtd.emrtd-read-support', value: options.eMrtdReadSupported }))
+
+    // TODO: This is a hack to allow features to be overwritten. This should be fixed in Credo
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const features = (featureRegistry as any).features as Feature[]
+
+    const existingItemIndex = features.findIndex((item) => item.id === MrtdCapabilities.EMrtdReadSupport)
+    if (existingItemIndex !== -1) {
+      features.splice(existingItemIndex, 1)
+    }
+    featureRegistry.register(
+      new Capability({ id: MrtdCapabilities.EMrtdReadSupport, value: options.eMrtdReadSupported }),
+    )
   }
 
   /**
@@ -151,7 +164,7 @@ export class DidCommMrtdApi {
    * Discover Features Disclosure events
    * @param connectionId
    */
-  public async requestEMrtdCapabilities(options: {
+  public async requestMrtdCapabilities(options: {
     connectionId: string
     awaitDisclosure?: boolean
     awaitDisclosureTimeoutMs?: number
@@ -159,12 +172,18 @@ export class DidCommMrtdApi {
     const { connectionId, awaitDisclosure, awaitDisclosureTimeoutMs } = options
     const discoverFeatures = this.agentContext.dependencyManager.resolve(DiscoverFeaturesApi)
 
-    discoverFeatures.queryFeatures({
+    const disclosures = await discoverFeatures.queryFeatures({
       connectionId,
       protocolVersion: 'v2',
       queries: [{ featureType: 'capability', match: 'mrtd.*' }],
       awaitDisclosures: awaitDisclosure,
       awaitDisclosuresTimeoutMs: awaitDisclosureTimeoutMs,
     })
+
+    return {
+      eMrtdReadSupported: disclosures.features?.some(
+        (feature) => feature.id === MrtdCapabilities.EMrtdReadSupport && (feature as Capability).value === true,
+      ),
+    }
   }
 }
