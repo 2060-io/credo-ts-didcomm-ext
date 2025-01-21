@@ -1,5 +1,7 @@
+export * from './Capability'
 export * from './DidCommMrtdRole'
 export * from './EMrtdData'
 export * from './EMrtdDataGroup'
+export * from './MrtdCapabilities'
 export * from './MrzData'
 export * from './ProblemReportReason'
