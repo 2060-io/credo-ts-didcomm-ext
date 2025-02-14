@@ -1,15 +1,22 @@
 {
   "name": "@2060.io/credo-ts-receipts",
+  "main": "build/index",
+  "types": "build/index",
   "version": "0.0.1",
-  "description": "Message Receipts protocol implementation for @credo-ts/core",
-  "author": "2060.io",
-  "homepage": "https://github.com/2060-io/credo-ts-receipts",
-  "license": "ISC",
-  "main": "build/index.js",
-  "types": "build/index.js",
   "files": [
     "build"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "description": "Message Receipts protocol implementation for @credo-ts/core",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/receipts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/receipts"
+  },
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rimraf -rf ./build",
@@ -18,37 +25,17 @@
     "check-types": "tsc --noEmit -p tsconfig.build.json",
     "check-format": "yarn prettier --check",
     "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
-    "release": "release-it",
     "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/2060-io/credo-ts-receipts"
   },
   "bugs": {
     "url": "https://github.com/2060-io/credo-ts-receipts/issues"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@credo-ts/askar": "0.5.13",
     "@credo-ts/node": "0.5.13",
     "@hyperledger/aries-askar-nodejs": "0.2.3",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^20.11.16",
     "@types/node-fetch": "^2.6.4",
-    "@types/uuid": "^9.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.48.1",
-    "@typescript-eslint/parser": "^5.48.1",
-    "jest": "^29.5.0",
-    "prettier": "^2.2.1",
-    "release-it": "^14.13.1",
-    "ts-jest": "^29.0.5",
-    "ts-node": "^10.8.1",
-    "tsconfig-paths": "^4.1.2",
-    "typescript": "~4.9.4"
+    "@types/uuid": "^9.0.0"
   },
   "dependencies": {
     "@credo-ts/core": "0.5.13",
@@ -58,25 +45,5 @@
     "rxjs": "^7.2.0",
     "tsyringe": "^4.8.0",
     "uuid": "^9.0.0"
-  },
-  "release-it": {
-    "github": {
-      "release": true
-    },
-    "npm": {
-      "skipChecks": true,
-      "ignoreVersion": true,
-      "tag": "latest"
-    },
-    "git": {
-      "push": false,
-      "commit": false,
-      "requireCommits": true,
-      "tagAnnotation": "${version}",
-      "requireBranch": "main"
-    }
-  },
-  "resolutions": {
-    "@hyperledger/aries-askar-nodejs": "0.2.3"
   }
 }
