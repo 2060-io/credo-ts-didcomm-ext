@@ -51,7 +51,7 @@ export const removeRecord = <R extends BaseRecordAny>(record: R, state: RecordsS
 const filterByType = <R extends BaseRecordAny>(recordClass: RecordClass<R>) => {
   return pipe(
     map((event: BaseEvent) => (event.payload as Record<string, R>).record),
-    filter((record: R) => record.type === recordClass.type)
+    filter((record: R) => record.type === recordClass.type),
   )
 }
 
@@ -64,7 +64,7 @@ export const recordsAddedByType = <R extends BaseRecordAny>(agent: Agent | undef
 
 export const recordsUpdatedByType = <R extends BaseRecordAny>(
   agent: Agent | undefined,
-  recordClass: RecordClass<R>
+  recordClass: RecordClass<R>,
 ) => {
   if (!agent) {
     throw new Error('Agent is required to subscribe to events')
@@ -76,7 +76,7 @@ export const recordsUpdatedByType = <R extends BaseRecordAny>(
 
 export const recordsRemovedByType = <R extends BaseRecordAny>(
   agent: Agent | undefined,
-  recordClass: RecordClass<R>
+  recordClass: RecordClass<R>,
 ) => {
   if (!agent) {
     throw new Error('Agent is required to subscribe to events')
