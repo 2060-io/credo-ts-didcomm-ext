@@ -26,13 +26,13 @@
   },
   "devDependencies": {
     "@hyperledger/aries-askar-nodejs": "^0.2.3",
-    "@credo-ts/askar": "^0.5.10",
-    "@credo-ts/core": "^0.5.10",
-    "@credo-ts/node": "^0.5.10",
+    "@credo-ts/askar": "^0.5.13",
+    "@credo-ts/core": "^0.5.13",
+    "@credo-ts/node": "^0.5.13",
     "ts-node-dev": "^1.1.8"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.5.10"
+    "@credo-ts/core": "^0.5.13"
   },
   "dependencies": {
     "class-transformer": "0.5.1",
