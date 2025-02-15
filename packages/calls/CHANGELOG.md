@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.11](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.10...@2060.io/credo-ts-didcomm-calls@v0.0.11) (2025-02-15)
+
+
+### Features
+
+* add didcomm receipts package ([#72](https://github.com/2060-io/credo-ts-didcomm-ext/issues/72)) ([61633e0](https://github.com/2060-io/credo-ts-didcomm-ext/commit/61633e05563953e97f0fda32fbaeed7549360858))
+
 ## [0.0.10](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-calls@v0.0.9...@2060.io/credo-ts-didcomm-calls@v0.0.10) (2024-12-03)
 
 
