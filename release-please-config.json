@@ -9,6 +9,9 @@
     "packages/calls": {
       "release-type": "node"
     },
+    "packages/media-sharing": {
+      "release-type": "node"
+    },
     "packages/mrtd": {
       "release-type": "node"
     },

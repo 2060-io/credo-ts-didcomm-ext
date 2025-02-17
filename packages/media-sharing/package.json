@@ -1,0 +1,51 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-media-sharing",
+  "version": "0.0.1",
+  "description": "DIDComm Media sharing protocol implementation for credo-ts",
+  "author": "2060.io",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/media-sharing",
+  "license": "Apache-2.0",
+  "main": "build/index.js",
+  "types": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "check-types": "tsc --noEmit -p tsconfig.build.json",
+    "check-format": "yarn prettier --check",
+    "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/media-sharing"
+  },
+  "bugs": {
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "0.5.13",
+    "@credo-ts/node": "0.5.13",
+    "@hyperledger/aries-askar-nodejs": "0.2.3",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^20.11.16",
+    "@types/uuid": "^9.0.0"
+  },
+  "dependencies": {
+    "@credo-ts/core": "0.5.13",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "tsyringe": "^4.8.0",
+    "uuid": "^9.0.0"
+  }
+}
