@@ -28,7 +28,6 @@ describe('media test', () => {
   let bobWalletId: string
   let bobWalletKey: string
   let aliceConnectionRecord: ConnectionRecord | undefined
-  let bobConnectionRecord: ConnectionRecord | undefined
 
   beforeEach(async () => {
     aliceWalletId = utils.uuid()
@@ -87,7 +86,7 @@ describe('media test', () => {
       { autoAcceptConnection: true },
     )
 
-    bobConnectionRecord = await bobAgent.connections.returnWhenIsConnected(connectionRecord!.id)
+    await bobAgent.connections.returnWhenIsConnected(connectionRecord!.id)
     aliceConnectionRecord = (await aliceAgent.connections.findAllByOutOfBandId(outOfBandRecord.id))[0]
     aliceConnectionRecord = await aliceAgent.connections.returnWhenIsConnected(aliceConnectionRecord!.id)
   })

@@ -109,8 +109,6 @@ export class MediaSharingService {
    * @returns
    */
   public async createMediaRequest(agentContext: AgentContext, options: RequestMediaSharingRecordOptions) {
-    const conenctionId = options.connectionId
-
     // Create message
     const message = new RequestMediaMessage({
       parentThreadId: options.parentThreadId,
