@@ -3,5 +3,5 @@
   "packages/user-profile": "0.0.6",
   "packages/media-sharing": "0.0.1",
   "packages/mrtd": "0.0.12",
-  "packages/receipts": "0.0.7"
+  "packages/receipts": "0.0.8"
 }
