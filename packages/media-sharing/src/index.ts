@@ -1,3 +1,4 @@
+export * from './MediaSharingApi'
 export * from './MediaSharingModule'
 export * from './handlers'
 export * from './messages'
