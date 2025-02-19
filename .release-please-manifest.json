@@ -1,7 +1,7 @@
 {
   "packages/calls": "0.0.10",
   "packages/user-profile": "0.0.6",
-  "packages/media-sharing": "0.0.1",
+  "packages/media-sharing": "0.0.2",
   "packages/mrtd": "0.0.12",
   "packages/receipts": "0.0.7"
 }
