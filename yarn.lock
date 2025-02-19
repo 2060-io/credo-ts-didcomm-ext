@@ -1061,10 +1061,10 @@
   resolved "https://registry.yarnpkg.com/@js-joda/timezone/-/timezone-2.3.0.tgz#72878f6dc8afef20c29906e5d8d946f91618a2c3"
   integrity sha512-DHXdNs0SydSqC5f0oRJPpTcNfnpRojgBqMCFupQFv6WgeZAjU3DBx+A7JtaGPP3dHrP2Odi2N8Vf+uAm/8ynCQ==
 
-"@li0ard/tsemrtd@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@li0ard/tsemrtd/-/tsemrtd-0.2.1.tgz#0ec2cceb0fa2002cc07fdd5aa8561ad40cb39b85"
-  integrity sha512-uJTNPDf4/KScQYRxMeenqLsY5nOFotJPmxTmxkA84oRo9sf7vsBqLf8UM4IMfxwa9rQA92CmCSVSHonSpQNqpg==
+"@li0ard/tsemrtd@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@li0ard/tsemrtd/-/tsemrtd-0.2.2.tgz#a6dfdca33f9f3b0737a16f6a8be00e13d214713c"
+  integrity sha512-u+xw2AbsyMMyGx5tJI9chmwRiVcmJWCy3eO2fTx0BTL3sgQl0FwqmPWgbNqmREtZxrXv2SO4hkKvl2BXGGay6Q==
   dependencies:
     "@peculiar/asn1-cms" "^2.3.13"
     "@peculiar/asn1-schema" "^2.3.13"
