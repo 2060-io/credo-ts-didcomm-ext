@@ -18,6 +18,7 @@ class SharedMediaItemDescriptor {
   public id!: string
 
   @Expose({ name: 'attachment_id' })
+  @IsString()
   public attachmentId!: string
 
   public ciphering?: CipheringInfo
