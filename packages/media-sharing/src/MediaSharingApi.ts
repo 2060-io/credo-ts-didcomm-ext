@@ -1,4 +1,12 @@
-import { AgentContext, ConnectionService, injectable, MessageSender, OutboundMessageContext } from '@credo-ts/core'
+import {
+  AgentContext,
+  ConnectionService,
+  injectable,
+  MessageSender,
+  OutboundMessageContext,
+  Query,
+  QueryOptions,
+} from '@credo-ts/core'
 
 import { RequestMediaHandler, ShareMediaHandler } from './handlers'
 import { MediaSharingRecord, SharedMediaItem, SharedMediaItemOptions } from './repository'
@@ -127,6 +135,20 @@ export class MediaSharingApi {
    */
   public getAll(): Promise<MediaSharingRecord[]> {
     return this.mediaSharingService.getAll(this.agentContext)
+  }
+
+  /**
+   * Find all Media Sharing record matching a given query
+   *
+   * @param query the record id
+   * @param queryOptions The query options
+   * @returns  array containing all matching records
+   */
+  public async findAllByQuery(
+    query: Query<MediaSharingRecord>,
+    queryOptions?: QueryOptions,
+  ): Promise<MediaSharingRecord[]> {
+    return this.mediaSharingService.findAllByQuery(this.agentContext, query, queryOptions)
   }
 
   /**
