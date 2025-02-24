@@ -37,7 +37,8 @@
     "@hyperledger/aries-askar-nodejs": "0.2.3",
     "@types/jest": "^26.0.23",
     "@types/node": "^20.11.16",
-    "@types/uuid": "^9.0.0"
+    "@types/uuid": "^9.0.0",
+    "prettier": "^3.5.2"
   },
   "dependencies": {
     "@credo-ts/core": "0.5.13",
