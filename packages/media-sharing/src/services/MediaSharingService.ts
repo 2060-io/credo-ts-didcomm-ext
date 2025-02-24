@@ -1,4 +1,11 @@
-import { AgentContext, CredoError, EventEmitter, MessageHandlerInboundMessage } from '@credo-ts/core'
+import {
+  AgentContext,
+  CredoError,
+  EventEmitter,
+  MessageHandlerInboundMessage,
+  Query,
+  QueryOptions,
+} from '@credo-ts/core'
 import { Lifecycle, scoped } from 'tsyringe'
 
 import { MediaSharingEventTypes, MediaSharingStateChangedEvent } from '../MediaSharingEvents'
@@ -196,6 +203,19 @@ export class MediaSharingService {
    */
   public getAll(agentContext: AgentContext): Promise<MediaSharingRecord[]> {
     return this.mediaSharingRepository.getAll(agentContext)
+  }
+
+  /**
+   * Find all media sharing records by query
+   *
+   * @returns Returns all matching records
+   */
+  public async findAllByQuery(
+    agentContext: AgentContext,
+    mediaQuery: Query<MediaSharingRecord>,
+    queryOptions?: QueryOptions,
+  ) {
+    return this.mediaSharingRepository.findByQuery(agentContext, mediaQuery, queryOptions)
   }
 
   /**
