@@ -1,6 +1,6 @@
 {
   "name": "@2060.io/credo-ts-didcomm-media-sharing",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "DIDComm Media sharing protocol implementation for credo-ts",
   "author": "2060.io",
   "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/media-sharing",
