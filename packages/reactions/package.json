@@ -1,0 +1,49 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-reactions",
+  "main": "build/index",
+  "types": "build/index",
+  "version": "0.0.7",
+  "files": [
+    "build"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "description": "DIDComm Message Reactions protocol implementation for @credo-ts/core",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/reactions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/reactions"
+  },
+  "scripts": {
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "check-types": "tsc --noEmit -p tsconfig.build.json",
+    "check-format": "yarn prettier --check",
+    "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext/issues"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "0.5.13",
+    "@credo-ts/node": "0.5.13",
+    "@hyperledger/aries-askar-nodejs": "0.2.3",
+    "@types/node-fetch": "^2.6.4",
+    "@types/uuid": "^9.0.0"
+  },
+  "dependencies": {
+    "@credo-ts/core": "0.5.13",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "tsyringe": "^4.8.0",
+    "uuid": "^9.0.0"
+  }
+}
