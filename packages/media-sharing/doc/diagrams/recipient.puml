@@ -1,0 +1,29 @@
+@startuml Media sharing basic flow (recipient)
+title Media sharing basic flow (recipient)
+
+participant "App" as App
+participant "AFJ" as AFJ
+participant "Recipient" as Recipient
+participant "File Server" as FS
+
+App <- AFJ: MediaSharingStateUpdateEvent \n(MediaSharingRecord, state='media-shared')
+note left
+MediaSharingRecord will 
+contain all needed info
+to download and store the file
+end note
+App -> FS: Download File (over HTTP or any other protocol)
+...
+App <-- FS: OK
+note left
+At this point, media is downloaded
+end note
+App -> AFJ: media.setMetadata( {id, metadata })
+note left
+In the metadata, the app can store
+the local path of the downloaded file, 
+in order to know that this record
+has been already cached
+end note
+
+@enduml
