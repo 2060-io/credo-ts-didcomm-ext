@@ -15,6 +15,9 @@
     "packages/mrtd": {
       "release-type": "node"
     },
+    "packages/reactions": {
+      "release-type": "node"
+    },
     "packages/receipts": {
       "release-type": "node"
     },
