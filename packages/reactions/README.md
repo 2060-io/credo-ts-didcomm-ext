@@ -33,7 +33,7 @@ This module is used to provide an Agent built with [Credo](https://github.com/op
 It's conceived as an extension module for Credo which can be injected to an existing agent instance:
 
 ```ts
-import { ReceiptsModule } from 'credo-ts-receipts'
+import { DidCommReactionsModule } from '@2060.io/credo-ts-didcomm-reactions'
 
 const agent = new Agent({
   config: {
