@@ -1,0 +1,31 @@
+@startuml Media sharing basic flow (sender)
+title Media sharing basic flow (sender)
+
+participant "App" as App
+participant "AFJ" as AFJ
+participant "Recipient" as Recipient
+participant "File Server" as FS
+
+App -> AFJ: media.create({ mimeType, metadata, ...})
+note left
+In the metadata, the app 
+can store localPath or 
+any useful information 
+(will not be exchanged)
+end note
+App <-- AFJ: MediaSharingRecord \n(id = uuid(), state = 'Pending')
+App -> FS: Upload File (over HTTP or any other protocol)
+...
+App <-- FS: OK (remoteUri)
+note left
+At this point, media is uploaded,
+ but not yet shared with the recipient
+end note
+App -> AFJ: media.share( {id, remoteUri, ... })
+AFJ -> Recipient: share-media(descriptor)
+note left
+Now, recipient is notified and can download/decrypt 
+and see the media
+end note
+
+@enduml

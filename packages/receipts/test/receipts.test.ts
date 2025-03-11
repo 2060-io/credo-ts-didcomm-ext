@@ -15,7 +15,7 @@ import { ReceiptsEventTypes } from '../src/services'
 import { SubjectInboundTransport } from './transport/SubjectInboundTransport'
 import { SubjectOutboundTransport } from './transport/SubjectOutboundTransport'
 
-const logger = new ConsoleLogger(LogLevel.info)
+const logger = new ConsoleLogger(LogLevel.off)
 
 export type SubjectMessage = { message: EncryptedMessage; replySubject?: Subject<SubjectMessage> }
 
