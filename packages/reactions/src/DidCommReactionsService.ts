@@ -1,10 +1,9 @@
-import { EventEmitter, InboundMessageContext } from '@credo-ts/core'
-import { Lifecycle, scoped } from 'tsyringe'
+import { EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
 
 import { MessageReactionsReceivedEvent, ReactionsEventTypes } from './DidcommReactionsEvents'
 import { MessageReactionsMessageOptions, MessageReactionsMessage } from './messages'
 
-@scoped(Lifecycle.ContainerScoped)
+@injectable()
 export class DidCommReactionsService {
   private eventEmitter: EventEmitter
 
