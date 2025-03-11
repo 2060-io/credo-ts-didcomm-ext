@@ -2,7 +2,7 @@
   "name": "@2060.io/credo-ts-didcomm-reactions",
   "main": "build/index",
   "types": "build/index",
-  "version": "0.0.7",
+  "version": "0.0.2",
   "files": [
     "build"
   ],
