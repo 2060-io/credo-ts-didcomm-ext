@@ -39,10 +39,14 @@
   },
   "dependencies": {
     "@li0ard/tsemrtd": "^0.2.2",
+    "@types/pkijs": "^3.0.1",
+    "asn1js": "^3.0.6",
+    "axios": "^1.11.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "esbuild": "^0.24.0",
     "mrz": "^4.2.0",
+    "pkijs": "^3.2.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "tsyringe": "^4.8.0"
