@@ -38,29 +38,29 @@ export class SodVerifierService {
     details?: string
   }> {
     try {
-      // Step 1: Clean TLV if present
+      
       this.logger.info('[SodVerifierService] verifySod - Step 1: Extracting DER from TLV (if present)')
       sodBuffer = this.extractDerFromTlv(sodBuffer)
 
-      // Step 2: Decode ASN.1 from SOD buffer
+      
       this.logger.info('[SodVerifierService] verifySod - Step 2: Decoding ASN.1 structure from SOD buffer')
       const sodAsn1 = fromBER(sodBuffer.buffer.slice(sodBuffer.byteOffset, sodBuffer.byteOffset + sodBuffer.byteLength))
       this.logger.debug('[SodVerifierService] verifySod - ASN.1 decoding result...')
       if (sodAsn1.offset === -1) throw new Error('Invalid ASN.1 structure in SOD')
 
-      // Step 3: Parse CMS/PKCS7 content
+      
       this.logger.info('[SodVerifierService] verifySod - Step 3: Parsing CMS/PKCS7 content')
       const cms = new ContentInfo({ schema: sodAsn1.result })
       const signedData = new SignedData({ schema: cms.content })
 
-      // Step 4: Extract LDS Security Object
+      
       this.logger.info('[SodVerifierService] verifySod - Step 4: Extracting encapsulated LDS Security Object')
       // @ts-ignore
       const ldsContent: ArrayBuffer = signedData.encapContentInfo.eContent.valueBlock.valueHex
       const ldsASN1 = fromBER(ldsContent)
       if (ldsASN1.offset === -1) throw new Error('Invalid LDS ASN.1 in SOD content')
 
-      // Step 5: Parse LDS SEQUENCE
+      
       this.logger.info('[SodVerifierService] verifySod - Step 5: Parsing LDS SEQUENCE')
       const sodSeq = ldsASN1.result as Sequence
       const hashAlgorithmSeq = sodSeq.valueBlock.value[1] as Sequence
@@ -71,7 +71,7 @@ export class SodVerifierService {
         `[SodVerifierService] verifySod - Step 5: Digest algorithm OID: ${hashAlgorithmOid} => ${hashAlgorithm}`,
       )
 
-      // Step 6: Extract DataGroup hashes
+      
       this.logger.info('[SodVerifierService] verifySod - Step 6: Extracting Data Group hashes')
       const dgHashesSeq = sodSeq.valueBlock.value[2] as Sequence
       const dgHashMap: Record<string, Buffer> = {}
@@ -98,7 +98,6 @@ export class SodVerifierService {
         )
       }
 
-      // Step 7: DataGroup integrity check
       this.logger.info('[SodVerifierService] verifySod - Step 7: Verifying DataGroup integrity')
       let integrity = true
       for (const dgName in dgHashMap) {
@@ -126,7 +125,6 @@ export class SodVerifierService {
         }
       }
 
-      // Step 8: Authenticity verification
       this.logger.info('[SodVerifierService] verifySod - Step 8: Authenticity verification (DSC signature)')
       const sodSignerCerts = signedData.certificates as Certificate[]
       const signerInfo = signedData.signerInfos[0]
