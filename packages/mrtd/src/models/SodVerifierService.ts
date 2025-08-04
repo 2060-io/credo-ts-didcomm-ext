@@ -1,6 +1,6 @@
 import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
 import { Certificate, ContentInfo, SignedData } from 'pkijs'
-import { X509Certificate } from '@peculiar/x509'
+import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import * as crypto from 'crypto'
 import { ConsoleLogger, LogLevel, type Logger } from '@credo-ts/core'
 
@@ -38,29 +38,25 @@ export class SodVerifierService {
     details?: string
   }> {
     try {
-      
       this.logger.info('[SodVerifierService] verifySod - Step 1: Extracting DER from TLV (if present)')
       sodBuffer = this.extractDerFromTlv(sodBuffer)
 
-      
       this.logger.info('[SodVerifierService] verifySod - Step 2: Decoding ASN.1 structure from SOD buffer')
       const sodAsn1 = fromBER(sodBuffer.buffer.slice(sodBuffer.byteOffset, sodBuffer.byteOffset + sodBuffer.byteLength))
       this.logger.debug('[SodVerifierService] verifySod - ASN.1 decoding result...')
       if (sodAsn1.offset === -1) throw new Error('Invalid ASN.1 structure in SOD')
 
-      
       this.logger.info('[SodVerifierService] verifySod - Step 3: Parsing CMS/PKCS7 content')
       const cms = new ContentInfo({ schema: sodAsn1.result })
       const signedData = new SignedData({ schema: cms.content })
+      this.logger.debug(`[SodVerifierService] verifySod - SignedData ${JSON.stringify(signedData, null, 2)}`)
 
-      
       this.logger.info('[SodVerifierService] verifySod - Step 4: Extracting encapsulated LDS Security Object')
       // @ts-ignore
       const ldsContent: ArrayBuffer = signedData.encapContentInfo.eContent.valueBlock.valueHex
       const ldsASN1 = fromBER(ldsContent)
       if (ldsASN1.offset === -1) throw new Error('Invalid LDS ASN.1 in SOD content')
 
-      
       this.logger.info('[SodVerifierService] verifySod - Step 5: Parsing LDS SEQUENCE')
       const sodSeq = ldsASN1.result as Sequence
       const hashAlgorithmSeq = sodSeq.valueBlock.value[1] as Sequence
@@ -71,7 +67,6 @@ export class SodVerifierService {
         `[SodVerifierService] verifySod - Step 5: Digest algorithm OID: ${hashAlgorithmOid} => ${hashAlgorithm}`,
       )
 
-      
       this.logger.info('[SodVerifierService] verifySod - Step 6: Extracting Data Group hashes')
       const dgHashesSeq = sodSeq.valueBlock.value[2] as Sequence
       const dgHashMap: Record<string, Buffer> = {}
@@ -125,17 +120,18 @@ export class SodVerifierService {
         }
       }
 
+      // Step 8: Authenticity verification using X509ChainBuilder (ICAO trust chain)
       this.logger.info('[SodVerifierService] verifySod - Step 8: Authenticity verification (DSC signature)')
+
       const sodSignerCerts = signedData.certificates as Certificate[]
       const signerInfo = signedData.signerInfos[0]
 
-      this.logger.debug(`[SodVerifierService] verifySod - signerInfo: ${JSON.stringify(signerInfo, null, 2)}`)
-      this.logger.debug(`[SodVerifierService] verifySod - signedData.certificates: ${signedData.certificates}`)
-
+      // Try to find the Document Signer Certificate (DSC) using SID (issuer+serial)
+      // ICAO fallback: if not found but only one certificate is present, use it
       let docSignerCert: Certificate | undefined = undefined
       if (Array.isArray(sodSignerCerts)) {
-        for (const cert of sodSignerCerts) {
-          if (
+        docSignerCert = sodSignerCerts.find(
+          (cert) =>
             cert &&
             cert.issuer &&
             cert.serialNumber &&
@@ -145,22 +141,15 @@ export class SodVerifierService {
             typeof cert.issuer.isEqual === 'function' &&
             typeof cert.serialNumber.isEqual === 'function' &&
             cert.issuer.isEqual(signerInfo.sid.issuer) &&
-            cert.serialNumber.isEqual(signerInfo.sid.serialNumber)
-          ) {
-            docSignerCert = cert
-            break
-          }
-        }
+            cert.serialNumber.isEqual(signerInfo.sid.serialNumber),
+        )
       }
-
-      // ICAO 9303 fallback: accept single certificate as self-signed if no SID match found
       if (!docSignerCert && sodSignerCerts && sodSignerCerts.length === 1) {
         docSignerCert = sodSignerCerts[0]
         this.logger.warn(
           '[SodVerifierService] verifySod - No SID match for document signer, but only one certificate present. Using as self-signed (ICAO fallback).',
         )
       }
-
       if (!docSignerCert) {
         this.logger.error(
           '[SodVerifierService] verifySod - No matching document signer certificate found in SOD. Certificates:',
@@ -168,29 +157,28 @@ export class SodVerifierService {
         )
         throw new Error('No matching document signer certificate found in SOD')
       }
-      this.logger.info(
-        '[SodVerifierService] verifySod - Document signer certificate selected for authenticity verification.',
-      )
+      this.logger.info('[SodVerifierService] verifySod - Document signer certificate selected for chain verification.')
 
       const docSignerX509 = new X509Certificate(Buffer.from(docSignerCert.toSchema().toBER(false)))
+      const chainBuilder = new X509ChainBuilder({ certificates: this.trustAnchors })
 
       let authenticity = false
-      for (const anchor of this.trustAnchors) {
-        try {
-          if (await docSignerX509.verify({ publicKey: anchor.publicKey })) {
-            authenticity = true
-            this.logger.info(
-              `[SodVerifierService] verifySod - Authenticity verified: Document signer is trusted by CSCA anchor: ${anchor.subject}`,
-            )
-            break
-          }
-        } catch (error) {
-          // continue
+      try {
+        const chain = await chainBuilder.build(docSignerX509)
+        if (chain && chain.length > 0) {
+          authenticity = true
+          this.logger.info(
+            `[SodVerifierService] verifySod - Authenticity verified: Document signer is trusted by a CSCA (chain length: ${chain.length})`,
+          )
+        } else {
+          this.logger.warn(
+            '[SodVerifierService] verifySod - Authenticity verification FAILED: No valid trust chain found for DSC.',
+          )
         }
-      }
-      if (!authenticity) {
-        this.logger.warn(
-          '[SodVerifierService] verifySod - Authenticity verification FAILED: Document signer is not trusted by any CSCA anchor.',
+      } catch (error) {
+        this.logger.error(
+          '[SodVerifierService] verifySod - Authenticity chain validation error: ' +
+            (error instanceof Error ? error.message : String(error)),
         )
       }
 
