@@ -1,7 +1,6 @@
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
-//import { promises as fs } from 'fs'
 import * as os from 'os'
 import * as path from 'path'
 import {
@@ -25,13 +24,17 @@ export class MasterListService {
   private logger: Logger
   private readonly sourceLocation: string
   private readonly cacheFilePath: string
+  
 
   /**
    * Initialize a new MasterListService for a given source.
    * @param sourceLocation Path or URL to the Master List LDIF file.
    * @throws If the location is not defined.
    */
-  constructor(@inject(DidCommMrtdModuleConfig) private readonly config: DidCommMrtdModuleConfig) {
+  constructor(
+    @inject(DidCommMrtdModuleConfig) private readonly config: DidCommMrtdModuleConfig,
+    @inject(AgentContext) private agentContext: AgentContext,
+  ) {
     this.logger = new ConsoleLogger(LogLevel.info)
     const sourceLocation = this.config.masterListCscaLocation ?? ''
     if (!sourceLocation) {
@@ -47,13 +50,13 @@ export class MasterListService {
    * Can only be called once per instance.
    * @throws If any error occurs reading or parsing the Master List file.
    */
-  public async initialize(agentContext: AgentContext): Promise<void> {
+  public async initialize(): Promise<void> {
     if (this.isInitialized) {
       this.logger.info('[MasterListService] initialize - MasterListService has already been initialized.')
       return
     }
     this.logger.info(`MasterListService: loading from ${this.sourceLocation}`)
-    const fileSystem = agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    const fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
 
     let ldifContent: string
     try {
