@@ -3,7 +3,8 @@ import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
 import { promises as fs } from 'fs'
 import axios from 'axios'
-import { ConsoleLogger, LogLevel, type Logger } from '@credo-ts/core'
+import { ConsoleLogger, inject, LogLevel, type Logger } from '@credo-ts/core'
+import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 
 /**
  * Service for loading and parsing ICAO Master List files (LDIF format) to extract CSCA certificates
@@ -11,21 +12,23 @@ import { ConsoleLogger, LogLevel, type Logger } from '@credo-ts/core'
  */
 export class MasterListService {
   private trustStore: Map<string, X509Certificate> = new Map()
-  private sourceLocation: string
   private isInitialized = false
   private logger: Logger
+  private readonly sourceLocation: string
 
   /**
    * Initialize a new MasterListService for a given source.
-   * @param location Path or URL to the Master List LDIF file.
+   * @param sourceLocation Path or URL to the Master List LDIF file.
    * @throws If the location is not defined.
    */
-  constructor(location: string) {
-    if (!location) {
+  constructor(@inject(DidCommMrtdModuleConfig) private readonly config: DidCommMrtdModuleConfig) {
+    this.logger = new ConsoleLogger(LogLevel.info)
+    const sourceLocation = this.config.masterListCscaLocation ?? ''
+    if (!sourceLocation) {
       throw new Error('The Master List location (URL or file path) cannot be null or undefined.')
     }
-    this.sourceLocation = location
-    this.logger = new ConsoleLogger(LogLevel.info)
+    this.sourceLocation = sourceLocation
+    this.logger.info(`[MasterListService] Initialized with source: ${this.sourceLocation}`)
   }
 
   /**
@@ -38,7 +41,7 @@ export class MasterListService {
       this.logger.info('[MasterListService] initialize - MasterListService has already been initialized.')
       return
     }
-
+    this.logger.info(`MasterListService: loading from ${this.sourceLocation}`)
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {

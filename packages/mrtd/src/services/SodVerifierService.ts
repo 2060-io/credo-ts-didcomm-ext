@@ -2,7 +2,8 @@ import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1j
 import { Certificate, ContentInfo, SignedData } from 'pkijs'
 import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import * as crypto from 'crypto'
-import { ConsoleLogger, LogLevel, type Logger } from '@credo-ts/core'
+import { ConsoleLogger, inject, LogLevel, type Logger } from '@credo-ts/core'
+import { MasterListService } from './MasterListService'
 
 /**
  * Utility class to verify SOD (EF.SOD) authenticity and integrity.
@@ -15,12 +16,9 @@ export class SodVerifierService {
   /**
    * @param trustAnchors List of X509 CSCA certificates for signature verification.
    */
-  constructor(trustAnchors: X509Certificate[]) {
-    if (!Array.isArray(trustAnchors) || trustAnchors.length === 0) {
-      throw new Error('No trust anchors provided for SOD verification.')
-    }
+  constructor(@inject(MasterListService) private readonly mlService: MasterListService) {
     this.logger = new ConsoleLogger(LogLevel.info)
-    this.trustAnchors = trustAnchors
+    this.trustAnchors = []
   }
 
   /**
@@ -38,6 +36,11 @@ export class SodVerifierService {
     details?: string
   }> {
     try {
+      if (!(this.mlService as any).isInitialized) {
+        await this.mlService.initialize()
+      }
+      this.trustAnchors = this.mlService.getTrustAnchors()
+
       this.logger.info('[SodVerifierService] verifySod - Step 1: Extracting DER from TLV (if present)')
       sodBuffer = this.extractDerFromTlv(sodBuffer)
 
