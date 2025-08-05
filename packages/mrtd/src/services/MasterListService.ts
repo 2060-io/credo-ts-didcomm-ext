@@ -1,9 +1,18 @@
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
-import { promises as fs } from 'fs'
-import axios from 'axios'
-import { ConsoleLogger, inject, LogLevel, type Logger } from '@credo-ts/core'
+//import { promises as fs } from 'fs'
+import * as os from 'os'
+import * as path from 'path'
+import {
+  AgentContext,
+  ConsoleLogger,
+  FileSystem,
+  inject,
+  InjectionSymbols,
+  LogLevel,
+  type Logger,
+} from '@credo-ts/core'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 
 /**
@@ -15,6 +24,7 @@ export class MasterListService {
   private isInitialized = false
   private logger: Logger
   private readonly sourceLocation: string
+  private readonly cacheFilePath: string
 
   /**
    * Initialize a new MasterListService for a given source.
@@ -28,6 +38,7 @@ export class MasterListService {
       throw new Error('The Master List location (URL or file path) cannot be null or undefined.')
     }
     this.sourceLocation = sourceLocation
+    this.cacheFilePath = path.join(os.tmpdir(), 'icaopkd-master-list.ldif')
     this.logger.info(`[MasterListService] Initialized with source: ${this.sourceLocation}`)
   }
 
@@ -36,21 +47,30 @@ export class MasterListService {
    * Can only be called once per instance.
    * @throws If any error occurs reading or parsing the Master List file.
    */
-  public async initialize(): Promise<void> {
+  public async initialize(agentContext: AgentContext): Promise<void> {
     if (this.isInitialized) {
       this.logger.info('[MasterListService] initialize - MasterListService has already been initialized.')
       return
     }
     this.logger.info(`MasterListService: loading from ${this.sourceLocation}`)
+    const fileSystem = agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
-        this.logger.info(`[MasterListService] initialize - Downloading Master List from URL: ${this.sourceLocation}`)
-        const response = await axios.get<string>(this.sourceLocation, { responseType: 'text' })
-        ldifContent = response.data
+        if (await fileSystem.exists(this.cacheFilePath)) {
+          this.logger.info(`[MasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`)
+        } else {
+          this.logger.info(
+            `[MasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
+          )
+          await fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath)
+          this.logger.info(`[MasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
+        }
+        ldifContent = await fileSystem.read(this.cacheFilePath)
       } else {
         this.logger.info(`[MasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`)
-        ldifContent = await fs.readFile(this.sourceLocation, 'utf-8')
+        ldifContent = await fileSystem.read(this.sourceLocation)
       }
 
       this.logger.info('[MasterListService] initialize - Parsing and extracting CSCA certificates...')
