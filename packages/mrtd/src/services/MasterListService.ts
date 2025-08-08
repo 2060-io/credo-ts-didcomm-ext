@@ -24,6 +24,7 @@ export class MasterListService {
   private logger: Logger
   private readonly sourceLocation: string
   private readonly cacheFilePath: string
+  private fileSystem: FileSystem
 
   /**
    * Initialize a new MasterListService for a given source.
@@ -35,12 +36,14 @@ export class MasterListService {
     @inject(AgentContext) private agentContext: AgentContext,
   ) {
     this.logger = new ConsoleLogger(LogLevel.info)
+
     const sourceLocation = this.config.masterListCscaLocation
     if (!sourceLocation) {
       throw new Error('The Master List location (URL or file path) cannot be null or undefined.')
     }
     this.sourceLocation = sourceLocation
-    this.cacheFilePath = path.join(os.tmpdir(), 'icaopkd-master-list.ldif')
+    this.fileSystem = agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    this.cacheFilePath = this.fileSystem.cachePath
     this.logger.info(`[MasterListService] Initialized with source: ${this.sourceLocation}`)
   }
 
@@ -55,24 +58,23 @@ export class MasterListService {
       return
     }
     this.logger.info(`MasterListService: loading from ${this.sourceLocation}`)
-    const fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
-        if (await fileSystem.exists(this.cacheFilePath)) {
+        if (await this.fileSystem.exists(this.cacheFilePath)) {
           this.logger.info(`[MasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`)
         } else {
           this.logger.info(
             `[MasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
           )
-          await fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath)
+          await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath)
           this.logger.info(`[MasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
         }
-        ldifContent = await fileSystem.read(this.cacheFilePath)
+        ldifContent = await this.fileSystem.read(this.cacheFilePath)
       } else {
         this.logger.info(`[MasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`)
-        ldifContent = await fileSystem.read(this.sourceLocation)
+        ldifContent = await this.fileSystem.read(this.sourceLocation)
       }
 
       this.logger.info('[MasterListService] initialize - Parsing and extracting CSCA certificates...')
