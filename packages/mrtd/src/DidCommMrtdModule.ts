@@ -1,4 +1,3 @@
-// packages/mrtd/src/DidCommMrtdModule.ts
 
 import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 import { Protocol } from '@credo-ts/core'
