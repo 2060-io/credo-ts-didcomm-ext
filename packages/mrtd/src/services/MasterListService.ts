@@ -24,7 +24,6 @@ export class MasterListService {
   private logger: Logger
   private readonly sourceLocation: string
   private readonly cacheFilePath: string
-  
 
   /**
    * Initialize a new MasterListService for a given source.
@@ -36,7 +35,7 @@ export class MasterListService {
     @inject(AgentContext) private agentContext: AgentContext,
   ) {
     this.logger = new ConsoleLogger(LogLevel.info)
-    const sourceLocation = this.config.masterListCscaLocation ?? ''
+    const sourceLocation = this.config.masterListCscaLocation
     if (!sourceLocation) {
       throw new Error('The Master List location (URL or file path) cannot be null or undefined.')
     }

@@ -1,12 +1,10 @@
-
 import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 import { Protocol } from '@credo-ts/core'
 
 import { DidCommMrtdApi } from './DidCommMrtdApi'
 import { DidCommMrtdService } from './DidCommMrtdService'
 import { DidCommMrtdRole } from './models'
-import { MasterListService } from './services/MasterListService'
-import { SodVerifierService } from './services/SodVerifierService'
+import { MasterListService, SodVerifierService } from './services'
 
 import { DidCommMrtdModuleConfig, DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
 
