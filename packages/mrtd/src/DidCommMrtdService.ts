@@ -1,4 +1,4 @@
-import { EventEmitter, InboundMessageContext } from '@credo-ts/core'
+import { AgentContext, EventEmitter, InboundMessageContext } from '@credo-ts/core'
 import * as Mrz from 'mrz'
 import { Lifecycle, scoped } from 'tsyringe'
 
@@ -18,6 +18,9 @@ import {
   MrzDataRequestMessage,
 } from './messages'
 import { parseEMrtdData } from './models'
+
+import { MasterListService, SodVerifierService } from './services'
+
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -86,6 +89,7 @@ export class DidCommMrtdService {
     const { agentContext, message } = messageContext
 
     let parsed
+
     try {
       const parseResult = parseEMrtdData(message.dataGroups)
 
@@ -95,15 +99,52 @@ export class DidCommMrtdService {
       parsed = { valid: false }
     }
 
+    const verification = await this.sodVerification(agentContext, message.dataGroups).catch((e) => ({
+      authenticity: false,
+      integrity: false,
+      details: e instanceof Error ? e.message : String(e),
+    }))
+
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
     eventEmitter.emit<EMrtdDataReceivedEvent>(agentContext, {
       type: MrtdEventTypes.EMrtdDataReceived,
       payload: {
         connection,
-        dataGroups: { raw: message.dataGroups, parsed },
+        dataGroups: { raw: message.dataGroups, parsed, verification },
         threadId: message.threadId,
       },
     })
+  }
+
+  /**
+   * Verifies the SOD and returns the verification result.
+   * @param agentContext The agent context.
+   * @param dataGroupsBase64 Base64-encoded eMRTD data groups.
+   * @returns Verification result with authenticity and integrity flags, and optional details.
+   */
+  private async sodVerification(
+    agentContext: AgentContext,
+    dataGroupsBase64: Record<string, string>,
+  ): Promise<{ authenticity: boolean; integrity: boolean; details?: string } | undefined> {
+    const sodB64 = dataGroupsBase64?.SOD 
+    if (!sodB64) return undefined
+
+    const sodBuffer = Buffer.from(sodB64, 'base64')
+    const dgMap: Record<string, Buffer> = {}
+
+    for (const [name, b64] of Object.entries(dataGroupsBase64)) {
+      if (!b64 || name.toUpperCase() === 'SOD') continue
+      dgMap[name] = Buffer.from(b64, 'base64')
+    }
+
+    // Ensure Master List is loaded once and cached in memory
+    const mlService = agentContext.dependencyManager.resolve(MasterListService)
+    if (!(mlService as any).isInitialized) {
+      await mlService.initialize()
+    }
+
+    const verifier = agentContext.dependencyManager.resolve(SodVerifierService)
+    return verifier.verifySod(sodBuffer, dgMap)
   }
 
   public async processEMrtdDataRequest(messageContext: InboundMessageContext<EMrtdDataRequestMessage>) {

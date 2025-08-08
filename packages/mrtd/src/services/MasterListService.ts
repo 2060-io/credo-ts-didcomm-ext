@@ -6,6 +6,7 @@ import {
   ConsoleLogger,
   FileSystem,
   inject,
+  injectable,
   InjectionSymbols,
   LogLevel,
   type Logger,
@@ -16,6 +17,7 @@ import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
  * Service for loading and parsing ICAO Master List files (LDIF format) to extract CSCA certificates
  * and provide trust anchors for eMRTD authenticity verification.
  */
+@injectable()
 export class MasterListService {
   private trustStore: Map<string, X509Certificate> = new Map()
   private isInitialized = false

@@ -2,13 +2,15 @@ import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1j
 import { Certificate, ContentInfo, SignedData } from 'pkijs'
 import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import * as crypto from 'crypto'
-import { ConsoleLogger, inject, LogLevel, type Logger } from '@credo-ts/core'
+import { ConsoleLogger, inject, injectable, LogLevel, type Logger } from '@credo-ts/core'
 import { MasterListService } from './MasterListService'
+import { SodVerification } from '../models/EMrtdSodVerification'
 
 /**
  * Utility class to verify SOD (EF.SOD) authenticity and integrity.
  * Requires CSCA trust anchors loaded from MasterListService.
  */
+@injectable()
 export class SodVerifierService {
   private trustAnchors: X509Certificate[]
   private logger: Logger
@@ -27,14 +29,7 @@ export class SodVerifierService {
    * @param dataGroups Record<string, Buffer> mapping DGx filenames (e.g. 'DG1') to their raw data
    * @returns Object with authenticity and integrity flags, and optional error.
    */
-  public async verifySod(
-    sodBuffer: Buffer,
-    dataGroups: Record<string, Buffer>,
-  ): Promise<{
-    authenticity: boolean
-    integrity: boolean
-    details?: string
-  }> {
+  public async verifySod(sodBuffer: Buffer, dataGroups: Record<string, Buffer>): Promise<SodVerification> {
     try {
       if (!(this.mlService as any).isInitialized) {
         await this.mlService.initialize()
