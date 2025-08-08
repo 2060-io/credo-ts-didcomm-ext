@@ -1,8 +1,6 @@
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
-import * as os from 'os'
-import * as path from 'path'
 import {
   AgentContext,
   ConsoleLogger,
@@ -35,7 +33,7 @@ export class MasterListService {
     @inject(DidCommMrtdModuleConfig) private readonly config: DidCommMrtdModuleConfig,
     @inject(AgentContext) private agentContext: AgentContext,
   ) {
-    this.logger = new ConsoleLogger(LogLevel.info)
+    this.logger = agentContext.config.logger
 
     const sourceLocation = this.config.masterListCscaLocation
     if (!sourceLocation) {
