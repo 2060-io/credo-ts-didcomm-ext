@@ -1,14 +1,7 @@
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
-import {
-  AgentContext,
-  FileSystem,
-  inject,
-  injectable,
-  InjectionSymbols,
-  type Logger,
-} from '@credo-ts/core'
+import { AgentContext, FileSystem, inject, injectable, InjectionSymbols, type Logger } from '@credo-ts/core'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 
 /**
@@ -20,29 +13,17 @@ export class CscaMasterListService {
   private trustStore: Map<string, X509Certificate> = new Map()
   private isInitialized = false
   private logger: Logger
-  private readonly sourceLocation: string
-  private readonly cacheFilePath: string
-  private fileSystem: FileSystem
+  private sourceLocation?: string
+  private cacheFilePath?: string
+  private fileSystem?: FileSystem
 
   /**
    * Initialize a new CscaMasterListService for a given source.
    * @param sourceLocation Path or URL to the Master List LDIF file.
    * @throws If the location is not defined.
    */
-  constructor(
-    @inject(DidCommMrtdModuleConfig) private readonly config: DidCommMrtdModuleConfig,
-    @inject(AgentContext) private agentContext: AgentContext,
-  ) {
+  constructor(@inject(AgentContext) private agentContext: AgentContext) {
     this.logger = agentContext.config.logger
-
-    const sourceLocation = this.config.masterListCscaLocation
-    if (!sourceLocation) {
-      throw new Error('The Master List location (URL or file path) cannot be null or undefined.')
-    }
-    this.sourceLocation = sourceLocation
-    this.fileSystem = agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
-    this.cacheFilePath = this.fileSystem.cachePath
-    this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
   }
 
   /**
@@ -55,13 +36,32 @@ export class CscaMasterListService {
       this.logger.info('[CscaMasterListService] initialize - CscaMasterListService has already been initialized.')
       return
     }
-    this.logger.info(`CscaMasterListService: loading from ${this.sourceLocation}`)
+
+    const config = this.agentContext.dependencyManager.resolve(DidCommMrtdModuleConfig)
+
+    const sourceLocation = config.masterListCscaLocation
+    if (!sourceLocation) {
+      this.isInitialized = true
+      this.logger?.warn(
+        '[CscaMasterListService] initialize - No "masterListCscaLocation" configured. Authenticity verification will be disabled.',
+      )
+      return
+    }
+
+    this.sourceLocation = sourceLocation
+
+    this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
+
+    this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
+        this.cacheFilePath = this.fileSystem.cachePath
         if (await this.fileSystem.exists(this.cacheFilePath)) {
-          this.logger.info(`[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`)
+          this.logger.info(
+            `[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`,
+          )
         } else {
           this.logger.info(
             `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
@@ -71,7 +71,9 @@ export class CscaMasterListService {
         }
         ldifContent = await this.fileSystem.read(this.cacheFilePath)
       } else {
-        this.logger.info(`[CscaMasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`)
+        this.logger.info(
+          `[CscaMasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`,
+        )
         ldifContent = await this.fileSystem.read(this.sourceLocation)
       }
 
