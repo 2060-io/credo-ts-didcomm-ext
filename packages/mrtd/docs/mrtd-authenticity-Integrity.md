@@ -1,130 +1,156 @@
 # eMRTD Authenticity & Integrity Verification
 
-This module provides robust authenticity and integrity verification for electronic Machine Readable Travel Documents (eMRTD) such as passports and national ID cards, following [ICAO Doc 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303) standards. It validates the EF.SOD signature and the hash values of all included Data Groups (DGs) using a trust store built from the official ICAO Master List (CSCA certificates).
+This module adds authenticity and integrity verification for electronic Machine Readable Travel Documents (eMRTD) such as passports and national ID cards, following ICAO Doc 9303. It validates EF.SOD (CMS/PKCS#7) and the hash values of all included Data Groups (DGs) using a trust store built from the ICAO Master List (CSCA certificates).
 
 ---
 
 ## Features
 
-- **ICAO Master List ingestion:** Load the Master List either from a local file path or by downloading it from a provided URL (LDIF format).
-- **Automatic CSCA extraction:** Parses and loads all valid CSCA certificates into a trust anchor store for signature validation.
-- **DER & TLV SOD parsing:** Seamlessly supports both raw DER and TLV-wrapped (0x77) SOD formats, as per ICAO LDS requirements.
-- **Full integrity verification:** Checks that all present DGs (e.g., DG1, DG2) match their expected hash in the SOD.
-- **Authenticity chain validation:** Verifies the document signer against the full CSCA chain, enforcing ICAO chain-of-trust requirements.
-- **Comprehensive logging:** All steps are logged with clear context for traceability and audit.
-- **Written with TypeScript/ES2019 best practices:** Thorough JSDoc, clear structure, and robust error handling.
+- **ICAO Master List ingestion** (LDIF): from local file path or via URL.
+- **Automatic CSCA extraction**: parses Master List and loads CSCA certificates into an in‑memory trust store.
+- **TLV/DER support**: EF.SOD may arrive as raw DER or TLV‑wrapped (tag `0x77`) – both are handled.
+- **Integrity checks**: hashes each provided DG and compares against the SOD.
+- **Authenticity checks**: validates the document signer certificate chain against CSCA trust anchors.
+- **Agent‑native I/O**: uses the Agent’s `FileSystem` and `fetch` (no extra HTTP/fs deps).
+- **Lazy, optional setup**: if no Master List is configured, authenticity is skipped.
 
 ---
 
-## How It Works
+## Architecture (high level)
 
-### Overview
+- **`CscaMasterListService`**
 
-1. **Master List Load:** The module ingests the ICAO Master List in LDIF format (either from a URL or a file), extracts all CSCA certificates, and builds the trust store.
-2. **Document Verification:**
-   - Receives a JSON with all DG fields and EF.SOD, base64 encoded.
-   - SOD is decoded and, if needed, the DER portion is extracted from a TLV envelope (0x77 tag).
-   - The SOD’s ASN.1 structure is validated (CMS SignedData).
-   - The LDS Security Object and all Data Group hashes are extracted from the SOD.
-   - Each provided DG is hashed and compared to its corresponding SOD value.
-   - The document signer certificate is validated against the CSCA chain from the trust store.
+  - Lazily resolves `DidCommMrtdModuleConfig` and `FileSystem` inside `initialize()`.
+  - If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. If the file already exists, it is re‑used; otherwise it downloads and caches it.
+  - Extracts all CSCA certificates from the LDIF Master List into an internal trust store.
 
-### Flow Diagram
+- **`SodVerifierService`**
 
-![Flow Diagram](./assets/mrtd-auth-verify.png)
+  - Depends on `CscaMasterListService`.
+  - `verifySod(sodBuffer: Buffer, dataGroups: Record<string, Buffer>)` → `{ authenticity, integrity, details? }`.
+  - Parses SOD (CMS SignedData), extracts LDS hashes, checks DG integrity, and validates DSC chain against CSCA anchors.
+
+- **`DidCommMrtdService`**
+
+  - `processEMrtdData(...)` parses base64 DGs, ensures the Master List is initialized once, delegates SOD verification to `SodVerifierService`, then emits `EMrtdDataReceived` with both parsed fields and the verification outcome.
+  - Event payload shape:
+
+    ```ts
+    {
+      connection,
+      dataGroups: {
+        raw: Record<string, string> // base64
+        parsed: {
+          valid: boolean
+          fields?: ParsedEMrtdData
+          verification?: { authenticity: boolean; integrity: boolean; details?: string }
+        }
+      },
+      threadId
+    }
+    ```
 
 ---
 
-## Usage Example
+## Configuration
 
-### Required Files
-
-- **Master List (LDIF):** e.g. `csca-certs/icaopkd-002-complete-000317.ldif`
-- **Document DGs & SOD (JSON):** e.g. `csca-certs/passport-1.txt`
-
-### Example Test
-
-```typescript
-import * as fs from 'fs'
-import * as path from 'path'
-import { MasterListService } from './models/MasterListService'
-import { SodVerifierService } from './models/SodVerifierService'
-
-async function main() {
-  // 1. Load Master List (file or URL)
-  const masterListPath = path.resolve(__dirname, 'csca-certs/icaopkd-002-complete-000317.ldif')
-  const passportFilePath = path.resolve(__dirname, 'csca-certs/passport-1.txt')
-
-  // 2. Initialize trust anchors
-  const masterListService = new MasterListService(masterListPath)
-  await masterListService.initialize()
-
-  // 3. Load and decode passport DGs and SOD (all base64)
-  const passportJson = JSON.parse(fs.readFileSync(passportFilePath, 'utf8'))
-  const passportData = passportJson.dataGroupsBase64 || passportJson
-
-  if (!passportData.SOD) {
-    throw new Error('The passport file does not contain the SOD field.')
-  }
-
-  const sodBuffer = Buffer.from(passportData.SOD, 'base64')
-  const dg1Buffer = Buffer.from(passportData.DG1, 'base64')
-  const dg2Buffer = passportData.DG2 ? Buffer.from(passportData.DG2, 'base64') : undefined
-
-  const dgMap: Record<string, Buffer> = { DG1: dg1Buffer }
-  if (dg2Buffer) dgMap.DG2 = dg2Buffer
-
-  // 4. Perform verification
-  const sodVerifier = new SodVerifierService(masterListService.getTrustAnchors())
-  const result = await sodVerifier.verifySod(sodBuffer, dgMap)
-
-  // 5. Output results
-  console.log('Authenticity:', result.authenticity)
-  console.log('Integrity:', result.integrity)
-  if (result.details) {
-    console.log('Details:', result.details)
-  }
+```ts
+// DidCommMrtdModuleConfigOptions
+export interface DidCommMrtdModuleConfigOptions {
+  /** URL or local file path to the CSCA Master List (LDIF). Optional. */
+  masterListCscaLocation?: string
 }
+```
 
-main().catch((err) => {
-  console.error('Error in verification:', err)
+Register the module (the config is optional — omit it to disable authenticity):
+
+```ts
+import { Agent } from '@credo-ts/core'
+import { DidCommMrtdModule, DidCommMrtdModuleConfig } from '@2060.io/credo-ts-didcomm-mrtd'
+
+const agent = new Agent({
+  config: {
+    /* ... */
+  },
+  dependencies: agentDependencies,
+  modules: {
+    mrtd: new DidCommMrtdModule(
+      new DidCommMrtdModuleConfig({
+        // Local path OR HTTPS URL (LDIF). Omit to skip authenticity.
+        masterListCscaLocation: 'https://example.org/icao-master-list.ldif',
+      }),
+    ),
+  },
 })
 ```
 
-#### Example JSON Format
+- **Notes**
+
+- For HTTP(S) sources, the Master List is downloaded to `FileSystem.cachePath` and reused on subsequent starts. If download fails but a previous cache exists, the cached copy is used (with a warning).
+
+- If `masterListCscaLocation` is not provided, `CscaMasterListService.initialize()` logs a warning and short‑circuits; `SodVerifierService` will return a result indicating authenticity is not available if no CSCA anchors are present.
+
+---
+
+## Direct service usage example
+
+When you want to verify outside of a DIDComm flow, you can call the services directly:
+
+```ts
+import * as fs from 'fs'
+import { CscaMasterListService, SodVerifierService } from '@2060.io/credo-ts-didcomm-mrtd/dist/services'
+
+// Resolve from agent container instead in a real app
+const ml = container.resolve(CscaMasterListService)
+await ml.initialize() // idempotent; loads config + caches file if URL
+
+const verifier = container.resolve(SodVerifierService)
+
+// Build inputs (base64 → Buffer)
+const json = JSON.parse(fs.readFileSync('csca-certs/example.txt', 'utf8'))
+const data = json.dataGroupsBase64 ?? json
+
+const sod = Buffer.from(data.SOD, 'base64')
+const dgs: Record<string, Buffer> = {}
+for (const [k, v] of Object.entries<string>(data)) if (k !== 'SOD') dgs[k] = Buffer.from(v, 'base64')
+
+const result = await verifier.verifySod(sod, dgs)
+```
+
+### Input JSON format
 
 ```json
 {
-  "DG1": "<base64-encoded DG1>",
-  "DG2": "<base64-encoded DG2>",
-  "SOD": "<base64-encoded EF.SOD>"
-}
-```
-
-Expected response:
-
-```json
-{
-  "authenticity": true,
-  "integrity": true,
-  "details": null
+  "DG1": "<base64>",
+  "DG2": "<base64>",
+  "SOD": "<base64>"
 }
 ```
 
 ---
 
-## Notes on SOD and TLV Handling
+## Using `DidCommMrtdService` in a flow
 
-- EF.SOD may be delivered as a TLV (tag 0x77), per ICAO LDS specification. The system auto-detects and extracts the inner DER CMS.
-- You **do not need to pre-process** the SOD; simply provide the base64-decoded bytes as given by the document reader.
-- Data Groups (DGs) can also arrive in TLV or DER — both are handled before hash computation.
+`processEMrtdData(messageContext)` will:
+
+1. Parse the base64 DGs to structured fields.
+2. Ensure the Master List is initialized once (cached in memory by the CSCA service).
+3. Delegate SOD verification to `SodVerifierService`.
+4. Emit `EMrtdDataReceived` with `{ raw, parsed }`, where `parsed.verification` contains `{ authenticity, integrity, details? }`.
+
+You can subscribe to the event via the agent’s `EventEmitter` and react accordingly.
+
+---
+
+## Notes on SOD & TLV
+
+- EF.SOD may be TLV‑wrapped (tag `0x77`). The verifier auto‑detects and extracts the inner DER before decoding CMS.
+- DG buffers can also be TLV or DER; the verifier strips an outer TLV before hashing.
 
 ---
 
-## Output
+## Output semantics
 
-- **Authenticity:** Indicates if the SOD signature is valid and trusted by any CSCA from the Master List.
-- **Integrity:** Indicates if all provided DGs match their hashes as registered in the SOD.
-- **Details:** Optional explanation for errors or mismatches.
-
----
+- **authenticity**: `true` if a valid chain from the document signer to a CSCA in the Master List is found.
+- **integrity**: `true` if all provided DGs match the hashes in EF.SOD.
+- **details**: optional error/mismatch message to aid debugging.
