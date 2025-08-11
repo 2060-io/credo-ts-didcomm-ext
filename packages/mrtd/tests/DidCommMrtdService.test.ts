@@ -13,7 +13,7 @@ import {
 } from '@credo-ts/core'
 
 import { MrtdEventTypes } from '../src/DidCommMrtdEvents'
-import { DidCommMrtdService } from '../src/DidCommMrtdService'
+import { DidCommMrtdService } from '../src/services/DidCommMrtdService'
 import { EMrtdDataMessage } from '../src/messages'
 import { MrtdProblemReportReason } from '../src/models'
 

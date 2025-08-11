@@ -2,7 +2,7 @@ import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 import { Protocol } from '@credo-ts/core'
 
 import { DidCommMrtdApi } from './DidCommMrtdApi'
-import { DidCommMrtdService } from './DidCommMrtdService'
+import { DidCommMrtdService } from './services/DidCommMrtdService'
 import { DidCommMrtdRole } from './models'
 import { CscaMasterListService, SodVerifierService } from './services'
 

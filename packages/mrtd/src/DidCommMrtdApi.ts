@@ -9,7 +9,7 @@ import {
   Feature,
 } from '@credo-ts/core'
 
-import { DidCommMrtdService } from './DidCommMrtdService'
+import { DidCommMrtdService } from './services/DidCommMrtdService'
 import {
   EMrtdDataHandler,
   EMrtdDataRequestHandler,
