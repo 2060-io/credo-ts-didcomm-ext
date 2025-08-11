@@ -20,6 +20,7 @@ import {
 import { parseEMrtdData } from './models'
 
 import { CscaMasterListService, SodVerifierService } from './services'
+import { DidCommMrtdModuleConfig } from './config/DidCommMrtdModuleConfig'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -88,6 +89,7 @@ export class DidCommMrtdService {
     const { agentContext, message } = messageContext
 
     let parsed
+    let verification
 
     try {
       const parseResult = parseEMrtdData(message.dataGroups)
@@ -98,11 +100,18 @@ export class DidCommMrtdService {
       parsed = { valid: false }
     }
 
-    const verification = await this.sodVerification(agentContext, message.dataGroups).catch((e) => ({
-      authenticity: false,
-      integrity: false,
-      details: e instanceof Error ? e.message : String(e),
-    }))
+    const config = agentContext.dependencyManager.resolve(DidCommMrtdModuleConfig)
+    if (config.masterListCscaLocation) {
+      try {
+        verification = await this.sodVerification(agentContext, message.dataGroups)
+      } catch (error) {
+        verification = {
+          authenticity: false,
+          integrity: false,
+          details: error instanceof Error ? error.message : String(error),
+        }
+      }
+    }
 
     const eventEmitter = agentContext.dependencyManager.resolve(EventEmitter)
     eventEmitter.emit<EMrtdDataReceivedEvent>(agentContext, {
@@ -139,7 +148,6 @@ export class DidCommMrtdService {
     // Ensure Master List is loaded once and cached in memory
     const mlService = agentContext.dependencyManager.resolve(CscaMasterListService)
     await mlService.initialize()
-    
 
     const verifier = agentContext.dependencyManager.resolve(SodVerifierService)
     return verifier.verifySod(sodBuffer, dgMap)
