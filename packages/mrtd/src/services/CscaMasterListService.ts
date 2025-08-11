@@ -3,12 +3,10 @@ import { ContentInfo, SignedData, Certificate } from 'pkijs'
 import { X509Certificate } from '@peculiar/x509'
 import {
   AgentContext,
-  ConsoleLogger,
   FileSystem,
   inject,
   injectable,
   InjectionSymbols,
-  LogLevel,
   type Logger,
 } from '@credo-ts/core'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
@@ -18,7 +16,7 @@ import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
  * and provide trust anchors for eMRTD authenticity verification.
  */
 @injectable()
-export class MasterListService {
+export class CscaMasterListService {
   private trustStore: Map<string, X509Certificate> = new Map()
   private isInitialized = false
   private logger: Logger
@@ -27,7 +25,7 @@ export class MasterListService {
   private fileSystem: FileSystem
 
   /**
-   * Initialize a new MasterListService for a given source.
+   * Initialize a new CscaMasterListService for a given source.
    * @param sourceLocation Path or URL to the Master List LDIF file.
    * @throws If the location is not defined.
    */
@@ -44,7 +42,7 @@ export class MasterListService {
     this.sourceLocation = sourceLocation
     this.fileSystem = agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
     this.cacheFilePath = this.fileSystem.cachePath
-    this.logger.info(`[MasterListService] Initialized with source: ${this.sourceLocation}`)
+    this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
   }
 
   /**
@@ -54,42 +52,42 @@ export class MasterListService {
    */
   public async initialize(): Promise<void> {
     if (this.isInitialized) {
-      this.logger.info('[MasterListService] initialize - MasterListService has already been initialized.')
+      this.logger.info('[CscaMasterListService] initialize - CscaMasterListService has already been initialized.')
       return
     }
-    this.logger.info(`MasterListService: loading from ${this.sourceLocation}`)
+    this.logger.info(`CscaMasterListService: loading from ${this.sourceLocation}`)
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
         if (await this.fileSystem.exists(this.cacheFilePath)) {
-          this.logger.info(`[MasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`)
+          this.logger.info(`[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`)
         } else {
           this.logger.info(
-            `[MasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
+            `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
           )
           await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath)
-          this.logger.info(`[MasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
+          this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
         }
         ldifContent = await this.fileSystem.read(this.cacheFilePath)
       } else {
-        this.logger.info(`[MasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`)
+        this.logger.info(`[CscaMasterListService] initialize - Reading Master List from local file: ${this.sourceLocation}`)
         ldifContent = await this.fileSystem.read(this.sourceLocation)
       }
 
-      this.logger.info('[MasterListService] initialize - Parsing and extracting CSCA certificates...')
+      this.logger.info('[CscaMasterListService] initialize - Parsing and extracting CSCA certificates...')
       await this._extractCSCACertsFromLDIF(ldifContent)
 
       this.isInitialized = true
       this.logger.info(
-        `[MasterListService] initialize - Initialization complete. Loaded ${this.trustStore.size} CSCA certificates into the trust store.`,
+        `[CscaMasterListService] initialize - Initialization complete. Loaded ${this.trustStore.size} CSCA certificates into the trust store.`,
       )
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error)
       this.logger.error(
-        `[MasterListService] initialize - Error initializing from "${this.sourceLocation}": ${errorMsg}`,
+        `[CscaMasterListService] initialize - Error initializing from "${this.sourceLocation}": ${errorMsg}`,
       )
-      throw new Error('Could not initialize MasterListService. eMRTD verification will not be available.')
+      throw new Error('Could not initialize CscaMasterListService. eMRTD verification will not be available.')
     }
   }
 
@@ -100,7 +98,7 @@ export class MasterListService {
    */
   public getTrustAnchors(): X509Certificate[] {
     if (!this.isInitialized) {
-      throw new Error('MasterListService has not been initialized. Call initialize() first.')
+      throw new Error('CscaMasterListService has not been initialized. Call initialize() first.')
     }
     return Array.from(this.trustStore.values())
   }
@@ -191,18 +189,18 @@ export class MasterListService {
           validMasterLists++
           extractedCSCA += loadedCount
           this.logger.info(
-            `[MasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
+            `[CscaMasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
           )
         }
       } catch (error) {
         // Most entries are invalid, just skip and continue
-        this.logger.warn('[MasterListService] extractCSCACerts - Skipping invalid Master List entry.')
+        this.logger.warn('[CscaMasterListService] extractCSCACerts - Skipping invalid Master List entry.')
       }
     }
 
     if (validMasterLists === 0) throw new Error('No valid Master List found in LDIF file')
     this.logger.info(
-      `[MasterListService] extractCSCACerts - Extracted ${extractedCSCA} CSCA certificates from ${validMasterLists} valid Master List entries.`,
+      `[CscaMasterListService] extractCSCACerts - Extracted ${extractedCSCA} CSCA certificates from ${validMasterLists} valid Master List entries.`,
     )
   }
 }

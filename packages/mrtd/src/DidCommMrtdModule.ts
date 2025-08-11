@@ -4,7 +4,7 @@ import { Protocol } from '@credo-ts/core'
 import { DidCommMrtdApi } from './DidCommMrtdApi'
 import { DidCommMrtdService } from './DidCommMrtdService'
 import { DidCommMrtdRole } from './models'
-import { MasterListService, SodVerifierService } from './services'
+import { CscaMasterListService, SodVerifierService } from './services'
 
 import { DidCommMrtdModuleConfig, DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
 
@@ -33,7 +33,7 @@ export class DidCommMrtdModule implements Module {
     dependencyManager.registerInstance(DidCommMrtdModuleConfig, this.config)
 
     // Register services
-    dependencyManager.registerSingleton(MasterListService)
+    dependencyManager.registerSingleton(CscaMasterListService)
     dependencyManager.registerSingleton(SodVerifierService)
 
     // Register primary service

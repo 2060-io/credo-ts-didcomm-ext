@@ -19,8 +19,7 @@ import {
 } from './messages'
 import { parseEMrtdData } from './models'
 
-import { MasterListService, SodVerifierService } from './services'
-
+import { CscaMasterListService, SodVerifierService } from './services'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -126,7 +125,7 @@ export class DidCommMrtdService {
     agentContext: AgentContext,
     dataGroupsBase64: Record<string, string>,
   ): Promise<{ authenticity: boolean; integrity: boolean; details?: string } | undefined> {
-    const sodB64 = dataGroupsBase64?.SOD 
+    const sodB64 = dataGroupsBase64?.SOD
     if (!sodB64) return undefined
 
     const sodBuffer = Buffer.from(sodB64, 'base64')
@@ -138,7 +137,7 @@ export class DidCommMrtdService {
     }
 
     // Ensure Master List is loaded once and cached in memory
-    const mlService = agentContext.dependencyManager.resolve(MasterListService)
+    const mlService = agentContext.dependencyManager.resolve(CscaMasterListService)
     if (!(mlService as any).isInitialized) {
       await mlService.initialize()
     }
