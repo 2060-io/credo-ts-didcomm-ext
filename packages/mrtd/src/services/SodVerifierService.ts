@@ -31,10 +31,16 @@ export class SodVerifierService {
    */
   public async verifySod(sodBuffer: Buffer, dataGroups: Record<string, Buffer>): Promise<SodVerification> {
     try {
-      if (!(this.mlService as any).isInitialized) {
-        await this.mlService.initialize()
-      }
+      await this.mlService.initialize()
+
       this.trustAnchors = this.mlService.getTrustAnchors()
+
+      if (this.trustAnchors.length === 0) {
+        this.logger.warn(
+          '[SodVerifierService] verifySod - No CSCA trust anchors loaded. Please initialize CscaMasterListService first.',
+        )
+        return { authenticity: false, integrity: false, details: 'No CSCA trust anchors loaded' }
+      }
 
       this.logger.info('[SodVerifierService] verifySod - Step 1: Extracting DER from TLV (if present)')
       sodBuffer = this.extractDerFromTlv(sodBuffer)

@@ -138,9 +138,8 @@ export class DidCommMrtdService {
 
     // Ensure Master List is loaded once and cached in memory
     const mlService = agentContext.dependencyManager.resolve(CscaMasterListService)
-    if (!(mlService as any).isInitialized) {
-      await mlService.initialize()
-    }
+    await mlService.initialize()
+    
 
     const verifier = agentContext.dependencyManager.resolve(SodVerifierService)
     return verifier.verifySod(sodBuffer, dgMap)
