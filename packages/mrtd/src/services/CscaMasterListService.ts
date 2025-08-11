@@ -57,7 +57,7 @@ export class CscaMasterListService {
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
-        this.cacheFilePath = this.fileSystem.cachePath
+        this.cacheFilePath = `${this.fileSystem.cachePath}/icao-master-list.ldif`
         if (await this.fileSystem.exists(this.cacheFilePath)) {
           this.logger.info(
             `[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`,
