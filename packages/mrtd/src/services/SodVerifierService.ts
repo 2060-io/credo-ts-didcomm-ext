@@ -4,7 +4,7 @@ import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import * as crypto from 'crypto'
 import { ConsoleLogger, inject, injectable, LogLevel, type Logger } from '@credo-ts/core'
 import { CscaMasterListService } from './CscaMasterListService'
-import { SodVerification } from '../models/EMrtdSodVerification'
+import { SodVerification } from '../models/SodVerification'
 
 /**
  * Utility class to verify SOD (EF.SOD) authenticity and integrity.

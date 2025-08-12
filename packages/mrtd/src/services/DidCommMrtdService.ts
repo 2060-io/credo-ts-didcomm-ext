@@ -21,7 +21,7 @@ import { parseEMrtdData } from '../models'
 
 import { CscaMasterListService, SodVerifierService } from '.'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
-import { SodVerification } from '../models/EMrtdSodVerification'
+import { SodVerification } from '../models/SodVerification'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {

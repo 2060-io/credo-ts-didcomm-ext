@@ -17,7 +17,7 @@ const { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } =
   require('../esm/bundle.js') as typeof tsemrtd
 
 import { EMrtdDataGroup } from './EMrtdDataGroup'
-import { SodVerification } from './EMrtdSodVerification'
+import { SodVerification } from './SodVerification'
 
 export type EMrtdData = {
   raw: Record<string, string>
