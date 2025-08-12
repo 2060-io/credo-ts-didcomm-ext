@@ -1,4 +1,4 @@
-import type { DidCommMrtdService } from '../DidCommMrtdService'
+import type { DidCommMrtdService } from '../services/DidCommMrtdService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
 import { MrzDataRequestMessage } from '../messages'
