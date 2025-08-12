@@ -21,6 +21,7 @@ import { parseEMrtdData } from '../models'
 
 import { CscaMasterListService, SodVerifierService } from '.'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
+import { SodVerification } from '../models/EMrtdSodVerification'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
@@ -133,9 +134,9 @@ export class DidCommMrtdService {
   private async sodVerification(
     agentContext: AgentContext,
     dataGroupsBase64: Record<string, string>,
-  ): Promise<{ authenticity: boolean; integrity: boolean; details?: string } | undefined> {
+  ): Promise<SodVerification> {
     const sodB64 = dataGroupsBase64?.SOD
-    if (!sodB64) return undefined
+    if (!sodB64) return { authenticity: false, integrity: false, details: 'SOD not found in datagroups' }
 
     const sodBuffer = Buffer.from(sodB64, 'base64')
     const dgMap: Record<string, Buffer> = {}
