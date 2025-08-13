@@ -1,7 +1,3 @@
-// packages/mrtd/src/DidCommMrtdModuleConfig.ts
-
-import type { InjectionToken } from '@credo-ts/core'
-
 /**
  * Module configuration options for DidCommMrtdModule.
  */

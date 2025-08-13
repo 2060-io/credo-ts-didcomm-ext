@@ -1,10 +1,12 @@
-import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
-import { Certificate, ContentInfo, SignedData } from 'pkijs'
-import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
-import * as crypto from 'crypto'
 import { ConsoleLogger, inject, injectable, LogLevel, type Logger } from '@credo-ts/core'
-import { CscaMasterListService } from './CscaMasterListService'
+import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
+import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
+import * as crypto from 'crypto'
+import { Certificate, ContentInfo, SignedData } from 'pkijs'
+
 import { SodVerification } from '../models/SodVerification'
+
+import { CscaMasterListService } from './CscaMasterListService'
 
 /**
  * Utility class to verify SOD (EF.SOD) authenticity and integrity.
@@ -18,7 +20,7 @@ export class SodVerifierService {
   /**
    * @param trustAnchors List of X509 CSCA certificates for signature verification.
    */
-  constructor(@inject(CscaMasterListService) private readonly mlService: CscaMasterListService) {
+  public constructor(@inject(CscaMasterListService) private readonly mlService: CscaMasterListService) {
     this.logger = new ConsoleLogger(LogLevel.info)
     this.trustAnchors = []
   }
