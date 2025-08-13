@@ -10,6 +10,7 @@ import {
   MrzDataReceivedEvent,
   MrzDataRequestedEvent,
 } from '../DidCommMrtdEvents'
+import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 import {
   EMrtdDataMessage,
   EMrtdDataRequestMessage,
@@ -18,10 +19,10 @@ import {
   MrzDataRequestMessage,
 } from '../messages'
 import { parseEMrtdData } from '../models'
-
-import { CscaMasterListService, SodVerifierService } from '.'
-import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 import { SodVerification } from '../models/SodVerification'
+
+import { CscaMasterListService } from './CscaMasterListService'
+import { SodVerifierService } from './SodVerifierService'
 
 @scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {

@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@li0ard/tsemrtd": "^0.2.2",
+    "@peculiar/x509": "^1.13.0",
     "@types/pkijs": "^3.0.1",
     "asn1js": "^3.0.6",
     "class-transformer": "0.5.1",

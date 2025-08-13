@@ -9,7 +9,6 @@ import {
   Feature,
 } from '@credo-ts/core'
 
-import { DidCommMrtdService } from './services/DidCommMrtdService'
 import {
   EMrtdDataHandler,
   EMrtdDataRequestHandler,
@@ -20,6 +19,7 @@ import {
 import { Capability } from './models/Capability'
 import { MrtdCapabilities } from './models/MrtdCapabilities'
 import { MrtdProblemReportReason } from './models/ProblemReportReason'
+import { DidCommMrtdService } from './services/DidCommMrtdService'
 
 @injectable()
 export class DidCommMrtdApi {

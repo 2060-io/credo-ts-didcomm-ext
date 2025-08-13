@@ -1,7 +1,8 @@
+import { AgentContext, FileSystem, inject, injectable, InjectionSymbols, type Logger } from '@credo-ts/core'
+import { X509Certificate } from '@peculiar/x509'
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
-import { X509Certificate } from '@peculiar/x509'
-import { AgentContext, FileSystem, inject, injectable, InjectionSymbols, type Logger } from '@credo-ts/core'
+
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 
 /**
@@ -22,7 +23,7 @@ export class CscaMasterListService {
    * @param sourceLocation Path or URL to the Master List LDIF file.
    * @throws If the location is not defined.
    */
-  constructor(@inject(AgentContext) private agentContext: AgentContext) {
+  public constructor(@inject(AgentContext) private agentContext: AgentContext) {
     this.logger = agentContext.config.logger
   }
 
@@ -117,7 +118,7 @@ export class CscaMasterListService {
 
     let match: RegExpExecArray | null
     while ((match = regex.exec(ldifContent)) !== null) {
-      let b64 = match[1].replace(/\r/g, '').replace(/\n/g, '').replace(/ /g, '')
+      const b64 = match[1].replace(/\r/g, '').replace(/\n/g, '').replace(/ /g, '')
       try {
         const buf = Buffer.from(b64, 'base64')
         if (buf.length > 10000) {
@@ -155,8 +156,9 @@ export class CscaMasterListService {
 
         // Step 2: Extract encapsulated ASN.1 (OCTET STRING) payload
         const eci = signedData.encapContentInfo
-        // @ts-ignore
-        const masterListDER: ArrayBuffer = eci.eContent.valueBlock.valueHex
+
+        const masterListDER = eci.eContent?.valueBlock.valueHex
+        if (!masterListDER) throw new Error('Invalid DER Master List')
 
         // Step 3: Parse Master List
         const mlASN1 = fromBER(masterListDER)

@@ -1,3 +1,4 @@
+import type { SodVerification } from './SodVerification'
 import type tsemrtd from '@li0ard/tsemrtd'
 import type { SecurityInfos } from '@li0ard/tsemrtd/dist/asn1/eac'
 import type { CSCAMasterList } from '@li0ard/tsemrtd/dist/asn1/pkd'
@@ -17,7 +18,6 @@ const { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } =
   require('../esm/bundle.js') as typeof tsemrtd
 
 import { EMrtdDataGroup } from './EMrtdDataGroup'
-import { SodVerification } from './SodVerification'
 
 export type EMrtdData = {
   raw: Record<string, string>

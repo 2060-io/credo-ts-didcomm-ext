@@ -1,10 +1,11 @@
+import { Hasher, inject, injectable, InjectionSymbols, TypedArrayEncoder, type Logger } from '@credo-ts/core'
+import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
 import { Certificate, ContentInfo, SignedData } from 'pkijs'
-import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
-import * as crypto from 'crypto'
-import { ConsoleLogger, inject, injectable, LogLevel, type Logger } from '@credo-ts/core'
-import { CscaMasterListService } from './CscaMasterListService'
+
 import { SodVerification } from '../models/SodVerification'
+
+import { CscaMasterListService } from './CscaMasterListService'
 
 /**
  * Utility class to verify SOD (EF.SOD) authenticity and integrity.
@@ -18,8 +19,11 @@ export class SodVerifierService {
   /**
    * @param trustAnchors List of X509 CSCA certificates for signature verification.
    */
-  constructor(@inject(CscaMasterListService) private readonly mlService: CscaMasterListService) {
-    this.logger = new ConsoleLogger(LogLevel.info)
+  public constructor(
+    @inject(CscaMasterListService) private readonly mlService: CscaMasterListService,
+    @inject(InjectionSymbols.Logger) logger: Logger,
+  ) {
+    this.logger = logger
     this.trustAnchors = []
   }
 
@@ -56,8 +60,11 @@ export class SodVerifierService {
       this.logger.debug(`[SodVerifierService] verifySod - SignedData ${JSON.stringify(signedData, null, 2)}`)
 
       this.logger.info('[SodVerifierService] verifySod - Step 4: Extracting encapsulated LDS Security Object')
-      // @ts-ignore
-      const ldsContent: ArrayBuffer = signedData.encapContentInfo.eContent.valueBlock.valueHex
+
+      const ldsContent = signedData.encapContentInfo.eContent?.valueBlock.valueHex
+      if (!ldsContent) {
+        throw new Error('Invalid LDS content in SOD')
+      }
       const ldsASN1 = fromBER(ldsContent)
       if (ldsASN1.offset === -1) throw new Error('Invalid LDS ASN.1 in SOD content')
 
@@ -103,15 +110,15 @@ export class SodVerifierService {
         if (dataGroups[dgName]) {
           // Always check and remove TLV for every DG before hashing
           const cleanDataGroup = this.extractDerFromTlv(dataGroups[dgName])
-          const computed = crypto.createHash(hashAlgorithm).update(cleanDataGroup).digest()
-          const expectedHex = dgHashMap[dgName].toString('hex')
-          const actualHex = computed.toString('hex')
-          const matches = computed.equals(dgHashMap[dgName])
+          const computed = Hasher.hash(cleanDataGroup, hashAlgorithm)
+          const matches = Buffer.compare(computed, dgHashMap[dgName]) === 0
 
           this.logger.info(
             `[SodVerifierService] verifySod - Step 7: Integrity check for ${dgName}: ${matches ? 'OK' : 'FAIL'}`,
           )
           if (!matches) {
+            const expectedHex = dgHashMap[dgName].toString('hex')
+            const actualHex = TypedArrayEncoder.toHex(computed)
             this.logger.warn(`[SodVerifierService] verifySod - [FAIL] Hash mismatch for ${dgName}:`)
             this.logger.warn(`[SodVerifierService] verifySod -   Expected (from SOD): ${expectedHex}`)
             this.logger.warn(`[SodVerifierService] verifySod -   Actual  (computed): ${actualHex}`)
@@ -209,11 +216,11 @@ export class SodVerifierService {
   private oidToHashAlgo(oid: string): string {
     switch (oid) {
       case '2.16.840.1.101.3.4.2.1':
-        return 'sha256'
+        return 'sha-256'
       case '2.16.840.1.101.3.4.2.3':
-        return 'sha512'
+        return 'sha-512'
       case '1.3.14.3.2.26':
-        return 'sha1'
+        return 'sha-1'
       default:
         throw new Error(`[SodVerifierService] oidToHashAlgo - Unsupported hash algorithm OID: ${oid}`)
     }

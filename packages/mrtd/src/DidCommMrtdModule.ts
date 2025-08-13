@@ -1,12 +1,13 @@
+import type { DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
 import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
+
 import { Protocol } from '@credo-ts/core'
 
 import { DidCommMrtdApi } from './DidCommMrtdApi'
-import { DidCommMrtdService } from './services/DidCommMrtdService'
+import { DidCommMrtdModuleConfig } from './config/DidCommMrtdModuleConfig'
 import { DidCommMrtdRole } from './models'
 import { CscaMasterListService, SodVerifierService } from './services'
-
-import { DidCommMrtdModuleConfig, DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
+import { DidCommMrtdService } from './services/DidCommMrtdService'
 
 /**
  * Module configuration and registration for DIDComm MRTD.
