@@ -1,4 +1,4 @@
-import { ConsoleLogger, inject, injectable, LogLevel, type Logger } from '@credo-ts/core'
+import { inject, injectable, InjectionSymbols, type Logger } from '@credo-ts/core'
 import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
 import * as crypto from 'crypto'
@@ -20,8 +20,11 @@ export class SodVerifierService {
   /**
    * @param trustAnchors List of X509 CSCA certificates for signature verification.
    */
-  public constructor(@inject(CscaMasterListService) private readonly mlService: CscaMasterListService) {
-    this.logger = new ConsoleLogger(LogLevel.info)
+  public constructor(
+    @inject(CscaMasterListService) private readonly mlService: CscaMasterListService,
+    @inject(InjectionSymbols.Logger) logger: Logger,
+  ) {
+    this.logger = logger
     this.trustAnchors = []
   }
 
