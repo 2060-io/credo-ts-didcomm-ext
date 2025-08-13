@@ -156,8 +156,9 @@ export class CscaMasterListService {
 
         // Step 2: Extract encapsulated ASN.1 (OCTET STRING) payload
         const eci = signedData.encapContentInfo
-        // @ts-ignore
-        const masterListDER: ArrayBuffer = eci.eContent.valueBlock.valueHex
+
+        const masterListDER = eci.eContent?.valueBlock.valueHex
+        if (!masterListDER) throw new Error('Invalid DER Master List')
 
         // Step 3: Parse Master List
         const mlASN1 = fromBER(masterListDER)

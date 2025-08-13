@@ -60,8 +60,11 @@ export class SodVerifierService {
       this.logger.debug(`[SodVerifierService] verifySod - SignedData ${JSON.stringify(signedData, null, 2)}`)
 
       this.logger.info('[SodVerifierService] verifySod - Step 4: Extracting encapsulated LDS Security Object')
-      // @ts-ignore
-      const ldsContent: ArrayBuffer = signedData.encapContentInfo.eContent.valueBlock.valueHex
+
+      const ldsContent = signedData.encapContentInfo.eContent?.valueBlock.valueHex
+      if (!ldsContent) {
+        throw new Error('Invalid LDS content in SOD')
+      }
       const ldsASN1 = fromBER(ldsContent)
       if (ldsASN1.offset === -1) throw new Error('Invalid LDS ASN.1 in SOD content')
 
