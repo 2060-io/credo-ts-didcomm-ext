@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.14](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.13...@2060.io/credo-ts-didcomm-mrtd@v0.0.14) (2025-08-13)
+
+
+### Features
+
+* **mrtd:** add SOD authenticity and integrity verification ([#86](https://github.com/2060-io/credo-ts-didcomm-ext/issues/86)) ([ecdfff6](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ecdfff6c8078411d0db0bbef5acee5ba2a5893f0))
+
+
+### Bug Fixes
+
+* **mrtd:** lint errors and dependencies ([#89](https://github.com/2060-io/credo-ts-didcomm-ext/issues/89)) ([ee4adae](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ee4adae97422e8316a490b13442d227e3379f218))
+
 ## [0.0.13](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.12...@2060.io/credo-ts-didcomm-mrtd@v0.0.13) (2025-02-24)
 
 
