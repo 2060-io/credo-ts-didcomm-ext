@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   ci-trigger:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       triggered: ${{ steps.check.outputs.triggered }}
     steps:
@@ -39,7 +39,7 @@ jobs:
           echo "::set-output name=triggered::${SHOULD_RUN}"
 
   validate:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Validate
     needs: [ci-trigger]
     if: needs.ci-trigger.outputs.triggered == 'true'
@@ -68,7 +68,7 @@ jobs:
         run: yarn check-types
 
   integration-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Integration Tests
     needs: [ci-trigger]
     if: needs.ci-trigger.outputs.triggered == 'true'
