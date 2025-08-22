@@ -4,5 +4,5 @@
   "packages/media-sharing": "0.0.3",
   "packages/mrtd": "0.0.14",
   "packages/reactions": "0.0.2",
-  "packages/receipts": "0.0.7"
+  "packages/receipts": "0.0.8"
 }
