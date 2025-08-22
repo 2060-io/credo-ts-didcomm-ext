@@ -50,7 +50,7 @@ export class SodVerifierService {
       sodBuffer = this.extractDerFromTlv(sodBuffer)
 
       this.logger.info('[SodVerifierService] verifySod - Step 2: Decoding ASN.1 structure from SOD buffer')
-      const sodAsn1 = fromBER(sodBuffer.buffer.slice(sodBuffer.byteOffset, sodBuffer.byteOffset + sodBuffer.byteLength))
+      const sodAsn1 = fromBER(new Uint8Array(sodBuffer.buffer, sodBuffer.byteOffset, sodBuffer.byteLength))
       this.logger.debug('[SodVerifierService] verifySod - ASN.1 decoding result...')
       if (sodAsn1.offset === -1) throw new Error('Invalid ASN.1 structure in SOD')
 
@@ -110,8 +110,8 @@ export class SodVerifierService {
         if (dataGroups[dgName]) {
           // Always check and remove TLV for every DG before hashing
           const cleanDataGroup = this.extractDerFromTlv(dataGroups[dgName])
-          const computed = Hasher.hash(cleanDataGroup, hashAlgorithm)
-          const matches = Buffer.compare(computed, dgHashMap[dgName]) === 0
+          const computed = Hasher.hash(new Uint8Array(cleanDataGroup), hashAlgorithm)
+          const matches = Buffer.compare(computed, new Uint8Array(dgHashMap[dgName])) === 0
 
           this.logger.info(
             `[SodVerifierService] verifySod - Step 7: Integrity check for ${dgName}: ${matches ? 'OK' : 'FAIL'}`,
