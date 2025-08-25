@@ -5,38 +5,10 @@ import path from 'path'
 
 import { SodVerifierService } from '../src/services'
 
+import { MockCscaMasterListService } from './__mocks__/CscaMasterListService.mock'
+
 // Test vector taken from German BSI TR-03105-5 ReferenceDataSet
 // https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03105/BSI_TR-03105-5_ReferenceDataSet_zip.html
-
-// Minimal mock for Master List service
-interface ICscaMasterListService {
-  initialize(): Promise<void>
-  getTrustAnchors(): X509Certificate[]
-}
-
-/**
- * mock for the CSCA Master List service
- */
-class MockCscaMasterListService implements ICscaMasterListService {
-  /**
-   * @param anchors X509 trust anchors to be returned by the mock.
-   */
-  public constructor(private readonly anchors: X509Certificate[]) {}
-
-  /**
-   * Initialize the service.
-   */
-  public async initialize(): Promise<void> {
-    /* no-op */
-  }
-
-  /**
-   * @returns Provided trust anchors.
-   */
-  public getTrustAnchors(): X509Certificate[] {
-    return this.anchors
-  }
-}
 
 // Fixtures
 const FIXTURES = {
