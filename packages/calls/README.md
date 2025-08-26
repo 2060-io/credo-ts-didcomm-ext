@@ -51,7 +51,7 @@ const agent = new VSAgent({
   modules: {
     // ...other modules
     calls: new DidCommCallsModule(),
-  }
+  },
 })
 ```
 
