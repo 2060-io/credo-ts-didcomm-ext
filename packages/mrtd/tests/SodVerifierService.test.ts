@@ -3,7 +3,7 @@ import { X509Certificate } from '@peculiar/x509'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-import { SodVerifierService } from '../src/services'
+import { SodVerifierService } from '../src'
 
 import { MockCscaMasterListService } from './__mocks__/CscaMasterListService.mock'
 

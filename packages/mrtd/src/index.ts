@@ -1,6 +1,6 @@
 export { DidCommMrtdApi } from './DidCommMrtdApi'
 export { DidCommMrtdModule } from './DidCommMrtdModule'
-export { DidCommMrtdService } from './services/DidCommMrtdService'
 export * from './DidCommMrtdEvents'
 export * from './models'
 export * from './messages'
+export * from './services'
