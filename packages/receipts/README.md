@@ -39,6 +39,7 @@ npm install @2060.io/credo-ts-didcomm-receipts
 ```
 
 ## Usage
+
 Adding the Module to Your Agent
 To use the Receipts module, add it to your agent's modules configuration:
 
@@ -49,7 +50,7 @@ const agent = new VSAgent({
   modules: {
     // ...other modules
     receipts: new ReceiptsModule(),
-  }
+  },
 })
 ```
 
@@ -63,6 +64,7 @@ type VsAgentModules = {
 ```
 
 ### Sending Message Receipts
+
 To send message receipts (e.g., when a message is received or viewed):
 
 ```typescript
@@ -76,39 +78,44 @@ await agent.modules.receipts.send({
 ```
 
 ### Requesting Message Receipts
+
 To request receipts for specific messages or message types:
 
 ```typescript
 await agent.modules.receipts.request({
   connectionId: connection.id,
   requestedReceipts: [
-    { messageType: 'https://didcomm.org/my-protocol/1.0/my-message', states: [MessageState.Received, MessageState.Viewed] },
+    {
+      messageType: 'https://didcomm.org/my-protocol/1.0/my-message',
+      states: [MessageState.Received, MessageState.Viewed],
+    },
   ],
 })
 ```
 
 ### Handling Receipt Events
+
 Subscribe to receipt events to react to incoming receipts:
 
 ```typescript
 import { ReceiptsEventTypes, MessageReceiptsReceivedEvent } from '@2060.io/credo-ts-didcomm-receipts'
 
-agent.events.on(
-  ReceiptsEventTypes.MessageReceiptsReceived,
-  async ({ payload }: MessageReceiptsReceivedEvent) => {
-    const connectionId = payload.connectionId
-    config.logger.debug(`MessageReceiptsReceivedEvent received. Connection id: ${connectionId}. Receipts: ${JSON.stringify(payload.receipts)}`)
-    const receipts = payload.receipts
+agent.events.on(ReceiptsEventTypes.MessageReceiptsReceived, async ({ payload }: MessageReceiptsReceivedEvent) => {
+  const connectionId = payload.connectionId
+  config.logger.debug(
+    `MessageReceiptsReceivedEvent received. Connection id: ${connectionId}. Receipts: ${JSON.stringify(payload.receipts)}`,
+  )
+  const receipts = payload.receipts
 
-    receipts.forEach(receipt => {
-      const { messageId, timestamp, state } = receipt
-      sendMessageStateUpdatedEvent({ agent, messageId, connectionId, state, timestamp, config })
-    })
-  },
-)
+  receipts.forEach((receipt) => {
+    const { messageId, timestamp, state } = receipt
+    sendMessageStateUpdatedEvent({ agent, messageId, connectionId, state, timestamp, config })
+  })
+})
 ```
 
 ### Features
+
 - **Send Message Receipts**: Notify other agents about message states (received, viewed, etc.).
 - **Request Receipts**: Ask for receipts for specific messages or message types.
 - **Event Subscription**: Listen for receipt events to update UI or trigger workflows.
