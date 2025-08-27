@@ -135,4 +135,4 @@ Apache 2.0
 
 ---
 
-For more information, see the [Credo documentation](https://github.com/openwallet-foundation/credo-ts.git).
+For more information, see the [didcomm.org](https://didcomm.org/receipts/1.0/).
