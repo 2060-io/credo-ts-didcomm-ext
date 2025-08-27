@@ -56,30 +56,19 @@ const agent = new Agent({
 })
 ```
 
-### Receiving MRTD Messages
+### Sending MRTD Messages
 
-Subscribe to MRTD events to process incoming travel document data:
+Send MRTD events to process incoming travel document data:
 
 ```typescript
-import {
-  MrtdEventTypes,
-  EMrtdDataReceivedEvent,
-  EMrtdDataSubmitMessage,
-  MrtdSubmitState,
-} from '@2060.io/credo-ts-didcomm-mrtd'
+const result = await EIdReader.startReading({
+  // ...
+})
 
-agent.events.on(MrtdEventTypes.EMrtdDataReceived, async ({ payload }: EMrtdDataReceivedEvent) => {
-  const { connection, dataGroups, threadId } = payload
-
-  const msg = new EMrtdDataSubmitMessage({
-    connectionId: connection.id,
-    threadId,
-    state: MrtdSubmitState.Submitted,
-    dataGroups,
-  })
-
-  msg.id = await getRecordId(agent, msg.id)
-  await sendMessageReceivedEvent(agent, msg, msg.timestamp, config)
+await agent?.modules.mrtd.sendEMrtdData({
+  connectionId,
+  dataGroups: result.dataGroupsBase64,
+  threadId: didcommThreadId,
 })
 ```
 
