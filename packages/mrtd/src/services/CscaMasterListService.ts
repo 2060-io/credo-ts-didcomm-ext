@@ -67,7 +67,7 @@ export class CscaMasterListService {
           this.logger.info(
             `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
           )
-          await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath)
+          await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
           this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
         }
         ldifContent = await this.fileSystem.read(this.cacheFilePath)
@@ -148,7 +148,7 @@ export class CscaMasterListService {
     for (const buffer of masterListBlobs) {
       try {
         // Step 1: Parse CMS SignedData
-        const cmsAsn1 = fromBER(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength))
+        const cmsAsn1 = fromBER(new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength))
         if (cmsAsn1.offset === -1) throw new Error('Invalid ASN.1 structure (CMS)')
 
         const contentInfo = new ContentInfo({ schema: cmsAsn1.result })
