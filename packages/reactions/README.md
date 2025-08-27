@@ -54,15 +54,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VsAgentModules = {
-  // ...
-  reactions: DidCommReactionsModule
-}
-```
-
 ### Sending Message Reactions
 
 To send message reactions (e.g., emoji reactions or to remove a reaction):

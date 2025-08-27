@@ -55,19 +55,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VsAgentModules = {
-  credentials: CredentialsModule<
-    [V2CredentialProtocol<[LegacyIndyCredentialFormatService, AnonCredsCredentialFormatService]>]
-  >
-  proofs: ProofsModule<[V2ProofProtocol<[LegacyIndyProofFormatService, AnonCredsProofFormatService]>]>
-  receipts: ReceiptsModule
-  userProfile: UserProfileModule
-}
-```
-
 ### Handling Profile Events
 
 The module emits events when profile information should be updated or shared. Subscribe to these events to handle profile workflows in your application:

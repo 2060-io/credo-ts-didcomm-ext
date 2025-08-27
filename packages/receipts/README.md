@@ -54,15 +54,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VsAgentModules = {
-  // ...
-  receipts: ReceiptsModule
-}
-```
-
 ### Sending Message Receipts
 
 To send message receipts (e.g., when a message is received or viewed):

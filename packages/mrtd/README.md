@@ -56,15 +56,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VsAgentModules = {
-  // ...
-  mrtd: DidCommMrtdModule
-}
-```
-
 ### Receiving MRTD Messages
 
 Subscribe to MRTD events to process incoming travel document data:

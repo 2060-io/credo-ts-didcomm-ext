@@ -54,15 +54,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VsAgentModules = {
-  // ...
-  media: MediaSharingModule
-}
-```
-
 ### Receiving Media Files
 
 Subscribe to media sharing events to process incoming media files:

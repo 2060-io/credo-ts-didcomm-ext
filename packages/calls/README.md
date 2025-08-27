@@ -55,17 +55,6 @@ const agent = new Agent({
 })
 ```
 
-Example agent modules configuration:
-
-```typescript
-type VSAgentModules = {
-  calls: DidCommCallsModule
-  credentials: CredentialsModule<
-    [V2CredentialProtocol<[LegacyIndyCredentialFormatService, AnonCredsCredentialFormatService]>]
-  >
-}
-```
-
 ### Sending a Call Offer
 
 To initiate a call, send a `CallOfferRequestMessage` using the API:
@@ -73,13 +62,13 @@ To initiate a call, send a `CallOfferRequestMessage` using the API:
 ```typescript
 const msg = JsonTransformer.fromJSON(message, CallOfferRequestMessage)
 const callOffer = await agent.modules.calls.offer({
-    connectionId: connection.id,
-    offerExpirationTime: msg.offerExpirationTime,
-    offerStartTime: msg.offerStartTime,
-    description: msg.description,
-    callType: 'service',
-    parameters: msg.parameters,
-  })
+  connectionId: connection.id,
+  offerExpirationTime: msg.offerExpirationTime,
+  offerStartTime: msg.offerStartTime,
+  description: msg.description,
+  callType: 'service',
+  parameters: msg.parameters,
+})
 ```
 
 ### Handling Call Events
