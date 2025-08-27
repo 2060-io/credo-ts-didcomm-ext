@@ -43,7 +43,7 @@ npm install @2060.io/credo-ts-didcomm-mrtd
 
 To use the MRTD module, add it to your agent's modules configuration:
 
-> **Note:** The `masterListCscaLocation` must point to the **official ICAO Master List (CSCA certificates)** corresponding to the version you are working with. Make sure you always provide the up-to-date and correct list according to the ICAO release you intend to support.
+> **Note:** The `masterListCscaLocation` must point to the **official ICAO Master List (CSCA certificates)** corresponding to the version you are working with. Make sure you always provide the up-to-date and correct list according to the ICAO release you intend to support. The Master List is typically distributed with an **`.ldif` extension**. For further details, see [**mrtd-authenticity-integrity.md**](./docs/mrtd-authenticity-integrity.md).
 
 ```typescript
 import { DidCommMrtdModule } from '@2060.io/credo-ts-didcomm-mrtd'
