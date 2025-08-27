@@ -47,7 +47,7 @@ To use the DIDComm Calls module, add it to your agent's modules configuration:
 ```typescript
 import { DidCommCallsModule } from '@2060.io/credo-ts-didcomm-calls'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     calls: new DidCommCallsModule(),
