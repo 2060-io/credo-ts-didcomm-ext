@@ -54,56 +54,19 @@ const agent = new Agent({
 })
 ```
 
-### Receiving Media Files
+### Create Media
 
-Subscribe to media sharing events to process incoming media files:
+Create media sharing events to process media record:
 
 ```typescript
-import {
-  MediaSharingEventTypes,
-  MediaSharingStateChangedEvent,
-  MediaSharingState,
-  MediaSharingRole,
-  MediaMessage,
-} from '@2060.io/credo-ts-didcomm-media-sharing'
+const originalRecord = await agent.modules.media.findById(message.associatedRecordId)
 
-agent.events.on(MediaSharingEventTypes.StateChanged, async ({ payload }: MediaSharingStateChangedEvent) => {
-  const record = payload.mediaSharingRecord
-
-  config.logger
-    .debug(`MediaSharingStateChangedEvent received. Role: ${record.role} Connection id: ${record.connectionId}. 
-    Items: ${JSON.stringify(record.items)} `)
-
-  if (record.state === MediaSharingState.MediaShared && record.role === MediaSharingRole.Receiver) {
-    if (record.items) {
-      const message = new MediaMessage({
-        connectionId: record.connectionId!,
-        id: record.threadId,
-        threadId: record.parentThreadId,
-        timestamp: record.createdAt,
-        items: record.items?.map((item) => ({
-          id: item.id,
-          ciphering: item.ciphering, // Encryption info
-          uri: item.uri!,
-          mimeType: item.mimeType,
-          byteCount: item.byteCount,
-          description: item.description,
-          filename: item.fileName,
-          duration: item.metadata?.duration as number,
-          preview: item.metadata?.preview as string,
-          width: item.metadata?.width as number,
-          height: item.metadata?.height as number,
-          title: item.metadata?.title as string,
-          icon: item.metadata?.icon as string,
-          openingMode: item.metadata?.openingMode as string,
-          screenOrientation: item.metadata?.screenOrientation as string,
-        })),
-      })
-
-      if (message.threadId) message.threadId = await getRecordId(agent, message.threadId)
-      await sendMessageReceivedEvent(agent, message, message.timestamp, config)
-    }
-  }
+// Create media record entry
+const newRecord = await agent.modules.media.create({
+  connectionId: connection.id,
+  items: [item],
+  metadata: { ...originalRecord.metadata },
+  description: originalRecord.description,
 })
 ```
 
