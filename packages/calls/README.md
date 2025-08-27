@@ -71,18 +71,15 @@ type VSAgentModules = {
 To initiate a call, send a `CallOfferRequestMessage` using the API:
 
 ```typescript
-const callOffer = message as CallOfferMessage
-const msg = new CallOfferRequestMessage({
-  id: await getRecordId(agent, message.id),
-  connectionId: connection.id,
-  offerExpirationTime: callOffer.offerExpirationTime ?? undefined,
-  offerStartTime: callOffer.offerStartTime ?? undefined,
-  description: callOffer.description,
-  parameters: callOffer.parameters,
-  threadId: message.thread?.threadId,
-  timestamp: new Date(),
-})
-await agent.modules.calls.sendCallOffer(msg)
+const msg = JsonTransformer.fromJSON(message, CallOfferRequestMessage)
+const callOffer = await agent.modules.calls.offer({
+    connectionId: connection.id,
+    offerExpirationTime: msg.offerExpirationTime,
+    offerStartTime: msg.offerStartTime,
+    description: msg.description,
+    callType: 'service',
+    parameters: msg.parameters,
+  })
 ```
 
 ### Handling Call Events
