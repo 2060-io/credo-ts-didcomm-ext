@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.15](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.14...@2060.io/credo-ts-didcomm-mrtd@v0.0.15) (2025-08-27)
+
+
+### Bug Fixes
+
+* Prevent hash verification error when CscaMasterListService download file via url ([#95](https://github.com/2060-io/credo-ts-didcomm-ext/issues/95)) ([c80ec6a](https://github.com/2060-io/credo-ts-didcomm-ext/commit/c80ec6ac8a6d2d0604da04eaa5041afc66a2c6af))
+
 ## [0.0.14](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.13...@2060.io/credo-ts-didcomm-mrtd@v0.0.14) (2025-08-13)
 
 
