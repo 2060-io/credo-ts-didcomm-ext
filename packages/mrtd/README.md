@@ -48,7 +48,7 @@ To use the MRTD module, add it to your agent's modules configuration:
 ```typescript
 import { DidCommMrtdModule } from '@2060.io/credo-ts-didcomm-mrtd'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     mrtd: new DidCommMrtdModule({ masterListCscaLocation: options.masterListCscaLocation }),
@@ -125,4 +125,4 @@ Apache 2.0
 
 ---
 
-For more information, see the [docs](./docs/) folder for protocol details
+For more information, see the [Credo documentation](https://github.com/openwallet-foundation/credo-ts.git).

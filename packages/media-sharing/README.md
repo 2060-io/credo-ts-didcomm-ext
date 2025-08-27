@@ -46,7 +46,7 @@ To use the Media Sharing module, add it to your agent's modules configuration:
 ```typescript
 import { MediaSharingModule } from '@2060.io/credo-ts-didcomm-media-sharing'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     media: new MediaSharingModule(),
@@ -141,4 +141,4 @@ Apache 2.0
 
 ---
 
-For more information, see the [doc](./doc/) folder for
+For more information, see the [Credo documentation](https://github.com/openwallet-foundation/credo-ts.git).

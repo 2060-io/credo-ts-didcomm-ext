@@ -46,7 +46,7 @@ To use the Receipts module, add it to your agent's modules configuration:
 ```typescript
 import { ReceiptsModule } from '@2060.io/credo-ts-didcomm-receipts'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     receipts: new ReceiptsModule(),

@@ -47,7 +47,7 @@ To use the User Profile module, add it to your agent's modules configuration:
 ```typescript
 import { UserProfileModule, UserProfileModuleConfig } from '@2060.io/credo-ts-didcomm-user-profile'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     userProfile: new UserProfileModule(new UserProfileModuleConfig({ autoSendProfile: false })),

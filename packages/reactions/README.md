@@ -46,7 +46,7 @@ To use the Reactions module, add it to your agent's modules configuration:
 ```typescript
 import { DidCommReactionsModule } from '@2060.io/credo-ts-didcomm-reactions'
 
-const agent = new VSAgent({
+const agent = new Agent({
   modules: {
     // ...other modules
     reactions: new DidCommReactionsModule(),
@@ -164,4 +164,4 @@ Apache 2.0
 
 ---
 
-For more information,
+For more information, see the [Credo documentation](https://github.com/openwallet-foundation/credo-ts.git).
