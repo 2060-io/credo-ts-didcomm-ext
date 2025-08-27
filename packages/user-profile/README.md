@@ -60,25 +60,21 @@ const agent = new Agent({
 The module emits events when profile information should be updated or shared. Subscribe to these events to handle profile workflows in your application:
 
 ```typescript
-agent.events.on(
-  ProfileEventTypes.ConnectionProfileUpdated,
-  async ({ payload: { connection, profile } }: ConnectionProfileUpdatedEvent) => {
-    const { displayName, displayPicture, displayIcon, description, preferredLanguage } = profile
-    config.logger.debug(`ConnectionProfileUpdatedEvent received. Connection id: ${connection.id} 
-      Profile: ${JSON.stringify(profile)}`)
+import { ProfileMessage } from '@2060.io/vs-agent-model'
 
-    const msg = new ProfileMessage({
-      connectionId: connection.id,
-      displayName,
-      displayImageUrl: displayPicture && createDataUrl(displayPicture),
-      displayIconUrl: displayIcon && createDataUrl(displayIcon),
-      description,
-      preferredLanguage,
-    })
+const msg = JsonTransformer.fromJSON(message, ProfileMessage)
+const { displayImageUrl, displayName, displayIconUrl, description, preferredLanguage } = msg
 
-    await sendMessageReceivedEvent(agent, msg, msg.timestamp, config)
+await agent.modules.userProfile.sendUserProfile({
+  connectionId: connection.id,
+  profileData: {
+    displayName: displayName ?? undefined,
+    displayPicture: displayImageUrl ? parsePictureData(displayImageUrl) : undefined,
+    displayIcon: displayIconUrl ? parsePictureData(displayIconUrl) : undefined,
+    description: description ?? undefined,
+    preferredLanguage: preferredLanguage ?? undefined,
   },
-)
+})
 ```
 
 ### Features
