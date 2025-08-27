@@ -30,7 +30,7 @@
 
 ## Overview
 
-The **DIDComm User Profile** extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git) enables secure, decentralized sharing and updating of user profile information using the DIDComm protocol. It provides APIs, message handlers, and services to manage profile data between agents, including display name, profile picture, description, and preferred language.
+The **DIDComm User Profile** extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git) enables secure, decentralized sharing and updating of user profile information using DIDComm. It provides APIs, message handlers, and services to manage profile data between agents, including display name, profile picture, description, and preferred language.
 
 ## Installation
 
