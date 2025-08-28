@@ -93,9 +93,6 @@ import { ReceiptsEventTypes, MessageReceiptsReceivedEvent } from '@2060.io/credo
 
 agent.events.on(ReceiptsEventTypes.MessageReceiptsReceived, async ({ payload }: MessageReceiptsReceivedEvent) => {
   const connectionId = payload.connectionId
-  config.logger.debug(
-    `MessageReceiptsReceivedEvent received. Connection id: ${connectionId}. Receipts: ${JSON.stringify(payload.receipts)}`,
-  )
   const receipts = payload.receipts
 
   receipts.forEach((receipt) => {

@@ -68,6 +68,14 @@ const newRecord = await agent.modules.media.create({
 })
 ```
 
+### Sending a media file
+
+![](./doc/diagrams/sender.png)
+
+### Receiving a media file
+
+![](./doc/diagrams/recipient.png)
+
 ### Encryption and Security
 
 Media items can be transmitted with encryption. The `ciphering` property in each media item describes the encryption method and keys used. This ensures that only authorized recipients can access the shared files.
