@@ -59,8 +59,6 @@ const agent = new Agent({
 Create media sharing events to process media record:
 
 ```typescript
-const originalRecord = await agent.modules.media.findById(message.associatedRecordId)
-
 // Create media record entry
 const newRecord = await agent.modules.media.create({
   connectionId: connection.id,
