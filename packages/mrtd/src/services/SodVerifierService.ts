@@ -57,7 +57,6 @@ export class SodVerifierService {
       this.logger.info('[SodVerifierService] verifySod - Step 3: Parsing CMS/PKCS7 content')
       const cms = new ContentInfo({ schema: sodAsn1.result })
       const signedData = new SignedData({ schema: cms.content })
-      this.logger.debug(`[SodVerifierService] verifySod - SignedData ${JSON.stringify(signedData, null, 2)}`)
 
       this.logger.info('[SodVerifierService] verifySod - Step 4: Extracting encapsulated LDS Security Object')
 
