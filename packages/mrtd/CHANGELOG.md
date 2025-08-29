@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.16](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.15...@2060.io/credo-ts-didcomm-mrtd@v0.0.16) (2025-08-29)
+
+
+### Features
+
+* preload CSCA Master List during module initialize ([#99](https://github.com/2060-io/credo-ts-didcomm-ext/issues/99)) ([6b36ff2](https://github.com/2060-io/credo-ts-didcomm-ext/commit/6b36ff28c0cda79f3ff796868c6ca5d193ae576e))
+
 ## [0.0.15](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.14...@2060.io/credo-ts-didcomm-mrtd@v0.0.15) (2025-08-27)
 
 
