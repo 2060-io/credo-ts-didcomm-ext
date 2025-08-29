@@ -65,15 +65,20 @@ export class DidCommMrtdModule implements Module {
       return
     }
 
-    try {
-      const csaMasterList = agentContext.dependencyManager.resolve(CscaMasterListService)
-      logger.debug('[DidCommMrtdModule] Preload CSCA MasterList...')
-      csaMasterList.initialize()
-      logger.debug(
-        `[DidCommMrtdModule] CSCA MasterList loaded (${csaMasterList.getTrustAnchors().length} CSCA anchors).`,
-      )
-    } catch (e) {
-      logger.error(`[DidCommMrtdModule] CSCA MasterList Preload failed: ${e instanceof Error ? e.message : String(e)}`)
-    }
+    const csaMasterList = agentContext.dependencyManager.resolve(CscaMasterListService)
+    logger.debug('[DidCommMrtdModule] Preload CSCA MasterList...')
+
+    csaMasterList
+      .initialize()
+      .then(() => {
+        logger.debug(
+          `[DidCommMrtdModule] CSCA MasterList loaded (${csaMasterList.getTrustAnchors().length} CSCA anchors).`,
+        )
+      })
+      .catch((e) => {
+        logger.error(
+          `[DidCommMrtdModule] CSCA MasterList Preload failed: ${e instanceof Error ? e.message : String(e)}`,
+        )
+      })
   }
 }
