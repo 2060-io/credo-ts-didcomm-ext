@@ -1,7 +1,7 @@
 import type { DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
-import type { AgentContext, DependencyManager, FeatureRegistry, Logger, Module } from '@credo-ts/core'
+import type { AgentContext, DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 
-import { InjectionSymbols, Protocol } from '@credo-ts/core'
+import { Protocol } from '@credo-ts/core'
 
 import { DidCommMrtdApi } from './DidCommMrtdApi'
 import { DidCommMrtdModuleConfig } from './config/DidCommMrtdModuleConfig'
@@ -58,22 +58,22 @@ export class DidCommMrtdModule implements Module {
    * Initializes the module (e.g. by pre-loading the CSCA Master List if configured).
    */
   public async initialize(agentContext: AgentContext): Promise<void> {
-    const logger = agentContext.dependencyManager.resolve<Logger>(InjectionSymbols.Logger)
+    const logger = agentContext.config.logger
 
     if (!this.config.masterListCscaLocation) {
-      logger?.info('[DidCommMrtdModule] MASTER_LIST_CSCA_LOCATION not set; eMRTD verification remains disabled.')
+      logger.info('[DidCommMrtdModule] MASTER_LIST_CSCA_LOCATION not set; eMRTD verification remains disabled.')
       return
     }
 
     try {
       const csaMasterList = agentContext.dependencyManager.resolve(CscaMasterListService)
-      logger?.debug('[DidCommMrtdModule] Preload CSCA MasterList...')
-      await csaMasterList.initialize()
-      logger?.debug(
+      logger.debug('[DidCommMrtdModule] Preload CSCA MasterList...')
+      csaMasterList.initialize()
+      logger.debug(
         `[DidCommMrtdModule] CSCA MasterList loaded (${csaMasterList.getTrustAnchors().length} CSCA anchors).`,
       )
     } catch (e) {
-      logger?.error(`[DidCommMrtdModule] CSCA MasterList Preload failed: ${e instanceof Error ? e.message : String(e)}`)
+      logger.error(`[DidCommMrtdModule] CSCA MasterList Preload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
 }
