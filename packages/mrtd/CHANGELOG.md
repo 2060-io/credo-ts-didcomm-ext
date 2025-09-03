@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.17](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.16...@2060.io/credo-ts-didcomm-mrtd@v0.0.17) (2025-09-03)
+
+
+### Features
+
+* Add export SodVerification type ([#101](https://github.com/2060-io/credo-ts-didcomm-ext/issues/101)) ([d0fd24b](https://github.com/2060-io/credo-ts-didcomm-ext/commit/d0fd24bc767f84998cdac296a131e4f821ae913a))
+
 ## [0.0.16](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.15...@2060.io/credo-ts-didcomm-mrtd@v0.0.16) (2025-08-29)
 
 
