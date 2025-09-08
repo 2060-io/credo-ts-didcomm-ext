@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup node v22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org/'
@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup node ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://registry.npmjs.org/'
@@ -130,7 +130,7 @@ jobs:
       - name: Checkout credo-ts-didcomm-ext
         uses: actions/checkout@v5
       - name: Setup node v22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org/'
