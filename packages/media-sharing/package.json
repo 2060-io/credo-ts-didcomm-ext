@@ -32,8 +32,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@credo-ts/askar": "0.5.17",
-    "@credo-ts/node": "0.5.17",
+    "@credo-ts/askar": "^0.5.13",
+    "@credo-ts/node": "^0.5.13",
     "@hyperledger/aries-askar-nodejs": "0.2.3",
     "@types/jest": "^26.0.23",
     "@types/node": "^20.11.16",
@@ -41,7 +41,7 @@
     "prettier": "^3.5.2"
   },
   "dependencies": {
-    "@credo-ts/core": "0.5.17",
+    "@credo-ts/core": "^0.5.13",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.1.13",
