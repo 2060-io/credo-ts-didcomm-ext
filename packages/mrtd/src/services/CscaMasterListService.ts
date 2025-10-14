@@ -54,21 +54,22 @@ export class CscaMasterListService {
     this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
 
     this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    const clearCacheTtlSeconds = config.masterListCscaClearCacheTtlSeconds
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
         this.cacheFilePath = `${this.fileSystem.cachePath}/icao-master-list.ldif`
-        if (await this.fileSystem.exists(this.cacheFilePath)) {
+        const metadataPath = `${this.cacheFilePath}.metadata.json` // For storing download timestamp
+        const cacheExists = await this.fileSystem.exists(this.cacheFilePath)
+        const refreshCachedMl = !cacheExists || (await this.refreshCachedMasterList(clearCacheTtlSeconds, metadataPath))
+
+        if (refreshCachedMl) {
+          await this.downloadAndCacheMasterList(metadataPath)
+        } else {
           this.logger.info(
             `[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`,
           )
-        } else {
-          this.logger.info(
-            `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
-          )
-          await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
-          this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
         }
         ldifContent = await this.fileSystem.read(this.cacheFilePath)
       } else {
@@ -189,22 +190,132 @@ export class CscaMasterListService {
           }
         }
 
+        validMasterLists++
         if (loadedCount > 0) {
-          validMasterLists++
           extractedCSCA += loadedCount
-          this.logger.info(
-            `[CscaMasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
-          )
         }
+        this.logger.info(
+          `[CscaMasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
+        )
       } catch (error) {
         // Most entries are invalid, just skip and continue
         this.logger.warn('[CscaMasterListService] extractCSCACerts - Skipping invalid Master List entry.')
       }
     }
 
+    this.logger.info(`[CscaMasterListService] extractCSCACerts - Processed ${validMasterLists} Master List entries.`)
     if (validMasterLists === 0) throw new Error('No valid Master List found in LDIF file')
     this.logger.info(
       `[CscaMasterListService] extractCSCACerts - Extracted ${extractedCSCA} CSCA certificates from ${validMasterLists} valid Master List entries.`,
     )
+  }
+
+  /**
+   * Decides whether the cached Master List is stale and needs a remote refresh.
+   * @returns true when the cache must be refreshed, false to reuse the cached file.
+   */
+  private async refreshCachedMasterList(
+    clearCacheTtlSeconds: number | undefined,
+    metadataPath: string,
+  ): Promise<boolean> {
+    // If no FileSystem is available, we cannot manage a cache, so always reuse existing file if present.
+    if (!this.fileSystem) {
+      this.logger.debug(
+        '[CscaMasterListService] initialize - FileSystem not available. Reusing cached Master List if present.',
+      )
+      return true
+    }
+    // Undefined TTL means indefinite reuse of cached file.
+    if (clearCacheTtlSeconds === undefined) {
+      this.logger.info(
+        '[CscaMasterListService] initialize - No cache TTL configured. Reusing cached Master List indefinitely.',
+      )
+      return false
+    }
+    // Reject NaN and negative values as invalid, causing indefinite reuse of cached file.
+    if (Number.isNaN(clearCacheTtlSeconds)) {
+      this.logger.debug(
+        '[CscaMasterListService] initialize - Received NaN cache TTL configuration. Reusing cached Master List.',
+      )
+      return false
+    }
+    // Negative TTL means indefinite reuse of cached file.
+    if (clearCacheTtlSeconds < 0) {
+      this.logger.debug(
+        '[CscaMasterListService] initialize - Received negative cache TTL configuration. Reusing cached Master List.',
+      )
+      return false
+    }
+    // Zero TTL means always refresh the cached file.
+    if (clearCacheTtlSeconds === 0) {
+      this.logger.info(
+        '[CscaMasterListService] initialize - Cache TTL set to 0. Refreshing remote Master List on every initialization.',
+      )
+      return true
+    }
+
+    try {
+      if (!(await this.fileSystem.exists(metadataPath))) {
+        // No metadata means we cannot determine age; fetch a fresh copy.
+        this.logger.info(
+          '[CscaMasterListService] initialize - No metadata found for cached Master List. Refreshing remote copy.',
+        )
+        return true
+      }
+
+      const metadataRaw = await this.fileSystem.read(metadataPath)
+      const metadata = JSON.parse(metadataRaw) as { downloadedAt?: string }
+      const downloadedAt = metadata?.downloadedAt
+      const downloadedAtMs = downloadedAt ? Date.parse(downloadedAt) : NaN
+
+      if (Number.isNaN(downloadedAtMs)) {
+        // Invalid timestamp indicates the metadata is corrupt, so refresh to recover.
+        this.logger.info(
+          '[CscaMasterListService] initialize - Cached Master List metadata invalid. Refreshing remote copy.',
+        )
+        return true
+      }
+
+      const ageSeconds = (Date.now() - downloadedAtMs) / 1000
+      this.logger.info(
+        `[CscaMasterListService] initialize - Cached Master List age: ${ageSeconds.toFixed(
+          0,
+        )}s (TTL: ${clearCacheTtlSeconds}s)`,
+      )
+      // Cached file has exceeded TTL and must be replaced.
+      if (ageSeconds >= clearCacheTtlSeconds) {
+        this.logger.info(
+          `[CscaMasterListService] initialize - Cached Master List older than ${clearCacheTtlSeconds}s. Refreshing remote copy.`,
+        )
+        return true
+      }
+
+      return false
+    } catch (error) {
+      this.logger.error(
+        '[CscaMasterListService] initialize - Failed to read cache metadata. Refreshing remote Master List.',
+      )
+      return true
+    }
+  }
+
+  /**
+   * Downloads the Master List from the remote URL and caches it locally.
+   * Also writes metadata with the download timestamp.
+   * @param metadataPath Path to write metadata JSON file.
+   * @throws If download or file write fails.
+   */
+  private async downloadAndCacheMasterList(metadataPath: string): Promise<void> {
+    if (!this.fileSystem || !this.cacheFilePath || !this.sourceLocation) {
+      throw new Error('CscaMasterListService is not properly configured to download the Master List.')
+    }
+
+    this.logger.info(
+      `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
+    )
+    await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
+    // Write metadata with download timestamp
+    await this.fileSystem.write(metadataPath, JSON.stringify({ downloadedAt: new Date().toISOString() }))
+    this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
   }
 }
