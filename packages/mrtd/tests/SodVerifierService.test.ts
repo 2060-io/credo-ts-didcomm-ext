@@ -112,4 +112,13 @@ describe('SodVerifierService Testing', () => {
       console.log('Verification details:', result.details ?? '(no extra details)')
     }
   })
+
+  it('throws when no CSCA trust anchors are available', async () => {
+    const logger: Logger = new ConsoleLogger(LogLevel.info)
+    type MlDep = ConstructorParameters<typeof SodVerifierService>[0]
+    const emptyMl = new MockCscaMasterListService([])
+    const noAnchorService = new SodVerifierService(emptyMl as unknown as MlDep, logger)
+
+    await expect(noAnchorService.verifySod(Buffer.alloc(0), {})).rejects.toThrow('No CSCA trust anchors loaded')
+  })
 })
