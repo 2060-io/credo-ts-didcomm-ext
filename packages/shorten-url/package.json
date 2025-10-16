@@ -1,0 +1,42 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-shorten-url",
+  "version": "0.0.1",
+  "description": "DIDComm Shorten URL protocol implementation for @credo-ts/core",
+  "license": "Apache-2.0",
+  "main": "build/index",
+  "types": "build/index",
+  "files": [
+    "build"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/shorten-url",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/shorten-url"
+  },
+  "scripts": {
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "yarn run build",
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "@credo-ts/core": "^0.5.13"
+  },
+  "dependencies": {
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.8.0"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "^0.5.13",
+    "@credo-ts/node": "^0.5.13",
+    "@hyperledger/aries-askar-nodejs": "^0.2.3",
+    "ts-node-dev": "^2.0.0"
+  }
+}
