@@ -81,7 +81,7 @@ export class UserProfileApi {
    *
    * @returns updated User Profile data
    */
-  public async updateUserProfileData(props: Partial<UserProfileData>) {
+  public async updateUserProfileData(props: Partial<Omit<UserProfileData, 'updatedAt'>>) {
     await this.userProfileService.updateUserProfile(this.agentContext, props)
     return await this.getUserProfileData()
   }
