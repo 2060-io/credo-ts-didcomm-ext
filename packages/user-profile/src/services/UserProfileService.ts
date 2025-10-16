@@ -106,7 +106,7 @@ export class UserProfileService {
             base64: displayPictureData?.data.base64,
             links: displayPictureData?.data.links,
           }
-        : currentProfile?.displayPicture,
+        : undefined,
       displayIcon: displayIconData
         ? {
             mimeType: displayIconData?.mimeType,
