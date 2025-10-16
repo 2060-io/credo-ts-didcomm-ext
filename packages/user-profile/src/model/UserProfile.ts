@@ -10,4 +10,5 @@ export interface UserProfileData {
   displayIcon?: PictureData
   description?: string
   preferredLanguage?: string
+  updatedAt?: Date;
 }

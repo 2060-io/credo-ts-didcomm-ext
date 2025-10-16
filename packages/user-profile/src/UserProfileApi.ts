@@ -99,6 +99,7 @@ export class UserProfileApi {
       displayIcon: userProfile.displayIcon,
       description: userProfile.description,
       preferredLanguage: userProfile.preferredLanguage,
+      updatedAt: userProfile.updatedAt
     }
   }
 }

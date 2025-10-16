@@ -42,6 +42,7 @@ export class UserProfileService {
       displayName: userProfile.displayName,
       displayPicture: userProfile.displayPicture,
       preferredLanguage: userProfile.preferredLanguage,
+      updatedAt: userProfile.updatedAt
     }
 
     Object.assign(userProfile, props)
