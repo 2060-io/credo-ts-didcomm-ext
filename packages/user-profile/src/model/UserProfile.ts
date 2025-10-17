@@ -1,3 +1,5 @@
+import type { BaseRecord } from '@credo-ts/core'
+
 export interface PictureData {
   mimeType?: string
   links?: string[]
@@ -10,5 +12,8 @@ export interface UserProfileData {
   displayIcon?: PictureData
   description?: string
   preferredLanguage?: string
-  updatedAt?: Date
+}
+
+export interface GetUserProfileDataReturnType extends UserProfileData {
+  updatedAt: BaseRecord['updatedAt']
 }
