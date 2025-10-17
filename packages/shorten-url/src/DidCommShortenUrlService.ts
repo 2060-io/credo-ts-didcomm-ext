@@ -34,50 +34,50 @@ export class DidCommShortenUrlService {
   }
 
   // Process inbound messages and emit events
-  public async processRequest(ctx: InboundMessageContext<RequestShortenedUrlMessage>) {
-    const conn = ctx.assertReadyConnection()
-    const requestedValiditySeconds = ctx.message.requestedValiditySeconds
+  public async processRequest(inboundMessageContext: InboundMessageContext<RequestShortenedUrlMessage>) {
+    const conn = inboundMessageContext.assertReadyConnection()
+    const requestedValiditySeconds = inboundMessageContext.message.requestedValiditySeconds
     if (!Number.isInteger(requestedValiditySeconds) || requestedValiditySeconds < 0) {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
     }
-    this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(ctx.agentContext, {
+    this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
-        threadId: ctx.message.thread?.threadId,
-        url: ctx.message.url,
-        goalCode: ctx.message.goalCode,
+        threadId: inboundMessageContext.message.thread?.threadId,
+        url: inboundMessageContext.message.url,
+        goalCode: inboundMessageContext.message.goalCode,
         requestedValiditySeconds,
-        shortUrlSlug: ctx.message.shortUrlSlug,
+        shortUrlSlug: inboundMessageContext.message.shortUrlSlug,
       },
     })
   }
 
-  public async processShortenedUrl(ctx: InboundMessageContext<ShortenedUrlMessage>) {
-    const conn = ctx.assertReadyConnection()
-    const threadId = ctx.message.thread?.threadId
+  public async processShortenedUrl(inboundMessageContext: InboundMessageContext<ShortenedUrlMessage>) {
+    const conn = inboundMessageContext.assertReadyConnection()
+    const threadId = inboundMessageContext.message.thread?.threadId
     if (!threadId) {
       throw new CredoError('shortened-url message MUST include the thread id of the related request')
     }
-    this.eventEmitter.emit<DidCommShortenedUrlReceivedEvent>(ctx.agentContext, {
+    this.eventEmitter.emit<DidCommShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
         threadId,
-        shortenedUrl: ctx.message.shortenedUrl,
-        expiresTime: ctx.message.expiresTime,
+        shortenedUrl: inboundMessageContext.message.shortenedUrl,
+        expiresTime: inboundMessageContext.message.expiresTime,
       },
     })
   }
 
-  public async processInvalidate(ctx: InboundMessageContext<InvalidateShortenedUrlMessage>) {
-    const conn = ctx.assertReadyConnection()
-    this.eventEmitter.emit<DidCommInvalidateShortenedUrlReceivedEvent>(ctx.agentContext, {
+  public async processInvalidate(inboundMessageContext: InboundMessageContext<InvalidateShortenedUrlMessage>) {
+    const conn = inboundMessageContext.assertReadyConnection()
+    this.eventEmitter.emit<DidCommInvalidateShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
-        threadId: ctx.message.thread?.threadId,
-        shortenedUrl: ctx.message.shortenedUrl,
+        threadId: inboundMessageContext.message.thread?.threadId,
+        shortenedUrl: inboundMessageContext.message.shortenedUrl,
       },
     })
   }
