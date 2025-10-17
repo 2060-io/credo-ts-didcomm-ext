@@ -1,10 +1,10 @@
 import { CredoError, EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
 
 import {
-  InvalidateShortenedUrlReceivedEvent,
-  RequestShortenedUrlReceivedEvent,
-  ShortenUrlEventTypes,
-  ShortenedUrlReceivedEvent,
+  DidCommInvalidateShortenedUrlReceivedEvent,
+  DidCommRequestShortenedUrlReceivedEvent,
+  DidCommShortenUrlEventTypes,
+  DidCommShortenedUrlReceivedEvent,
 } from './DidCommShortenUrlEvents'
 import { RequestShortenedUrlMessage, ShortenedUrlMessage, InvalidateShortenedUrlMessage } from './messages'
 
@@ -40,8 +40,8 @@ export class DidCommShortenUrlService {
     if (!Number.isInteger(requestedValiditySeconds) || requestedValiditySeconds < 0) {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
     }
-    this.eventEmitter.emit<RequestShortenedUrlReceivedEvent>(ctx.agentContext, {
-      type: ShortenUrlEventTypes.RequestShortenedUrlReceived,
+    this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(ctx.agentContext, {
+      type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
         threadId: ctx.message.thread?.threadId,
@@ -59,8 +59,8 @@ export class DidCommShortenUrlService {
     if (!threadId) {
       throw new CredoError('shortened-url message MUST include the thread id of the related request')
     }
-    this.eventEmitter.emit<ShortenedUrlReceivedEvent>(ctx.agentContext, {
-      type: ShortenUrlEventTypes.ShortenedUrlReceived,
+    this.eventEmitter.emit<DidCommShortenedUrlReceivedEvent>(ctx.agentContext, {
+      type: DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
         threadId,
@@ -72,8 +72,8 @@ export class DidCommShortenUrlService {
 
   public async processInvalidate(ctx: InboundMessageContext<InvalidateShortenedUrlMessage>) {
     const conn = ctx.assertReadyConnection()
-    this.eventEmitter.emit<InvalidateShortenedUrlReceivedEvent>(ctx.agentContext, {
-      type: ShortenUrlEventTypes.InvalidateShortenedUrlReceived,
+    this.eventEmitter.emit<DidCommInvalidateShortenedUrlReceivedEvent>(ctx.agentContext, {
+      type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
       payload: {
         connectionId: conn.id,
         threadId: ctx.message.thread?.threadId,

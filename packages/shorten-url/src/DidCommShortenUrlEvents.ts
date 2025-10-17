@@ -1,13 +1,13 @@
 import type { BaseEvent } from '@credo-ts/core'
 
-export enum ShortenUrlEventTypes {
-  RequestShortenedUrlReceived = 'RequestShortenedUrlReceived',
-  ShortenedUrlReceived = 'ShortenedUrlReceived',
-  InvalidateShortenedUrlReceived = 'InvalidateShortenedUrlReceived',
+export enum DidCommShortenUrlEventTypes {
+  DidCommRequestShortenedUrlReceived = 'DidCommRequestShortenedUrlReceived',
+  DidCommShortenedUrlReceived = 'DidCommShortenedUrlReceived',
+  DidCommInvalidateShortenedUrlReceived = 'DidCommInvalidateShortenedUrlReceived',
 }
 
-export interface RequestShortenedUrlReceivedEvent extends BaseEvent {
-  type: ShortenUrlEventTypes.RequestShortenedUrlReceived
+export interface DidCommRequestShortenedUrlReceivedEvent extends BaseEvent {
+  type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived
   payload: {
     connectionId: string
     threadId?: string
@@ -18,8 +18,8 @@ export interface RequestShortenedUrlReceivedEvent extends BaseEvent {
   }
 }
 
-export interface ShortenedUrlReceivedEvent extends BaseEvent {
-  type: ShortenUrlEventTypes.ShortenedUrlReceived
+export interface DidCommShortenedUrlReceivedEvent extends BaseEvent {
+  type: DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived
   payload: {
     connectionId: string
     threadId: string
@@ -28,8 +28,8 @@ export interface ShortenedUrlReceivedEvent extends BaseEvent {
   }
 }
 
-export interface InvalidateShortenedUrlReceivedEvent extends BaseEvent {
-  type: ShortenUrlEventTypes.InvalidateShortenedUrlReceived
+export interface DidCommInvalidateShortenedUrlReceivedEvent extends BaseEvent {
+  type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived
   payload: {
     connectionId: string
     threadId?: string
