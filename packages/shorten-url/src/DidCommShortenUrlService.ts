@@ -35,7 +35,7 @@ export class DidCommShortenUrlService {
 
   // Process inbound messages and emit events
   public async processRequest(inboundMessageContext: InboundMessageContext<RequestShortenedUrlMessage>) {
-    const conn = inboundMessageContext.assertReadyConnection()
+    const connection = inboundMessageContext.assertReadyConnection()
     const requestedValiditySeconds = inboundMessageContext.message.requestedValiditySeconds
     if (!Number.isInteger(requestedValiditySeconds) || requestedValiditySeconds < 0) {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
@@ -43,7 +43,7 @@ export class DidCommShortenUrlService {
     this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
       payload: {
-        connectionId: conn.id,
+        connectionId: connection.id,
         threadId: inboundMessageContext.message.thread?.threadId,
         url: inboundMessageContext.message.url,
         goalCode: inboundMessageContext.message.goalCode,
@@ -54,7 +54,7 @@ export class DidCommShortenUrlService {
   }
 
   public async processShortenedUrl(inboundMessageContext: InboundMessageContext<ShortenedUrlMessage>) {
-    const conn = inboundMessageContext.assertReadyConnection()
+    const connection = inboundMessageContext.assertReadyConnection()
     const threadId = inboundMessageContext.message.thread?.threadId
     if (!threadId) {
       throw new CredoError('shortened-url message MUST include the thread id of the related request')
@@ -62,7 +62,7 @@ export class DidCommShortenUrlService {
     this.eventEmitter.emit<DidCommShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived,
       payload: {
-        connectionId: conn.id,
+        connectionId: connection.id,
         threadId,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
         expiresTime: inboundMessageContext.message.expiresTime,
@@ -71,11 +71,11 @@ export class DidCommShortenUrlService {
   }
 
   public async processInvalidate(inboundMessageContext: InboundMessageContext<InvalidateShortenedUrlMessage>) {
-    const conn = inboundMessageContext.assertReadyConnection()
+    const connection = inboundMessageContext.assertReadyConnection()
     this.eventEmitter.emit<DidCommInvalidateShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
       payload: {
-        connectionId: conn.id,
+        connectionId: connection.id,
         threadId: inboundMessageContext.message.thread?.threadId,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
       },
