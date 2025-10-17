@@ -24,7 +24,7 @@ export interface ShortenedUrlReceivedEvent extends BaseEvent {
     connectionId: string
     threadId: string
     shortenedUrl: string
-    expiresTime?: Number
+    expiresTime?: number
   }
 }
 
