@@ -1,5 +1,6 @@
 export * from './DidCommShortenUrlModule'
 export * from './DidCommShortenUrlApi'
+export * from './DidCommShortenUrlModuleConfig'
 export * from './DidCommShortenUrlService'
 export * from './DidCommShortenUrlEvents'
 export * from './messages'
