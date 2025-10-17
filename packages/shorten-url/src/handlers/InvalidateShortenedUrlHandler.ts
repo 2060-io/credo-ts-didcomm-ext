@@ -1,8 +1,7 @@
 import type { DidCommShortenUrlService } from '../DidCommShortenUrlService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
-import { getOutboundMessageContext } from '@credo-ts/core'
-import { AckMessage, AckStatus } from '@credo-ts/core'
+import { getOutboundMessageContext, AckMessage, AckStatus } from '@credo-ts/core'
 
 import { InvalidateShortenedUrlMessage } from '../messages'
 

@@ -70,13 +70,12 @@ export class DidCommShortenUrlApi {
     return { messageId: message.id }
   }
 
-  public async invalidateShortenedUrl(options: { connectionId: string; shortenedUrl: string; threadId?: string }) {
+  public async invalidateShortenedUrl(options: { connectionId: string; shortenedUrl: string }) {
     const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
     if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
 
     const message = this.shortenService.createInvalidate({
       shortenedUrl: options.shortenedUrl,
-      threadId: options.threadId,
     })
 
     await this.messageSender.sendMessage(

@@ -32,7 +32,6 @@ export interface DidCommInvalidateShortenedUrlReceivedEvent extends BaseEvent {
   type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived
   payload: {
     connectionId: string
-    threadId?: string
     shortenedUrl: string
   }
 }

@@ -4,7 +4,6 @@ import { IsString } from 'class-validator'
 
 export interface InvalidateShortenedUrlMessageOptions {
   id?: string
-  threadId?: string
   shortenedUrl: string
 }
 
@@ -13,7 +12,6 @@ export class InvalidateShortenedUrlMessage extends AgentMessage {
     super()
     if (options) {
       this.id = options.id ?? this.generateId()
-      if (options.threadId) this.setThread({ threadId: options.threadId })
       this.shortenedUrl = options.shortenedUrl
     }
   }

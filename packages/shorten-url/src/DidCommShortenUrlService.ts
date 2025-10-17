@@ -29,7 +29,7 @@ export class DidCommShortenUrlService {
     return new ShortenedUrlMessage(options)
   }
 
-  public createInvalidate(options: { shortenedUrl: string; threadId?: string }) {
+  public createInvalidate(options: { shortenedUrl: string }) {
     return new InvalidateShortenedUrlMessage(options)
   }
 
@@ -76,7 +76,6 @@ export class DidCommShortenUrlService {
       type: DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
       payload: {
         connectionId: connection.id,
-        threadId: inboundMessageContext.message.thread?.threadId,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
       },
     })
