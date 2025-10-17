@@ -1,9 +1,10 @@
+import type { DidCommShortenUrlModuleConfigOptions } from './DidCommShortenUrlModuleConfig'
 import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
 
 import { Protocol } from '@credo-ts/core'
 
 import { DidCommShortenUrlApi } from './DidCommShortenUrlApi'
-import { DidCommShortenUrlModuleConfig, DidCommShortenUrlModuleConfigOptions } from './DidCommShortenUrlModuleConfig'
+import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
 
 export class DidCommShortenUrlModule implements Module {
