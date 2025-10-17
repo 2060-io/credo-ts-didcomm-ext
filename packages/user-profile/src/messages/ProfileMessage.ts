@@ -14,7 +14,7 @@ export interface ProfileMessageOptions {
 
 class ProfileForExchange {
   public displayName?: string
-  public displayPicture?: string | null
+  public displayPicture?: string
   public displayIcon?: string
   public description?: string
   public preferredLanguage?: string
