@@ -6,7 +6,7 @@ export interface PictureData {
 
 export interface UserProfileData {
   displayName?: string
-  displayPicture?: PictureData
+  displayPicture?: PictureData | null | ''
   displayIcon?: PictureData
   description?: string
   preferredLanguage?: string
