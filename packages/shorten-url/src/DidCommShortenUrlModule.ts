@@ -6,6 +6,7 @@ import { Protocol } from '@credo-ts/core'
 import { DidCommShortenUrlApi } from './DidCommShortenUrlApi'
 import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
+import { DidCommShortenUrlRepository } from './repository'
 
 export class DidCommShortenUrlModule implements Module {
   public readonly config: DidCommShortenUrlModuleConfig
@@ -18,6 +19,7 @@ export class DidCommShortenUrlModule implements Module {
   public register(dependencyManager: DependencyManager, featureRegistry: FeatureRegistry): void {
     dependencyManager.registerContextScoped(DidCommShortenUrlApi)
     dependencyManager.registerInstance(DidCommShortenUrlModuleConfig, this.config)
+    dependencyManager.registerSingleton(DidCommShortenUrlRepository)
     dependencyManager.registerSingleton(DidCommShortenUrlService)
 
     featureRegistry.register(

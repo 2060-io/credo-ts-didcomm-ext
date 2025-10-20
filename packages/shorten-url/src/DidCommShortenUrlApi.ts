@@ -10,6 +10,8 @@ import {
 
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
 import { RequestShortenedUrlHandler, ShortenedUrlHandler, InvalidateShortenedUrlHandler } from './handlers'
+import { ShortenUrlRole, ShortenUrlState } from './models'
+import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
 
 @injectable()
 export class DidCommShortenUrlApi {
@@ -17,6 +19,7 @@ export class DidCommShortenUrlApi {
     private readonly messageHandlerRegistry: MessageHandlerRegistry,
     private readonly messageSender: MessageSender,
     private readonly shortenService: DidCommShortenUrlService,
+    private readonly shortenUrlRepository: DidCommShortenUrlRepository,
     private readonly connectionService: ConnectionService,
     private readonly agentContext: AgentContext,
   ) {
@@ -42,6 +45,18 @@ export class DidCommShortenUrlApi {
       requestedValiditySeconds: options.requestedValiditySeconds,
       shortUrlSlug: options.shortUrlSlug,
     })
+    // Create and save record
+    const record = new DidCommShortenUrlRecord({
+      connectionId: connection.id,
+      requestId: message.id,
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.RequestSent,
+      url: options.url,
+      goalCode: options.goalCode,
+      requestedValiditySeconds: options.requestedValiditySeconds,
+      shortUrlSlug: options.shortUrlSlug,
+    })
+    await this.shortenUrlRepository.save(this.agentContext, record)
 
     await this.messageSender.sendMessage(
       new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
@@ -63,6 +78,30 @@ export class DidCommShortenUrlApi {
       shortenedUrl: options.shortenedUrl,
       expiresTime: options.expiresTime,
     })
+    // Update or create record
+    const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
+      connectionId: connection.id,
+      requestId: options.threadId,
+      role: ShortenUrlRole.UrlShortener,
+    })
+    // Update existing record
+    if (record) {
+      record.shortenedUrl = options.shortenedUrl
+      record.expiresTime = options.expiresTime
+      record.state = ShortenUrlState.ShortenedSent
+      await this.shortenUrlRepository.update(this.agentContext, record)
+    } else {
+      // Create new record
+      const newRecord = new DidCommShortenUrlRecord({
+        connectionId: connection.id,
+        requestId: options.threadId,
+        role: ShortenUrlRole.UrlShortener,
+        state: ShortenUrlState.ShortenedSent,
+        shortenedUrl: options.shortenedUrl,
+        expiresTime: options.expiresTime,
+      })
+      await this.shortenUrlRepository.save(this.agentContext, newRecord)
+    }
 
     await this.messageSender.sendMessage(
       new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
@@ -77,6 +116,19 @@ export class DidCommShortenUrlApi {
     const message = this.shortenService.createInvalidate({
       shortenedUrl: options.shortenedUrl,
     })
+    // Update record
+    const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
+      connectionId: connection.id,
+      shortenedUrl: options.shortenedUrl,
+      role: ShortenUrlRole.LongUrlProvider,
+    })
+
+    if (!record) {
+      throw new CredoError('No shorten-url record found for the provided shortened_url on this connection')
+    }
+
+    record.state = ShortenUrlState.InvalidationSent
+    await this.shortenUrlRepository.update(this.agentContext, record)
 
     await this.messageSender.sendMessage(
       new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
