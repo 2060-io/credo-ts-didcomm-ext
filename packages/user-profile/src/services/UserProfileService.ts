@@ -107,7 +107,7 @@ export class UserProfileService {
             links: displayPictureData?.data.links,
           }
         : receivedProfile.displayPicture === '' || receivedProfile.displayPicture === null
-          ? undefined
+          ? receivedProfile.displayPicture
           : currentProfile?.displayPicture,
       displayIcon: displayIconData
         ? {
