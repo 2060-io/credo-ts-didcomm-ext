@@ -1,7 +1,7 @@
 import { injectable, MessageSender, AgentContext, OutboundMessageContext, ConnectionsApi } from '@credo-ts/core'
 
 import { ProfileHandler, RequestProfileHandler } from './handlers'
-import { UserProfileData } from './model'
+import { UserProfileData, GetUserProfileDataReturnType } from './model'
 import { UserProfileService } from './services'
 
 @injectable()
@@ -89,9 +89,9 @@ export class UserProfileApi {
   /**
    * Retrieve our User Profile Data from storage.
    *
-   * @returns our own UserProfileData
+   * @returns our own GetUserProfileDataReturnType
    */
-  public async getUserProfileData(): Promise<UserProfileData> {
+  public async getUserProfileData(): Promise<GetUserProfileDataReturnType> {
     const userProfile = await this.userProfileService.getUserProfile(this.agentContext)
     return {
       displayName: userProfile.displayName,
@@ -99,6 +99,7 @@ export class UserProfileApi {
       displayIcon: userProfile.displayIcon,
       description: userProfile.description,
       preferredLanguage: userProfile.preferredLanguage,
+      updatedAt: userProfile.updatedAt,
     }
   }
 }
