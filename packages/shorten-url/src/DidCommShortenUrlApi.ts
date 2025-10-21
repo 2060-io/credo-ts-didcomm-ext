@@ -84,8 +84,24 @@ export class DidCommShortenUrlApi {
       threadId: options.threadId,
       role: ShortenUrlRole.UrlShortener,
     })
-    // Update existing record
     if (record) {
+      if (record.shortenedUrl) {
+        throw new CredoError(
+          `Shortened URL already generated for thread ${options.threadId} (existing shortened URL: ${record.shortenedUrl}).`,
+        )
+      }
+
+      if (record.state === ShortenUrlState.InvalidationSent) {
+        throw new CredoError(
+          `Cannot send shortened URL for thread ${options.threadId} because it was already invalidated.`,
+        )
+      }
+
+      if (record.state !== ShortenUrlState.RequestReceived) {
+        throw new CredoError(
+          `Shortened URL already generated for thread ${options.threadId} (current state: ${record.state}).`,
+        )
+      }
       record.shortenedUrl = options.shortenedUrl
       record.expiresTime = options.expiresTime
       record.state = ShortenUrlState.ShortenedSent
@@ -125,6 +141,10 @@ export class DidCommShortenUrlApi {
 
     if (!record) {
       throw new CredoError('No shorten-url record found for the provided shortened_url on this connection')
+    }
+
+    if (record.state === ShortenUrlState.InvalidationSent) {
+      throw new CredoError(`Shortened URL ${options.shortenedUrl} has already been invalidated on this connection`)
     }
 
     record.state = ShortenUrlState.InvalidationSent
