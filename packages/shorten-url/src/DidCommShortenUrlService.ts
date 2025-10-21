@@ -54,13 +54,9 @@ export class DidCommShortenUrlService {
     })
 
     if (existingRecord) {
-      existingRecord.state = ShortenUrlState.RequestReceived
-      existingRecord.url = inboundMessageContext.message.url
-      existingRecord.goalCode = inboundMessageContext.message.goalCode
-      existingRecord.requestedValiditySeconds = requestedValiditySeconds
-      existingRecord.shortUrlSlug = inboundMessageContext.message.shortUrlSlug
-      await this.repository.update(inboundMessageContext.agentContext, existingRecord)
-    } else {
+      throw new CredoError(`shortened-url request already handled for thread ${threadId}`)
+    }
+
       const record = new DidCommShortenUrlRecord({
         connectionId: connection.id,
         threadId,
@@ -72,7 +68,7 @@ export class DidCommShortenUrlService {
         shortUrlSlug: inboundMessageContext.message.shortUrlSlug,
       })
       await this.repository.save(inboundMessageContext.agentContext, record)
-    }
+      await this.repository.save(inboundMessageContext.agentContext, record)
 
     this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
