@@ -42,15 +42,14 @@ export class DidCommShortenUrlService {
   public async processRequest(inboundMessageContext: InboundMessageContext<RequestShortenedUrlMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
     const requestedValiditySeconds = inboundMessageContext.message.requestedValiditySeconds
+    const threadId = inboundMessageContext.message.id
     if (!Number.isInteger(requestedValiditySeconds) || requestedValiditySeconds < 0) {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
     }
 
-    const requestId = inboundMessageContext.message.id
-
     const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
-      requestId,
+      threadId,
       role: ShortenUrlRole.UrlShortener,
     })
 
@@ -64,7 +63,7 @@ export class DidCommShortenUrlService {
     } else {
       const record = new DidCommShortenUrlRecord({
         connectionId: connection.id,
-        requestId,
+        threadId,
         role: ShortenUrlRole.UrlShortener,
         state: ShortenUrlState.RequestReceived,
         url: inboundMessageContext.message.url,
@@ -97,7 +96,7 @@ export class DidCommShortenUrlService {
 
     const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
-      requestId: threadId,
+      threadId,
       role: ShortenUrlRole.LongUrlProvider,
     })
 
@@ -109,7 +108,7 @@ export class DidCommShortenUrlService {
     } else {
       const record = new DidCommShortenUrlRecord({
         connectionId: connection.id,
-        requestId: threadId,
+        threadId,
         role: ShortenUrlRole.LongUrlProvider,
         state: ShortenUrlState.ShortenedReceived,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,

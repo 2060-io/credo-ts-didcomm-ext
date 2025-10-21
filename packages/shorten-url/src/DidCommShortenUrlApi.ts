@@ -48,7 +48,7 @@ export class DidCommShortenUrlApi {
     // Create and save record
     const record = new DidCommShortenUrlRecord({
       connectionId: connection.id,
-      requestId: message.id,
+      threadId: message.id,
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.RequestSent,
       url: options.url,
@@ -81,7 +81,7 @@ export class DidCommShortenUrlApi {
     // Update or create record
     const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
       connectionId: connection.id,
-      requestId: options.threadId,
+      threadId: options.threadId,
       role: ShortenUrlRole.UrlShortener,
     })
     // Update existing record
@@ -94,7 +94,7 @@ export class DidCommShortenUrlApi {
       // Create new record
       const newRecord = new DidCommShortenUrlRecord({
         connectionId: connection.id,
-        requestId: options.threadId,
+        threadId: options.threadId,
         role: ShortenUrlRole.UrlShortener,
         state: ShortenUrlState.ShortenedSent,
         shortenedUrl: options.shortenedUrl,

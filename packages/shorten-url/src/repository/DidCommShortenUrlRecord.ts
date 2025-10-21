@@ -6,7 +6,7 @@ export interface DidCommShortenUrlRecordProps {
   id?: string
   createdAt?: Date
   connectionId: string
-  requestId?: string
+  threadId?: string
   role: ShortenUrlRole
   state: ShortenUrlState
   url?: string
@@ -19,7 +19,7 @@ export interface DidCommShortenUrlRecordProps {
 
 export class DidCommShortenUrlRecord extends BaseRecord {
   public connectionId!: string
-  public requestId?: string
+  public threadId?: string
   public role!: ShortenUrlRole
   public state!: ShortenUrlState
   public url?: string
@@ -38,7 +38,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       this.id = props.id ?? utils.uuid()
       this.createdAt = props.createdAt ?? new Date()
       this.connectionId = props.connectionId
-      this.requestId = props.requestId
+      this.threadId = props.threadId
       this.role = props.role
       this.state = props.state
       this.url = props.url
@@ -56,7 +56,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       connectionId: this.connectionId,
       role: this.role,
       state: this.state,
-      ...(this.requestId ? { requestId: this.requestId } : {}),
+      ...(this.threadId ? { threadId: this.threadId } : {}),
       ...(this.shortenedUrl ? { shortenedUrl: this.shortenedUrl } : {}),
     }
   }
