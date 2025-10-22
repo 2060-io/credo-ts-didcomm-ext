@@ -40,10 +40,10 @@ export class SodVerifierService {
       this.trustAnchors = this.mlService.getTrustAnchors()
 
       if (this.trustAnchors.length === 0) {
-        this.logger.warn(
+        this.logger.error(
           '[SodVerifierService] verifySod - No CSCA trust anchors loaded. Please initialize CscaMasterListService first.',
         )
-        return { authenticity: false, integrity: false, details: 'No CSCA trust anchors loaded' }
+        throw new Error('No CSCA trust anchors loaded')
       }
 
       this.logger.info('[SodVerifierService] verifySod - Step 1: Extracting DER from TLV (if present)')
@@ -195,15 +195,9 @@ export class SodVerifierService {
       this.logger.info('[SodVerifierService] verifySod - Step 9: Verification finished')
       return { authenticity, integrity }
     } catch (error) {
-      this.logger.error(
-        '[SodVerifierService] verifySod - Verification failed: ' +
-          (error instanceof Error ? error.message : String(error)),
-      )
-      return {
-        authenticity: false,
-        integrity: false,
-        details: error instanceof Error ? error.message : String(error),
-      }
+      const err = error instanceof Error ? error : new Error(String(error))
+      this.logger.error('[SodVerifierService] verifySod - Verification failed: ' + err.message)
+      throw err
     }
   }
 
