@@ -56,8 +56,8 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       connectionId: this.connectionId,
       role: this.role,
       state: this.state,
-      ...(this.threadId ? { threadId: this.threadId } : {}),
-      ...(this.shortenedUrl ? { shortenedUrl: this.shortenedUrl } : {}),
+      threadId: this.threadId,
+      shortenedUrl: this.shortenedUrl,
     }
   }
 }
