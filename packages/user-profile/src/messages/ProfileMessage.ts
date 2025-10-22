@@ -15,7 +15,7 @@ export interface ProfileMessageOptions {
 class ProfileForExchange {
   public displayName?: string
   public displayPicture?: string | null
-  public displayIcon?: string
+  public displayIcon?: string | null
   public description?: string
   public preferredLanguage?: string
 }
@@ -33,7 +33,7 @@ export class ProfileMessage extends AgentMessage {
       this.profile = {
         ...options.profile,
         displayPicture: options.profile.displayPicture ? '#displayPicture' : options.profile.displayPicture,
-        displayIcon: options.profile.displayIcon ? '#displayIcon' : undefined,
+        displayIcon: options.profile.displayIcon ? '#displayIcon' : options.profile.displayIcon,
       }
 
       if (options.profile.displayPicture) {

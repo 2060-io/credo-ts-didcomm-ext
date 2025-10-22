@@ -115,7 +115,9 @@ export class UserProfileService {
             base64: displayIconData?.data.base64,
             links: displayIconData?.data.links,
           }
-        : currentProfile?.displayIcon,
+        : receivedProfile.displayIcon === '' || receivedProfile.displayIcon === null
+          ? receivedProfile.displayIcon
+          : currentProfile?.displayIcon,
     }
     if (currentProfile) {
       Object.assign(currentProfile, newProfile)

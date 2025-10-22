@@ -11,7 +11,7 @@ export interface UserProfileStorageProps extends UserProfileData {
 export class UserProfileRecord extends BaseRecord implements UserProfileStorageProps {
   public displayName?: string
   public displayPicture?: PictureData | null | ''
-  public displayIcon?: PictureData
+  public displayIcon?: PictureData | null | ''
   public description?: string
   public preferredLanguage?: string
 
