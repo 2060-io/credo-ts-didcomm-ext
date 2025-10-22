@@ -21,6 +21,9 @@
     "packages/receipts": {
       "release-type": "node"
     },
+    "packages/shorten-url": {
+      "release-type": "node"
+    },
     "packages/user-profile": {
       "release-type": "node"
     }
