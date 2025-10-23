@@ -68,7 +68,6 @@ export class DidCommShortenUrlService {
       shortUrlSlug: inboundMessageContext.message.shortUrlSlug,
     })
     await this.repository.save(inboundMessageContext.agentContext, record)
-    await this.repository.save(inboundMessageContext.agentContext, record)
 
     this.eventEmitter.emit<DidCommRequestShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
