@@ -106,14 +106,18 @@ export class UserProfileService {
             base64: displayPictureData?.data.base64,
             links: displayPictureData?.data.links,
           }
-        : currentProfile?.displayPicture,
+        : receivedProfile.displayPicture === '' || receivedProfile.displayPicture === null
+          ? receivedProfile.displayPicture
+          : currentProfile?.displayPicture,
       displayIcon: displayIconData
         ? {
             mimeType: displayIconData?.mimeType,
             base64: displayIconData?.data.base64,
             links: displayIconData?.data.links,
           }
-        : currentProfile?.displayIcon,
+        : receivedProfile.displayIcon === '' || receivedProfile.displayIcon === null
+          ? receivedProfile.displayIcon
+          : currentProfile?.displayIcon,
     }
     if (currentProfile) {
       Object.assign(currentProfile, newProfile)
