@@ -49,8 +49,8 @@ export class DidCommShortenUrlService {
 
     const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
-      threadId,
       role: ShortenUrlRole.UrlShortener,
+      url: inboundMessageContext.message.url,
     })
 
     if (existingRecord) {

@@ -58,6 +58,9 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       state: this.state,
       threadId: this.threadId,
       shortenedUrl: this.shortenedUrl,
+      url: this.url,
+      goalCode: this.goalCode,
+      shortUrlSlug: this.shortUrlSlug,
     }
   }
 }
