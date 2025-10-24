@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.3...@2060.io/credo-ts-didcomm-shorten-url@v0.0.4) (2025-10-24)
+
+
+### Bug Fixes
+
+* Add index records tags to improvement find requests ([#114](https://github.com/2060-io/credo-ts-didcomm-ext/issues/114)) ([fcdf195](https://github.com/2060-io/credo-ts-didcomm-ext/commit/fcdf1958314560638bf709790bcf01138f6bbc5d))
+
 ## [0.0.3](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.2...@2060.io/credo-ts-didcomm-shorten-url@v0.0.3) (2025-10-23)
 
 
