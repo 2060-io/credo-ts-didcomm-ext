@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.6...@2060.io/credo-ts-didcomm-user-profile@v0.0.7) (2025-10-27)
+
+
+### Features
+
+* add didcomm receipts package ([#72](https://github.com/2060-io/credo-ts-didcomm-ext/issues/72)) ([61633e0](https://github.com/2060-io/credo-ts-didcomm-ext/commit/61633e05563953e97f0fda32fbaeed7549360858))
+* add updatedAt to user profile ([#108](https://github.com/2060-io/credo-ts-didcomm-ext/issues/108)) ([1e26531](https://github.com/2060-io/credo-ts-didcomm-ext/commit/1e265313e571ca9a8c22a283012d9ba073c9bc9a))
+
+
+### Bug Fixes
+
+* **user-profile:** update connection profile properly when user sends null values  ([#110](https://github.com/2060-io/credo-ts-didcomm-ext/issues/110)) ([bbe02bd](https://github.com/2060-io/credo-ts-didcomm-ext/commit/bbe02bdb1aeacc18caf8902bf1123345af802e7c))
+
 ## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.5...@2060.io/credo-ts-didcomm-user-profile@v0.0.6) (2024-09-30)
 
 

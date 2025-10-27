@@ -1,6 +1,6 @@
 {
   "packages/calls": "0.0.10",
-  "packages/user-profile": "0.0.6",
+  "packages/user-profile": "0.0.7",
   "packages/media-sharing": "0.0.3",
   "packages/mrtd": "0.0.17",
   "packages/reactions": "0.0.2",
