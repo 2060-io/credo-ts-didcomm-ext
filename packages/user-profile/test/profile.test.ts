@@ -139,6 +139,62 @@ describe('profile test', () => {
     )
   })
 
+  test('Send stored profile with removed displayPicture and displayIcon', async () => {
+    const profileReceivedPromise = firstValueFrom(
+      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
+        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
+        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
+        timeout(5000),
+      ),
+    )
+
+    await bobAgent.modules.profile.updateUserProfileData({
+      description: 'My bio',
+      displayName: 'Daniel',
+      displayPicture: null,
+      displayIcon: '',
+    })
+    await bobAgent.modules.profile.sendUserProfile({ connectionId: bobConnectionRecord!.id, sendBackYours: false })
+
+    const profile = await profileReceivedPromise
+
+    expect(profile).toEqual(
+      expect.objectContaining({
+        displayName: 'Daniel',
+        description: 'My bio',
+        displayPicture: null,
+        displayIcon: '',
+      }),
+    )
+  })
+
+  test('Send stored profile with no changes in displayPicture and displayIcon', async () => {
+    const profileReceivedPromise = firstValueFrom(
+      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
+        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
+        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
+        timeout(5000),
+      ),
+    )
+
+    await bobAgent.modules.profile.updateUserProfileData({
+      description: 'My bio',
+      displayName: 'Daniel',
+      displayPicture: undefined,
+    })
+    await bobAgent.modules.profile.sendUserProfile({ connectionId: bobConnectionRecord!.id, sendBackYours: false })
+
+    const profile = await profileReceivedPromise
+
+    expect(profile).toEqual(
+      expect.objectContaining({
+        displayName: 'Daniel',
+        description: 'My bio',
+        displayPicture: undefined,
+      }),
+    )
+  })
+
   test('Send custom profile', async () => {
     const profileReceivedPromise = firstValueFrom(
       aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
