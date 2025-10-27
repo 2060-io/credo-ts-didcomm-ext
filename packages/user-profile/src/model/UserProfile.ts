@@ -8,8 +8,8 @@ export interface PictureData {
 
 export interface UserProfileData {
   displayName?: string
-  displayPicture?: PictureData
-  displayIcon?: PictureData
+  displayPicture?: PictureData | null | ''
+  displayIcon?: PictureData | null | ''
   description?: string
   preferredLanguage?: string
 }

@@ -10,8 +10,8 @@ export interface UserProfileStorageProps extends UserProfileData {
 // TODO: Store more data than display name, display picture and description
 export class UserProfileRecord extends BaseRecord implements UserProfileStorageProps {
   public displayName?: string
-  public displayPicture?: PictureData
-  public displayIcon?: PictureData
+  public displayPicture?: PictureData | null | ''
+  public displayIcon?: PictureData | null | ''
   public description?: string
   public preferredLanguage?: string
 
