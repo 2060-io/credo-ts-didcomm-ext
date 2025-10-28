@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.4...@2060.io/credo-ts-didcomm-shorten-url@v0.0.5) (2025-10-28)
+
+
+### Features
+
+* shorten url enhancements ([#116](https://github.com/2060-io/credo-ts-didcomm-ext/issues/116)) ([33eb9b8](https://github.com/2060-io/credo-ts-didcomm-ext/commit/33eb9b89d3b1b2d2d98250a98d79b58189e3d700))
+
 ## [0.0.4](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.3...@2060.io/credo-ts-didcomm-shorten-url@v0.0.4) (2025-10-24)
 
 
