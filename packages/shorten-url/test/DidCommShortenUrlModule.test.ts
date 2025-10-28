@@ -11,6 +11,7 @@ describe('DidCommShortenUrlModuleConfig', () => {
   it('defaults to both roles', () => {
     const config = new DidCommShortenUrlModuleConfig()
     expect(config.roles).toEqual([ShortenUrlRole.UrlShortener, ShortenUrlRole.LongUrlProvider])
+    expect(config.maximumRequestedValiditySeconds).toBe(60 * 60 * 24)
   })
 
   it('returns configured roles without duplicates', () => {
@@ -18,6 +19,25 @@ describe('DidCommShortenUrlModuleConfig', () => {
       roles: [ShortenUrlRole.LongUrlProvider, ShortenUrlRole.LongUrlProvider],
     })
     expect(config.roles).toEqual([ShortenUrlRole.LongUrlProvider])
+  })
+
+  it('accepts maximumRequestedValiditySeconds when positive integer', () => {
+    const config = new DidCommShortenUrlModuleConfig({ maximumRequestedValiditySeconds: 86_400 })
+    expect(config.maximumRequestedValiditySeconds).toBe(86_400)
+  })
+
+  it('allows disabling maximumRequestedValiditySeconds when set to null', () => {
+    const config = new DidCommShortenUrlModuleConfig({ maximumRequestedValiditySeconds: null })
+    expect(config.maximumRequestedValiditySeconds).toBeUndefined()
+  })
+
+  it('throws when maximumRequestedValiditySeconds is not a positive integer', () => {
+    expect(() => new DidCommShortenUrlModuleConfig({ maximumRequestedValiditySeconds: 0 })).toThrow(
+      'maximumRequestedValiditySeconds must be a positive integer',
+    )
+    expect(() => new DidCommShortenUrlModuleConfig({ maximumRequestedValiditySeconds: 12.5 })).toThrow(
+      'maximumRequestedValiditySeconds must be a positive integer',
+    )
   })
 })
 

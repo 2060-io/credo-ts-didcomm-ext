@@ -30,6 +30,8 @@ describe('DidCommShortenUrlApi', () => {
       save: jest.fn().mockResolvedValue(undefined),
       update: jest.fn().mockResolvedValue(undefined),
       findSingleByQuery: jest.fn().mockResolvedValue(null),
+      getById: jest.fn(),
+      delete: jest.fn().mockResolvedValue(undefined),
     }
 
     const api = new DidCommShortenUrlApi(
@@ -49,6 +51,46 @@ describe('DidCommShortenUrlApi', () => {
       repository: repositoryMock,
     }
   }
+
+  it('deleteById should remove record when connection matches', async () => {
+    const { api, repository, connectionService } = createApi()
+    const record = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.InvalidationReceived,
+    })
+    ;(connectionService.findById as jest.Mock).mockResolvedValue({ id: 'conn-1' })
+    ;(repository.getById as jest.Mock).mockResolvedValue(record)
+
+    await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
+    expect(repository.delete).toHaveBeenCalledWith(agentContext, record)
+  })
+
+  it('deleteById should throw when record does not belong to connection', async () => {
+    const { api, repository } = createApi()
+    const record = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'other-conn',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.InvalidationReceived,
+    })
+    ;(repository.getById as jest.Mock).mockResolvedValue(record)
+
+    await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).rejects.toThrow(
+      'Shortened URL record rec-1 does not belong to connection conn-1',
+    )
+    expect(repository.delete).not.toHaveBeenCalled()
+  })
+
+  it('deleteById should throw when connection does not exist', async () => {
+    const { api, connectionService } = createApi()
+    ;(connectionService.findById as jest.Mock).mockResolvedValue(null)
+
+    await expect(api.deleteById({ connectionId: 'missing', recordId: 'rec-1' })).rejects.toThrow(
+      'Connection not found with id missing',
+    )
+  })
 
   it('requestShortenedUrl should store record and send message', async () => {
     const { api, shortenService, repository, messageSender } = createApi()
