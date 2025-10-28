@@ -1,5 +1,7 @@
 import type { BaseEvent } from '@credo-ts/core'
 
+import type { DidCommShortenUrlRecord } from './repository'
+
 export enum DidCommShortenUrlEventTypes {
   DidCommRequestShortenedUrlReceived = 'DidCommRequestShortenedUrlReceived',
   DidCommShortenedUrlReceived = 'DidCommShortenedUrlReceived',
@@ -15,6 +17,7 @@ export interface DidCommRequestShortenedUrlReceivedEvent extends BaseEvent {
     goalCode: string
     requestedValiditySeconds: number
     shortUrlSlug?: string
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
 }
 
@@ -25,6 +28,7 @@ export interface DidCommShortenedUrlReceivedEvent extends BaseEvent {
     threadId: string
     shortenedUrl: string
     expiresTime?: number
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
 }
 
@@ -33,5 +37,6 @@ export interface DidCommInvalidateShortenedUrlReceivedEvent extends BaseEvent {
   payload: {
     connectionId: string
     shortenedUrl: string
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
 }
