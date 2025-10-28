@@ -16,7 +16,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
   - `shortened-url`
   - `invalidate-shortened-url`
 - Typed API to send/receive messages
-- Configurable maximum validity window for inbound requests (defaults to 24 hours, disable via config)
+- Optional maximum validity window for inbound requests (enforce by supplying a positive value)
 - Event emission for inbound messages so your app can plug in a real shortener
 - Wallet records for each shorten-url exchange (full lifecycle saved in storage)
 - Protocol registration with configurable roles for feature discovery
@@ -47,7 +47,7 @@ const agent = new Agent({
     shortenUrl: new DidCommShortenUrlModule({
       // Example: mobile agent acting only as long-url-provider
       roles: [ShortenUrlRole.LongUrlProvider],
-      // Optional: tighten default 24h maximum validity down to 2 hours
+      // Optional: enforce a 2 hour maximum validity (set to 0 or omit to allow any value)
       maximumRequestedValiditySeconds: 60 * 60 * 2,
     }),
   },
@@ -57,7 +57,7 @@ const agent = new Agent({
 
 If you omit the configuration, the module registers both `url-shortener` and `long-url-provider` roles by default, so it “just works”.
 
-Inbound `request-shortened-url` messages that exceed the configured maximum (24 hours by default) are rejected with a `CredoError` whose message starts with `validity_too_long`, allowing callers to distinguish the cause.
+Inbound `request-shortened-url` messages that exceed the configured maximum are rejected with a `CredoError` whose message starts with `validity_too_long`, allowing callers to distinguish the cause.
 
 ### 2) As **long-url-provider** – request a shortened URL
 
@@ -117,7 +117,7 @@ await agent.modules.shortenUrl.invalidateShortenedUrl({
 `DidCommShortenUrlModule` accepts the following options:
 
 - `roles` (default: both roles) – restrict the protocol roles this agent announces/supports.
-- `maximumRequestedValiditySeconds` (optional) – positive integer upper bound for `requested_validity_seconds`. Defaults to 24 hours; set to `null` to disable the limit. Requests that exceed it are rejected before persisting a record and emit a `validity_too_long` error.
+- `maximumRequestedValiditySeconds` (optional) – positive integer upper bound for `requested_validity_seconds`. Omit or set to `0` to allow any value. Requests that exceed the configured limit are rejected before persisting a record and emit a `validity_too_long` error.
 
 ### `DidCommShortenUrlApi`
 

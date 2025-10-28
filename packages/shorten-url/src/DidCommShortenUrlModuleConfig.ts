@@ -7,13 +7,13 @@ export interface DidCommShortenUrlModuleConfigOptions {
   roles?: ShortenUrlRole[]
   /**
    * Maximum requested validity (seconds) accepted from request-shortened-url messages.
-   * When omitted, a default of 24 hours is enforced. Set to null to disable the maximum.
+   * Values > 0 enforce the provided maximum.
+   * 0 or undefined remove the maximum.
    */
-  maximumRequestedValiditySeconds?: number | null
+  maximumRequestedValiditySeconds?: number
 }
 
 const DefaultShortenUrlRoles = [ShortenUrlRole.UrlShortener, ShortenUrlRole.LongUrlProvider] as const
-const DefaultMaximumRequestedValiditySeconds = 60 * 60 * 24
 
 export class DidCommShortenUrlModuleConfig {
   #roles?: ShortenUrlRole[]
@@ -24,12 +24,12 @@ export class DidCommShortenUrlModuleConfig {
     this.options = options ?? {}
     this.#roles = this.options.roles
     const maximumRequestedValiditySeconds = this.options.maximumRequestedValiditySeconds
-    if (maximumRequestedValiditySeconds === undefined) {
-      this.#maximumRequestedValiditySeconds = DefaultMaximumRequestedValiditySeconds
-    } else if (maximumRequestedValiditySeconds === null) {
+    if (maximumRequestedValiditySeconds === undefined || maximumRequestedValiditySeconds === 0) {
       this.#maximumRequestedValiditySeconds = undefined
-    } else if (!Number.isInteger(maximumRequestedValiditySeconds) || maximumRequestedValiditySeconds <= 0) {
-      throw new Error('maximumRequestedValiditySeconds must be a positive integer')
+    } else if (!Number.isInteger(maximumRequestedValiditySeconds)) {
+      throw new Error('maximumRequestedValiditySeconds must be an integer')
+    } else if (maximumRequestedValiditySeconds < 0) {
+      throw new Error('maximumRequestedValiditySeconds must be zero or a positive integer')
     } else {
       this.#maximumRequestedValiditySeconds = maximumRequestedValiditySeconds
     }
