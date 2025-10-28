@@ -6,6 +6,7 @@ import {
   DidCommShortenUrlEventTypes,
   DidCommShortenedUrlReceivedEvent,
 } from './DidCommShortenUrlEvents'
+import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 import { InvalidateShortenedUrlMessage, RequestShortenedUrlMessage, ShortenedUrlMessage } from './messages'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
@@ -47,6 +48,14 @@ export class DidCommShortenUrlService {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
     }
 
+    const config = inboundMessageContext.agentContext.dependencyManager.resolve(DidCommShortenUrlModuleConfig)
+    const maximumRequestedValiditySeconds = config.maximumRequestedValiditySeconds
+    if (maximumRequestedValiditySeconds !== undefined && requestedValiditySeconds > maximumRequestedValiditySeconds) {
+      throw new CredoError(
+        `validity_too_long: requested_validity_seconds (${requestedValiditySeconds}) exceeds maximum of ${maximumRequestedValiditySeconds}`,
+      )
+    }
+
     const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
       role: ShortenUrlRole.UrlShortener,
@@ -78,6 +87,7 @@ export class DidCommShortenUrlService {
         goalCode: inboundMessageContext.message.goalCode,
         requestedValiditySeconds,
         shortUrlSlug: inboundMessageContext.message.shortUrlSlug,
+        shortenUrlRecord: record,
       },
     })
   }
@@ -95,13 +105,15 @@ export class DidCommShortenUrlService {
       role: ShortenUrlRole.LongUrlProvider,
     })
 
+    let record: DidCommShortenUrlRecord
     if (existingRecord) {
       existingRecord.state = ShortenUrlState.ShortenedReceived
       existingRecord.shortenedUrl = inboundMessageContext.message.shortenedUrl
       existingRecord.expiresTime = inboundMessageContext.message.expiresTime
       await this.repository.update(inboundMessageContext.agentContext, existingRecord)
+      record = existingRecord
     } else {
-      const record = new DidCommShortenUrlRecord({
+      record = new DidCommShortenUrlRecord({
         connectionId: connection.id,
         threadId,
         role: ShortenUrlRole.LongUrlProvider,
@@ -119,6 +131,7 @@ export class DidCommShortenUrlService {
         threadId,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
         expiresTime: inboundMessageContext.message.expiresTime,
+        shortenUrlRecord: record,
       },
     })
   }
@@ -144,6 +157,7 @@ export class DidCommShortenUrlService {
       payload: {
         connectionId: connection.id,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
+        shortenUrlRecord: record,
       },
     })
   }

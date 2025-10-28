@@ -156,6 +156,21 @@ export class DidCommShortenUrlApi {
     return { messageId: message.id }
   }
 
+  public async deleteById(options: { connectionId: string; recordId: string }) {
+    const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
+    if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
+
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
+    if (record.connectionId !== connection.id) {
+      throw new CredoError(
+        `Shortened URL record ${options.recordId} does not belong to connection ${options.connectionId}`,
+      )
+    }
+
+    await this.shortenUrlRepository.delete(this.agentContext, record)
+    return { recordId: options.recordId }
+  }
+
   private registerMessageHandlers() {
     this.messageHandlerRegistry.registerMessageHandler(new RequestShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new ShortenedUrlHandler(this.shortenService))

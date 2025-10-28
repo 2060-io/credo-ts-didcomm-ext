@@ -16,6 +16,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
   - `shortened-url`
   - `invalidate-shortened-url`
 - Typed API to send/receive messages
+- Optional maximum validity window for inbound requests (enforce by supplying a positive value)
 - Event emission for inbound messages so your app can plug in a real shortener
 - Wallet records for each shorten-url exchange (full lifecycle saved in storage)
 - Protocol registration with configurable roles for feature discovery
@@ -46,6 +47,8 @@ const agent = new Agent({
     shortenUrl: new DidCommShortenUrlModule({
       // Example: mobile agent acting only as long-url-provider
       roles: [ShortenUrlRole.LongUrlProvider],
+      // Optional: enforce a 2 hour maximum validity (set to 0 or omit to allow any value)
+      maximumRequestedValiditySeconds: 60 * 60 * 2,
     }),
   },
   // ... transports, storage, logger, etc.
@@ -53,6 +56,8 @@ const agent = new Agent({
 ```
 
 If you omit the configuration, the module registers both `url-shortener` and `long-url-provider` roles by default, so it “just works”.
+
+Inbound `request-shortened-url` messages that exceed the configured maximum are rejected with a `CredoError` whose message starts with `validity_too_long`, allowing callers to distinguish the cause.
 
 ### 2) As **long-url-provider** – request a shortened URL
 
@@ -77,10 +82,11 @@ import {
 agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
   DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
   async (e) => {
-    const { connectionId, threadId, url } = e.payload
+    const { shortenUrlRecord } = e.payload
+    const { connectionId, threadId, url } = shortenUrlRecord
 
     // your real shortener here
-    const shortUrl = await myShortener(url)
+    const shortUrl = await myShortener(url!)
 
     await agent.modules.shortenUrl.sendShortenedUrl({
       connectionId,
@@ -106,6 +112,13 @@ await agent.modules.shortenUrl.invalidateShortenedUrl({
 
 ## API Overview
 
+### Configuration Options
+
+`DidCommShortenUrlModule` accepts the following options:
+
+- `roles` (default: both roles) – restrict the protocol roles this agent announces/supports.
+- `maximumRequestedValiditySeconds` (optional) – positive integer upper bound for `requested_validity_seconds`. Omit or set to `0` to allow any value. Requests that exceed the configured limit are rejected before persisting a record and emit a `validity_too_long` error.
+
 ### `DidCommShortenUrlApi`
 
 ```ts
@@ -128,13 +141,19 @@ invalidateShortenedUrl(options: {
   connectionId: string
   shortenedUrl: string
 }): Promise<{ messageId: string }>
+
+deleteById(options: {
+  connectionId: string
+  recordId: string
+}): Promise<{ recordId: string }>
 ```
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
 - `sendShortenedUrl` throws if a short URL already exists for the same `threadId`. This avoids sending multiple short links for one flow.
 - `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent.
+- `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
-All three methods persist a `DidCommShortenUrlRecord` in the agent wallet so you can audit or resume the flow later. Records carry the connection, protocol role, the thread id (we store the `@id` of the original `request-shortened-url`), state, original URL details, shortened URL, and expiration metadata.
+All operations persist `DidCommShortenUrlRecord` entries in the agent wallet so you can audit or resume the flow later. Records carry the connection, protocol role, the thread id (we store the `@id` of the original `request-shortened-url`), state, original URL details, shortened URL, and expiration metadata.
 
 ---
 
@@ -162,6 +181,7 @@ enum DidCommShortenUrlEventTypes {
     goalCode: string
     requestedValiditySeconds: number
     shortUrlSlug?: string
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
 
@@ -173,6 +193,7 @@ enum DidCommShortenUrlEventTypes {
     threadId: string
     shortenedUrl: string
     expiresTime?: number
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
 
@@ -182,6 +203,7 @@ enum DidCommShortenUrlEventTypes {
   {
     connectionId: string
     shortenedUrl: string
+    shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
 
