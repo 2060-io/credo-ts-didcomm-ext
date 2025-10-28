@@ -6,10 +6,10 @@ import {
   DidCommShortenUrlEventTypes,
   DidCommShortenedUrlReceivedEvent,
 } from './DidCommShortenUrlEvents'
+import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 import { InvalidateShortenedUrlMessage, RequestShortenedUrlMessage, ShortenedUrlMessage } from './messages'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
-import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 
 @injectable()
 export class DidCommShortenUrlService {
@@ -50,10 +50,7 @@ export class DidCommShortenUrlService {
 
     const config = inboundMessageContext.agentContext.dependencyManager.resolve(DidCommShortenUrlModuleConfig)
     const maximumRequestedValiditySeconds = config.maximumRequestedValiditySeconds
-    if (
-      maximumRequestedValiditySeconds !== undefined &&
-      requestedValiditySeconds > maximumRequestedValiditySeconds
-    ) {
+    if (maximumRequestedValiditySeconds !== undefined && requestedValiditySeconds > maximumRequestedValiditySeconds) {
       throw new CredoError(
         `validity_too_long: requested_validity_seconds (${requestedValiditySeconds}) exceeds maximum of ${maximumRequestedValiditySeconds}`,
       )

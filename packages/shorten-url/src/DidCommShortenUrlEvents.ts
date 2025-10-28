@@ -1,6 +1,5 @@
-import type { BaseEvent } from '@credo-ts/core'
-
 import type { DidCommShortenUrlRecord } from './repository'
+import type { BaseEvent } from '@credo-ts/core'
 
 export enum DidCommShortenUrlEventTypes {
   DidCommRequestShortenedUrlReceived = 'DidCommRequestShortenedUrlReceived',
