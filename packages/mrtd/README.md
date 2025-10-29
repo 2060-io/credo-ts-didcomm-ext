@@ -43,9 +43,7 @@ npm install @2060.io/credo-ts-didcomm-mrtd
 
 To use the MRTD module, add it to your agent's modules configuration:
 
-> **Note:** The `masterListCscaLocation` must point to the **official ICAO Master List (CSCA certificates)** corresponding to the version you are working with. Make sure you always provide the up-to-date and correct list according to the ICAO release you intend to support. The Master List is typically distributed with an **`.ldif` extension**. For further details, see [**mrtd-authenticity-integrity.md**](./docs/mrtd-authenticity-integrity.md).
->
-> When providing a `masterListCscaCacheTtlSeconds` value, the cache is evaluated each time the agent initializes. If the cached file is older than the supplied TTL (or the TTL is `0`), a fresh download happens during startup. There is no background refresh while the agent is running.
+> **Note:** The `masterListCscaLocation` must point to the **official ICAO Master List (CSCA certificates)** corresponding to the version you are working with. Make sure you always provide the up-to-date and correct list according to the ICAO release you intend to support. The Master List is typically distributed with an **`.ldif` extension**. For further details, see [**mrtd-authenticity-integrity.md**](./docs/mrtd-authenticity-integrity.md). When using an HTTP(S) URL, the service caches the file and records the filename in metadata so it can re-download automatically when the configured filename changes.
 
 ```typescript
 import { DidCommMrtdModule } from '@2060.io/credo-ts-didcomm-mrtd'
@@ -55,8 +53,6 @@ const agent = new Agent({
     // ...other modules
     mrtd: new DidCommMrtdModule({
       masterListCscaLocation: options.masterListCscaLocation,
-      // Refresh cached ICAO master list every 24h (0 forces download on each agent startup).
-      masterListCscaCacheTtlSeconds: 60 * 60 * 24,
     }),
   },
 })
@@ -93,7 +89,7 @@ import { EMrtdData, MrzData } from '@2060.io/credo-ts-didcomm-mrtd'
 
 - **Secure MRTD Data Exchange**: Transmit ICAO-compliant travel document data over DIDComm.
 - **Authenticity & Integrity Checks**: Validate document authenticity using CSCA master lists.
-- **Configurable Master List Refresh**: Refresh the cached ICAO Master List at agent initialization when the TTL marks it stale.
+- **Automatic Master List Refresh**: Cached ICAO Master Lists are refreshed automatically when the configured filename differs from the cached metadata.
 - **Event Subscription**: Listen for MRTD data events to trigger workflows or update UI.
 - **Protocol Integration**: Seamless integration with Credo agent and DIDComm protocols.
 

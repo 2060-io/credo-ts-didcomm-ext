@@ -22,7 +22,7 @@ This module adds authenticity and integrity verification for electronic Machine 
 
   - Lazily resolves `DidCommMrtdModuleConfig` and `FileSystem` inside `initialize()`.
 
-- If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. A metadata file tracks download time so the cache can be refreshed when the configured TTL expires; setting the TTL to `0` forces a download on every initialization.
+- If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. A metadata file records the original filename so the cache can be refreshed whenever the configured source name changes.
 
   - Extracts all CSCA certificates from the LDIF Master List into an internal trust store.
 
@@ -61,8 +61,6 @@ This module adds authenticity and integrity verification for electronic Machine 
 export interface DidCommMrtdModuleConfigOptions {
   /** URL or local file path to the CSCA Master List (LDIF). Optional. */
   masterListCscaLocation?: string
-  /** Optional cache TTL (seconds) when downloading the Master List via HTTP(S). */
-  masterListCscaCacheTtlSeconds?: number
 }
 ```
 
@@ -82,8 +80,6 @@ const agent = new Agent({
       new DidCommMrtdModuleConfig({
         // Local path OR HTTPS URL (LDIF). Omit to skip authenticity.
         masterListCscaLocation: 'https://example.org/icao-master-list.ldif',
-        // Optional TTL (seconds): refresh cached master list once stale (0 = refresh every startup).
-        masterListCscaCacheTtlSeconds: 60 * 60 * 24,
       }),
     ),
   },
@@ -92,7 +88,7 @@ const agent = new Agent({
 
 - **Notes**
 
-- For HTTP(S) sources, the Master List is downloaded to `FileSystem.cachePath` and reused on subsequent starts. A sidecar metadata file (`icao-master-list.ldif.metadata.json`) records the download timestamp so the cache can be refreshed once the configured TTL expires. Setting the TTL to `0` forces a fresh download at every agent initialization. If download fails and no cache exists, `initialize()` now throws `CscaMasterListInitializationError`; if a cache exists it is reused.
+- For HTTP(S) sources, the Master List is downloaded to `FileSystem.cachePath` and reused on subsequent starts. A sidecar metadata file (`icao-master-list.ldif.metadata.json`) records the download timestamp and filename so the cache can be refreshed automatically when the configured source filename differs from the cached one. If download fails and no cache exists, `initialize()` throws `CscaMasterListInitializationError`; if a cache exists it is reused.
 
 - If `masterListCscaLocation` is not provided, `CscaMasterListService.initialize()` logs a warning and short‑circuits; `SodVerifierService.verifySod` now throws when no CSCA anchors are available, signalling callers to handle the missing trust store.
 
