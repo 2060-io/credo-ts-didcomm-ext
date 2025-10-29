@@ -54,18 +54,21 @@ export class CscaMasterListService {
     this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
 
     this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
-    const clearCacheTtlSeconds = config.masterListCscaClearCacheTtlSeconds
+    const expectedFileName = this.getMasterListFileName(this.sourceLocation)
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
         this.cacheFilePath = `${this.fileSystem.cachePath}/icao-master-list.ldif`
+        this.logger.debug(
+          `[CscaMasterListService] initialize - Remote Master List URL detected. Cache path set to: ${this.cacheFilePath}`,
+        )
         const metadataPath = `${this.cacheFilePath}.metadata.json` // For storing download timestamp
         const cacheExists = await this.fileSystem.exists(this.cacheFilePath)
-        const refreshCachedMl = !cacheExists || (await this.refreshCachedMasterList(clearCacheTtlSeconds, metadataPath))
+        const refreshCachedMl = !cacheExists || (await this.refreshCachedMasterList(metadataPath, expectedFileName))
 
         if (refreshCachedMl) {
-          await this.downloadAndCacheMasterList(metadataPath)
+          await this.downloadAndCacheMasterList(metadataPath, expectedFileName)
         } else {
           this.logger.info(
             `[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`,
@@ -214,10 +217,7 @@ export class CscaMasterListService {
    * Decides whether the cached Master List is stale and needs a remote refresh.
    * @returns true when the cache must be refreshed, false to reuse the cached file.
    */
-  private async refreshCachedMasterList(
-    clearCacheTtlSeconds: number | undefined,
-    metadataPath: string,
-  ): Promise<boolean> {
+  private async refreshCachedMasterList(metadataPath: string, expectedFileName: string | undefined): Promise<boolean> {
     // If no FileSystem is available, we cannot manage a cache, so always reuse existing file if present.
     if (!this.fileSystem) {
       this.logger.debug(
@@ -225,35 +225,6 @@ export class CscaMasterListService {
       )
       return true
     }
-    // Undefined TTL means indefinite reuse of cached file.
-    if (clearCacheTtlSeconds === undefined) {
-      this.logger.info(
-        '[CscaMasterListService] initialize - No cache TTL configured. Reusing cached Master List indefinitely.',
-      )
-      return false
-    }
-    // Reject NaN and negative values as invalid, causing indefinite reuse of cached file.
-    if (Number.isNaN(clearCacheTtlSeconds)) {
-      this.logger.debug(
-        '[CscaMasterListService] initialize - Received NaN cache TTL configuration. Reusing cached Master List.',
-      )
-      return false
-    }
-    // Negative TTL means indefinite reuse of cached file.
-    if (clearCacheTtlSeconds < 0) {
-      this.logger.debug(
-        '[CscaMasterListService] initialize - Received negative cache TTL configuration. Reusing cached Master List.',
-      )
-      return false
-    }
-    // Zero TTL means always refresh the cached file.
-    if (clearCacheTtlSeconds === 0) {
-      this.logger.info(
-        '[CscaMasterListService] initialize - Cache TTL set to 0. Refreshing remote Master List on every initialization.',
-      )
-      return true
-    }
-
     try {
       if (!(await this.fileSystem.exists(metadataPath))) {
         // No metadata means we cannot determine age; fetch a fresh copy.
@@ -264,30 +235,30 @@ export class CscaMasterListService {
       }
 
       const metadataRaw = await this.fileSystem.read(metadataPath)
-      const metadata = JSON.parse(metadataRaw) as { downloadedAt?: string }
-      const downloadedAt = metadata?.downloadedAt
-      const downloadedAtMs = downloadedAt ? Date.parse(downloadedAt) : NaN
-
-      if (Number.isNaN(downloadedAtMs)) {
-        // Invalid timestamp indicates the metadata is corrupt, so refresh to recover.
+      const metadata = this.parseMetadata(metadataRaw)
+      if (!metadata) {
         this.logger.info(
-          '[CscaMasterListService] initialize - Cached Master List metadata invalid. Refreshing remote copy.',
+          '[CscaMasterListService] initialize - Cached Master List metadata could not be parsed. Refreshing remote copy.',
         )
         return true
       }
 
-      const ageSeconds = (Date.now() - downloadedAtMs) / 1000
-      this.logger.info(
-        `[CscaMasterListService] initialize - Cached Master List age: ${ageSeconds.toFixed(
-          0,
-        )}s (TTL: ${clearCacheTtlSeconds}s)`,
-      )
-      // Cached file has exceeded TTL and must be replaced.
-      if (ageSeconds >= clearCacheTtlSeconds) {
-        this.logger.info(
-          `[CscaMasterListService] initialize - Cached Master List older than ${clearCacheTtlSeconds}s. Refreshing remote copy.`,
-        )
-        return true
+      const downloadedFileName = metadata.downloadedFileName
+
+      if (expectedFileName) {
+        if (!downloadedFileName) {
+          this.logger.info(
+            '[CscaMasterListService] initialize - Cached Master List metadata missing file name. Refreshing remote copy.',
+          )
+          return true
+        }
+
+        if (expectedFileName !== downloadedFileName) {
+          this.logger.info(
+            `[CscaMasterListService] initialize - Cached Master List was downloaded as "${downloadedFileName}", but current configuration expects "${expectedFileName}". Refreshing remote copy.`,
+          )
+          return true
+        }
       }
 
       return false
@@ -305,7 +276,10 @@ export class CscaMasterListService {
    * @param metadataPath Path to write metadata JSON file.
    * @throws If download or file write fails.
    */
-  private async downloadAndCacheMasterList(metadataPath: string): Promise<void> {
+  private async downloadAndCacheMasterList(
+    metadataPath: string,
+    downloadedFileName: string | undefined,
+  ): Promise<void> {
     if (!this.fileSystem || !this.cacheFilePath || !this.sourceLocation) {
       throw new Error('CscaMasterListService is not properly configured to download the Master List.')
     }
@@ -315,7 +289,49 @@ export class CscaMasterListService {
     )
     await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
     // Write metadata with download timestamp
-    await this.fileSystem.write(metadataPath, JSON.stringify({ downloadedAt: new Date().toISOString() }))
+    const metadata: { downloadedAt: string; downloadedFileName?: string } = {
+      downloadedAt: new Date().toISOString(),
+    }
+
+    const resolvedFileName = downloadedFileName ?? this.getMasterListFileName(this.sourceLocation)
+    if (resolvedFileName) {
+      metadata.downloadedFileName = resolvedFileName
+    }
+
+    await this.fileSystem.write(metadataPath, JSON.stringify(metadata, null, 2))
     this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
+  }
+
+  private getMasterListFileName(source: string): string | undefined {
+    try {
+      const url = new URL(source)
+      const trimmedPath = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname
+      const segment = trimmedPath.split('/').pop()
+      if (segment) return segment
+    } catch {
+      this.logger.warn('[CscaMasterListService] getMasterListFileName - Source is not a valid URL.')
+    }
+
+    const path = source.trim()
+    if (!path) return undefined
+
+    const normalized = path.replace(/\\/g, '/')
+    const parts = normalized.split('/')
+    const candidate = parts.pop()
+
+    if (!candidate || candidate === '.') {
+      return undefined
+    }
+
+    return candidate
+  }
+
+  private parseMetadata(raw: string): { downloadedAt?: string; downloadedFileName?: string } | undefined {
+    try {
+      return JSON.parse(raw) as { downloadedAt?: string; downloadedFileName?: string }
+    } catch (error) {
+      this.logger.warn('[CscaMasterListService] initialize - Failed to parse metadata JSON.')
+      return undefined
+    }
   }
 }
