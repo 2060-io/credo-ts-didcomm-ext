@@ -1,12 +1,12 @@
 import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
-import { Expose } from 'class-transformer'
-import { IsInt, IsOptional, IsString } from 'class-validator'
+import { Expose, Transform } from 'class-transformer'
+import { IsISO8601, IsOptional, IsString } from 'class-validator'
 
 export interface ShortenedUrlMessageOptions {
   id?: string
   threadId: string
   shortenedUrl: string
-  expiresTime?: number
+  expiresTime?: string
 }
 
 export class ShortenedUrlMessage extends AgentMessage {
@@ -25,9 +25,10 @@ export class ShortenedUrlMessage extends AgentMessage {
   public shortenedUrl!: string
 
   @IsOptional()
-  @IsInt()
+  @IsISO8601()
   @Expose({ name: 'expires_time' })
-  public expiresTime?: number
+  @Transform(({ value }) => (value instanceof Date ? value.toISOString() : value), { toPlainOnly: true })
+  public expiresTime?: string
 
   @IsValidMessageType(ShortenedUrlMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/shorten-url/1.0/shortened-url')

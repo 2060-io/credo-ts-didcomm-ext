@@ -14,7 +14,7 @@ export interface DidCommShortenUrlRecordProps {
   goalCode?: string
   requestedValiditySeconds?: number
   shortUrlSlug?: string
-  expiresTime?: number
+  expiresTime?: Date
 }
 
 export class DidCommShortenUrlRecord extends BaseRecord {
@@ -27,7 +27,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
   public goalCode?: string
   public requestedValiditySeconds?: number
   public shortUrlSlug?: string
-  public expiresTime?: number
+  public expiresTime?: Date
 
   public static readonly type = 'DidCommShortenUrlRecord'
   public readonly type = DidCommShortenUrlRecord.type
