@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.5...@2060.io/credo-ts-didcomm-shorten-url@v0.0.6) (2025-10-31)
+
+
+### Features
+
+* compute expiresTime and align with DIDComm time format ([#118](https://github.com/2060-io/credo-ts-didcomm-ext/issues/118)) ([c66a87a](https://github.com/2060-io/credo-ts-didcomm-ext/commit/c66a87aa1e36d50480cdb08ca7d82ba508596ec9))
+
 ## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.4...@2060.io/credo-ts-didcomm-shorten-url@v0.0.5) (2025-10-28)
 
 
