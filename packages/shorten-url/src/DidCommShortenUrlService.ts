@@ -35,7 +35,7 @@ export class DidCommShortenUrlService {
     return new ShortenedUrlMessage({
       threadId: options.threadId,
       shortenedUrl: options.shortenedUrl,
-      expiresTime: options.expiresTime?.toISOString(),
+      expiresTime: options.expiresTime,
     })
   }
 
@@ -111,11 +111,11 @@ export class DidCommShortenUrlService {
 
     const messageExpiresTime = inboundMessageContext.message.expiresTime
     let expiresAt: Date | undefined
-    if (messageExpiresTime) {
-      expiresAt = new Date(messageExpiresTime)
-      if (Number.isNaN(expiresAt.getTime())) {
+    if (messageExpiresTime !== undefined) {
+      if (!(messageExpiresTime instanceof Date) || Number.isNaN(messageExpiresTime.getTime())) {
         throw new CredoError('shortened-url message includes an invalid expires_time')
       }
+      expiresAt = messageExpiresTime
     }
 
     let record: DidCommShortenUrlRecord
