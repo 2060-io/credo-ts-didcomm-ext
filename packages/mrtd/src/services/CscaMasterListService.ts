@@ -54,21 +54,25 @@ export class CscaMasterListService {
     this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
 
     this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    const expectedFileName = this.getMasterListFileName(this.sourceLocation)
 
     let ldifContent: string
     try {
       if (this.sourceLocation.startsWith('http://') || this.sourceLocation.startsWith('https://')) {
         this.cacheFilePath = `${this.fileSystem.cachePath}/icao-master-list.ldif`
-        if (await this.fileSystem.exists(this.cacheFilePath)) {
+        this.logger.debug(
+          `[CscaMasterListService] initialize - Remote Master List URL detected. Cache path set to: ${this.cacheFilePath}`,
+        )
+        const metadataPath = `${this.cacheFilePath}.metadata.json` // For storing download timestamp
+        const cacheExists = await this.fileSystem.exists(this.cacheFilePath)
+        const refreshCachedMl = !cacheExists || (await this.refreshCachedMasterList(metadataPath, expectedFileName))
+
+        if (refreshCachedMl) {
+          await this.downloadAndCacheMasterList(metadataPath, expectedFileName)
+        } else {
           this.logger.info(
             `[CscaMasterListService] initialize - cache found at ${this.cacheFilePath}, using cached file.`,
           )
-        } else {
-          this.logger.info(
-            `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
-          )
-          await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
-          this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
         }
         ldifContent = await this.fileSystem.read(this.cacheFilePath)
       } else {
@@ -189,22 +193,145 @@ export class CscaMasterListService {
           }
         }
 
+        validMasterLists++
         if (loadedCount > 0) {
-          validMasterLists++
           extractedCSCA += loadedCount
-          this.logger.info(
-            `[CscaMasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
-          )
         }
+        this.logger.info(
+          `[CscaMasterListService] extractCSCACerts - Extracted ${loadedCount} CSCA certificates from one Master List entry.`,
+        )
       } catch (error) {
         // Most entries are invalid, just skip and continue
         this.logger.warn('[CscaMasterListService] extractCSCACerts - Skipping invalid Master List entry.')
       }
     }
 
+    this.logger.info(`[CscaMasterListService] extractCSCACerts - Processed ${validMasterLists} Master List entries.`)
     if (validMasterLists === 0) throw new Error('No valid Master List found in LDIF file')
     this.logger.info(
       `[CscaMasterListService] extractCSCACerts - Extracted ${extractedCSCA} CSCA certificates from ${validMasterLists} valid Master List entries.`,
     )
+  }
+
+  /**
+   * Decides whether the cached Master List is stale and needs a remote refresh.
+   * @returns true when the cache must be refreshed, false to reuse the cached file.
+   */
+  private async refreshCachedMasterList(metadataPath: string, expectedFileName: string | undefined): Promise<boolean> {
+    // If no FileSystem is available, we cannot manage a cache, so always reuse existing file if present.
+    if (!this.fileSystem) {
+      this.logger.debug(
+        '[CscaMasterListService] initialize - FileSystem not available. Reusing cached Master List if present.',
+      )
+      return true
+    }
+    try {
+      if (!(await this.fileSystem.exists(metadataPath))) {
+        // No metadata means we cannot determine age; fetch a fresh copy.
+        this.logger.info(
+          '[CscaMasterListService] initialize - No metadata found for cached Master List. Refreshing remote copy.',
+        )
+        return true
+      }
+
+      const metadataRaw = await this.fileSystem.read(metadataPath)
+      const metadata = this.parseMetadata(metadataRaw)
+      if (!metadata) {
+        this.logger.info(
+          '[CscaMasterListService] initialize - Cached Master List metadata could not be parsed. Refreshing remote copy.',
+        )
+        return true
+      }
+
+      const downloadedFileName = metadata.downloadedFileName
+
+      if (expectedFileName) {
+        if (!downloadedFileName) {
+          this.logger.info(
+            '[CscaMasterListService] initialize - Cached Master List metadata missing file name. Refreshing remote copy.',
+          )
+          return true
+        }
+
+        if (expectedFileName !== downloadedFileName) {
+          this.logger.info(
+            `[CscaMasterListService] initialize - Cached Master List was downloaded as "${downloadedFileName}", but current configuration expects "${expectedFileName}". Refreshing remote copy.`,
+          )
+          return true
+        }
+      }
+
+      return false
+    } catch (error) {
+      this.logger.error(
+        '[CscaMasterListService] initialize - Failed to read cache metadata. Refreshing remote Master List.',
+      )
+      return true
+    }
+  }
+
+  /**
+   * Downloads the Master List from the remote URL and caches it locally.
+   * Also writes metadata with the download timestamp.
+   * @param metadataPath Path to write metadata JSON file.
+   * @throws If download or file write fails.
+   */
+  private async downloadAndCacheMasterList(
+    metadataPath: string,
+    downloadedFileName: string | undefined,
+  ): Promise<void> {
+    if (!this.fileSystem || !this.cacheFilePath || !this.sourceLocation) {
+      throw new Error('CscaMasterListService is not properly configured to download the Master List.')
+    }
+
+    this.logger.info(
+      `[CscaMasterListService] initialize - downloading and caching via FileSystem: ${this.sourceLocation}`,
+    )
+    await this.fileSystem.downloadToFile(this.sourceLocation, this.cacheFilePath, {})
+    // Write metadata with download timestamp
+    const metadata: { downloadedAt: string; downloadedFileName?: string } = {
+      downloadedAt: new Date().toISOString(),
+    }
+
+    const resolvedFileName = downloadedFileName ?? this.getMasterListFileName(this.sourceLocation)
+    if (resolvedFileName) {
+      metadata.downloadedFileName = resolvedFileName
+    }
+
+    await this.fileSystem.write(metadataPath, JSON.stringify(metadata, null, 2))
+    this.logger.info(`[CscaMasterListService] initialize - download complete and cached to ${this.cacheFilePath}`)
+  }
+
+  private getMasterListFileName(source: string): string | undefined {
+    try {
+      const url = new URL(source)
+      const trimmedPath = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname
+      const segment = trimmedPath.split('/').pop()
+      if (segment) return segment
+    } catch {
+      this.logger.warn('[CscaMasterListService] getMasterListFileName - Source is not a valid URL.')
+    }
+
+    const path = source.trim()
+    if (!path) return undefined
+
+    const normalized = path.replace(/\\/g, '/')
+    const parts = normalized.split('/')
+    const candidate = parts.pop()
+
+    if (!candidate || candidate === '.') {
+      return undefined
+    }
+
+    return candidate
+  }
+
+  private parseMetadata(raw: string): { downloadedAt?: string; downloadedFileName?: string } | undefined {
+    try {
+      return JSON.parse(raw) as { downloadedAt?: string; downloadedFileName?: string }
+    } catch (error) {
+      this.logger.warn('[CscaMasterListService] initialize - Failed to parse metadata JSON.')
+      return undefined
+    }
   }
 }

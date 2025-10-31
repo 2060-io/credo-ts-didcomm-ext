@@ -21,7 +21,9 @@ This module adds authenticity and integrity verification for electronic Machine 
 - **`CscaMasterListService`**
 
   - Lazily resolves `DidCommMrtdModuleConfig` and `FileSystem` inside `initialize()`.
-  - If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. If the file already exists, it is re‑used; otherwise it downloads and caches it.
+
+- If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. A metadata file records the original filename so the cache can be refreshed whenever the configured source name changes.
+
   - Extracts all CSCA certificates from the LDIF Master List into an internal trust store.
 
 - **`SodVerifierService`**
@@ -86,9 +88,9 @@ const agent = new Agent({
 
 - **Notes**
 
-- For HTTP(S) sources, the Master List is downloaded to `FileSystem.cachePath` and reused on subsequent starts. If download fails but a previous cache exists, the cached copy is used (with a warning).
+- For HTTP(S) sources, the Master List is downloaded to `FileSystem.cachePath` and reused on subsequent starts. A sidecar metadata file (`icao-master-list.ldif.metadata.json`) records the download timestamp and filename so the cache can be refreshed automatically when the configured source filename differs from the cached one. If download fails and no cache exists, `initialize()` throws `CscaMasterListInitializationError`; if a cache exists it is reused.
 
-- If `masterListCscaLocation` is not provided, `CscaMasterListService.initialize()` logs a warning and short‑circuits; `SodVerifierService` will return a result indicating authenticity is not available if no CSCA anchors are present.
+- If `masterListCscaLocation` is not provided, `CscaMasterListService.initialize()` logs a warning and short‑circuits; `SodVerifierService.verifySod` now throws when no CSCA anchors are available, signalling callers to handle the missing trust store.
 
 ---
 
