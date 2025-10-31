@@ -154,10 +154,11 @@ describe('DidCommShortenUrlService', () => {
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
+    const expiresAt = new Date('2024-11-27T12:00:00.000Z')
     const msg = new ShortenedUrlMessage({
       threadId: 'req-1',
       shortenedUrl: 'https://s.io/xyz',
-      expiresTime: 1732665600,
+      expiresTime: expiresAt,
     })
 
     await service.processShortenedUrl(makeCtx(msg))
@@ -167,13 +168,14 @@ describe('DidCommShortenUrlService', () => {
         connectionId: 'conn-1',
         state: ShortenUrlState.ShortenedReceived,
         shortenedUrl: 'https://s.io/xyz',
+        expiresTime: expiresAt,
       }),
     )
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived)
     expect(event.payload.threadId).toBe('req-1')
     expect(event.payload.shortenedUrl).toBe('https://s.io/xyz')
-    expect(event.payload.expiresTime).toBe(1732665600)
+    expect(event.payload.expiresTime?.toISOString()).toBe(expiresAt.toISOString())
     expect(event.payload.shortenUrlRecord).toBe(existingRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.ShortenedReceived)
   })
