@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.18](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.17...@2060.io/credo-ts-didcomm-mrtd@v0.0.18) (2025-10-31)
+
+
+### Features
+
+* Add refresh for ICAO master list cache ([#107](https://github.com/2060-io/credo-ts-didcomm-ext/issues/107)) ([f15a51e](https://github.com/2060-io/credo-ts-didcomm-ext/commit/f15a51e90e0feccc1ae2ce9869d2fb56ea156fba))
+
 ## [0.0.17](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-mrtd@v0.0.16...@2060.io/credo-ts-didcomm-mrtd@v0.0.17) (2025-09-03)
 
 
