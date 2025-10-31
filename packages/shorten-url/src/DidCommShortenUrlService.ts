@@ -31,8 +31,12 @@ export class DidCommShortenUrlService {
     return new RequestShortenedUrlMessage(options)
   }
 
-  public createShortenedUrl(options: { threadId: string; shortenedUrl: string; expiresTime?: number }) {
-    return new ShortenedUrlMessage(options)
+  public createShortenedUrl(options: { threadId: string; shortenedUrl: string; expiresTime?: Date }) {
+    return new ShortenedUrlMessage({
+      threadId: options.threadId,
+      shortenedUrl: options.shortenedUrl,
+      expiresTime: options.expiresTime,
+    })
   }
 
   public createInvalidate(options: { shortenedUrl: string }) {
@@ -105,11 +109,20 @@ export class DidCommShortenUrlService {
       role: ShortenUrlRole.LongUrlProvider,
     })
 
+    const messageExpiresTime = inboundMessageContext.message.expiresTime
+    let expiresAt: Date | undefined
+    if (messageExpiresTime !== undefined) {
+      if (!(messageExpiresTime instanceof Date) || Number.isNaN(messageExpiresTime.getTime())) {
+        throw new CredoError('shortened-url message includes an invalid expires_time')
+      }
+      expiresAt = messageExpiresTime
+    }
+
     let record: DidCommShortenUrlRecord
     if (existingRecord) {
       existingRecord.state = ShortenUrlState.ShortenedReceived
       existingRecord.shortenedUrl = inboundMessageContext.message.shortenedUrl
-      existingRecord.expiresTime = inboundMessageContext.message.expiresTime
+      existingRecord.expiresTime = expiresAt
       await this.repository.update(inboundMessageContext.agentContext, existingRecord)
       record = existingRecord
     } else {
@@ -119,7 +132,7 @@ export class DidCommShortenUrlService {
         role: ShortenUrlRole.LongUrlProvider,
         state: ShortenUrlState.ShortenedReceived,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
-        expiresTime: inboundMessageContext.message.expiresTime,
+        expiresTime: expiresAt,
       })
       await this.repository.save(inboundMessageContext.agentContext, record)
     }
@@ -130,7 +143,7 @@ export class DidCommShortenUrlService {
         connectionId: connection.id,
         threadId,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
-        expiresTime: inboundMessageContext.message.expiresTime,
+        expiresTime: expiresAt,
         shortenUrlRecord: record,
       },
     })

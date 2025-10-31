@@ -68,16 +68,19 @@ export class DidCommShortenUrlApi {
     connectionId: string
     threadId: string
     shortenedUrl: string
-    expiresTime?: number
+    expiresTime?: Date
   }) {
     const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
     if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
 
-    const message = this.shortenService.createShortenedUrl({
-      threadId: options.threadId,
-      shortenedUrl: options.shortenedUrl,
-      expiresTime: options.expiresTime,
-    })
+    let expiresAt: Date | undefined
+    if (options.expiresTime) {
+      if (!(options.expiresTime instanceof Date) || Number.isNaN(options.expiresTime.getTime())) {
+        throw new CredoError('expiresTime must be a valid Date instance')
+      }
+      expiresAt = options.expiresTime
+    }
+
     // Update or create record
     const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
       connectionId: connection.id,
@@ -102,8 +105,14 @@ export class DidCommShortenUrlApi {
           `Shortened URL already generated for thread ${options.threadId} (current state: ${record.state}).`,
         )
       }
+
+      if (!expiresAt && record.requestedValiditySeconds && record.requestedValiditySeconds > 0) {
+        const createdAt = record.createdAt ?? new Date()
+        expiresAt = new Date(createdAt.getTime() + record.requestedValiditySeconds * 1000)
+      }
+
       record.shortenedUrl = options.shortenedUrl
-      record.expiresTime = options.expiresTime
+      record.expiresTime = expiresAt
       record.state = ShortenUrlState.ShortenedSent
       await this.shortenUrlRepository.update(this.agentContext, record)
     } else {
@@ -114,10 +123,16 @@ export class DidCommShortenUrlApi {
         role: ShortenUrlRole.UrlShortener,
         state: ShortenUrlState.ShortenedSent,
         shortenedUrl: options.shortenedUrl,
-        expiresTime: options.expiresTime,
+        expiresTime: expiresAt,
       })
       await this.shortenUrlRepository.save(this.agentContext, newRecord)
     }
+
+    const message = this.shortenService.createShortenedUrl({
+      threadId: options.threadId,
+      shortenedUrl: options.shortenedUrl,
+      expiresTime: expiresAt,
+    })
 
     await this.messageSender.sendMessage(
       new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),

@@ -17,6 +17,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
   - `invalidate-shortened-url`
 - Typed API to send/receive messages
 - Optional maximum validity window for inbound requests (enforce by supplying a positive value)
+- Automatic DIDComm timestamp conversion for shortened-url responses (work with `Date`, sent as ISO strings)
 - Event emission for inbound messages so your app can plug in a real shortener
 - Wallet records for each shorten-url exchange (full lifecycle saved in storage)
 - Protocol registration with configurable roles for feature discovery
@@ -92,8 +93,8 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
       connectionId,
       threadId: threadId!,
       shortenedUrl: shortUrl,
-      // optional expiration in epoch seconds:
-      // expiresTime: Math.floor(Date.now() / 1000) + 3600,
+      // optional expiration time (Date). When omitted, we reuse the requester’s validity window if provided.
+      // expiresTime: new Date(Date.now() + 60 * 60 * 1000),
     })
   },
 )
@@ -134,7 +135,7 @@ sendShortenedUrl(options: {
   connectionId: string
   threadId: string
   shortenedUrl: string
-  expiresTime?: number
+  expiresTime?: Date
 }): Promise<{ messageId: string }>
 
 invalidateShortenedUrl(options: {
@@ -149,7 +150,7 @@ deleteById(options: {
 ```
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
-- `sendShortenedUrl` throws if a short URL already exists for the same `threadId`. This avoids sending multiple short links for one flow.
+- `sendShortenedUrl` throws if a short URL already exists for the same `threadId`. This avoids sending multiple short links for one flow. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
 - `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
@@ -159,7 +160,7 @@ All operations persist `DidCommShortenUrlRecord` entries in the agent wallet so 
 
 ## Events
 
-The service emits events for inbound messages so you can plug your own logic:
+The service emits events for inbound messages so you can plug your own logic. Timestamp fields are exposed as `Date` instances to your handler, but are serialized to ISO-8601 strings on the wire:
 
 ```ts
 enum DidCommShortenUrlEventTypes {
@@ -192,7 +193,7 @@ enum DidCommShortenUrlEventTypes {
     connectionId: string
     threadId: string
     shortenedUrl: string
-    expiresTime?: number
+    expiresTime?: Date
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```

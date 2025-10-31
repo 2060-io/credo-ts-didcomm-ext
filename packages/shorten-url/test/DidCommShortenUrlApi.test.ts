@@ -135,6 +135,8 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.RequestReceived,
+      requestedValiditySeconds: 300,
+      createdAt: new Date('2024-01-01T00:00:00.000Z'),
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -144,13 +146,21 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/xyz',
     })
 
+    const expectedExpires = new Date(existingRecord.createdAt!.getTime() + 300 * 1000)
+
     expect(repository.update).toHaveBeenCalledWith(
       agentContext,
       expect.objectContaining({
         state: ShortenUrlState.ShortenedSent,
         shortenedUrl: 'https://test.io/xyz',
+        expiresTime: expectedExpires,
       }),
     )
+    expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
+      threadId: 'req-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: expectedExpires,
+    })
   })
 
   it('sendShortenedUrl should error if shortened already sent', async () => {
@@ -272,5 +282,37 @@ describe('DidCommShortenUrlApi', () => {
     await expect(
       api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' }),
     ).rejects.toThrow('already been invalidated')
+  })
+
+  it('sendShortenedUrl should store provided expiresTime when creating new record', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({
+      threadId: 'req-1',
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+
+    const providedExpires = new Date('2024-02-01T10:00:00.000Z')
+
+    await api.sendShortenedUrl({
+      connectionId: 'conn-1',
+      threadId: 'req-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: providedExpires,
+    })
+
+    expect(repository.save).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({
+        expiresTime: providedExpires,
+      }),
+    )
+    expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
+      threadId: 'req-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: providedExpires,
+    })
   })
 })
