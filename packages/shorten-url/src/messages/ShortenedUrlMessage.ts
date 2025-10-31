@@ -30,7 +30,7 @@ export class ShortenedUrlMessage extends AgentMessage {
   @Transform(({ value, type }) => {
     if (value == null) return value
     // Helper to check for valid Date
-    const isValidDate = (v: any): v is Date => v instanceof Date && !isNaN(v.getTime())
+    const isValidDate = (v: unknown): v is Date => v instanceof Date && !isNaN(v.getTime())
 
     // Serialize Date to ISO string
     if (type === TransformationType.CLASS_TO_PLAIN) return isValidDate(value) ? value.toISOString() : value
