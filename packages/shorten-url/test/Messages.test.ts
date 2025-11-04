@@ -73,10 +73,10 @@ describe('DIDComm Shorten URL Message models', () => {
   })
 
   describe('ShortenedUrlMessage', () => {
-    it('should set thread id and expose shortened_url / expires_time (DATE) in JSON', () => {
+    it('should expose shortened_url / expires_time (DATE) in JSON', () => {
       const expiresAt = new Date('2024-11-27T12:00:00.000Z')
       const msg = new ShortenedUrlMessage({
-        threadId: 'req-123',
+        id: 'rec-123',
         shortenedUrl: 'https://test.io/a1b2',
         expiresTime: expiresAt,
       })
@@ -87,22 +87,20 @@ describe('DIDComm Shorten URL Message models', () => {
         shortened_url: 'https://test.io/a1b2',
         expires_time: expiresAt.toISOString(),
       })
-      expect(JsonTransformer.toJSON(msg)).toHaveProperty('~thread.thid', 'req-123')
     })
 
     it('should allow missing expires_time', () => {
       const msg = new ShortenedUrlMessage({
-        threadId: 'req-123',
         shortenedUrl: 'https://test.io/a1b2',
       })
       const json = JsonTransformer.toJSON(msg) as Record<string, unknown>
       expect(json['expires_time']).toBeUndefined()
     })
 
-    it('should project to DIDComm V2 structure with thid', () => {
+    it('should project to DIDComm V2 structure', () => {
       const expiresAt = new Date('2024-11-27T12:00:00.000Z')
       const msg = new ShortenedUrlMessage({
-        threadId: 'req-123',
+        id: 'rec-123',
         shortenedUrl: 'https://test.io/a1b2',
         expiresTime: expiresAt,
       })
@@ -110,7 +108,6 @@ describe('DIDComm Shorten URL Message models', () => {
       expect(toDidCommV2(msg)).toEqual({
         type: 'https://didcomm.org/shorten-url/1.0/shortened-url',
         id: msg.id,
-        thid: 'req-123',
         body: {
           shortened_url: 'https://test.io/a1b2',
           expires_time: expiresAt.toISOString(),
