@@ -61,7 +61,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.InvalidationReceived,
     })
     ;(connectionService.findById as jest.Mock).mockResolvedValue({ id: 'conn-1' })
-    ;(repository.getById as jest.Mock).mockResolvedValue(record)
+    ;;(repository.getById as jest.Mock).mockResolvedValue(record)
 
     await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
     expect(repository.delete).toHaveBeenCalledWith(agentContext, record)
@@ -69,13 +69,13 @@ describe('DidCommShortenUrlApi', () => {
 
   it('deleteById should throw when record does not belong to connection', async () => {
     const { api, repository } = createApi()
-    const record = new DidCommShortenUrlRecord({
+    const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
       connectionId: 'other-conn',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationReceived,
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(record)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).rejects.toThrow(
       'Shortened URL record rec-1 does not belong to connection conn-1',
@@ -125,12 +125,13 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new ShortenedUrlMessage({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
     ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
@@ -138,16 +139,11 @@ describe('DidCommShortenUrlApi', () => {
       requestedValiditySeconds: 300,
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await api.sendShortenedUrl({
-      connectionId: 'conn-1',
-      threadId: 'req-1',
-      shortenedUrl: 'https://test.io/xyz',
-    })
+    await api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
 
     const expectedExpires = new Date(existingRecord.createdAt!.getTime() + 300 * 1000)
-
     expect(repository.update).toHaveBeenCalledWith(
       agentContext,
       expect.objectContaining({
@@ -157,7 +153,7 @@ describe('DidCommShortenUrlApi', () => {
       }),
     )
     expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
       expiresTime: expectedExpires,
     })
@@ -167,67 +163,70 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new ShortenedUrlMessage({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
     ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', threadId: 'req-1', shortenedUrl: 'https://test.io/new' }),
-    ).rejects.toThrow('Shortened URL already generated for thread req-1')
+      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
+    ).rejects.toThrow('Shortened URL already generated for record rec-1')
   })
 
   it('sendShortenedUrl should error if record already contains shortenedUrl', async () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new ShortenedUrlMessage({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
     ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.RequestReceived,
       shortenedUrl: 'https://test.io/old',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', threadId: 'req-1', shortenedUrl: 'https://test.io/new' }),
-    ).rejects.toThrow('Shortened URL already generated for thread req-1')
+      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
+    ).rejects.toThrow('Shortened URL already generated for record rec-1')
   })
 
   it('sendShortenedUrl should error if the record was invalidated', async () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new ShortenedUrlMessage({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
     ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationSent,
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', threadId: 'req-1', shortenedUrl: 'https://test.io/new' }),
+      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
     ).rejects.toThrow('already invalidated')
   })
 
@@ -284,33 +283,39 @@ describe('DidCommShortenUrlApi', () => {
     ).rejects.toThrow('already been invalidated')
   })
 
-  it('sendShortenedUrl should store provided expiresTime when creating new record', async () => {
+  it('sendShortenedUrl should store provided expiresTime on existing record', async () => {
     const { api, shortenService, repository } = createApi()
 
-    const message = new ShortenedUrlMessage({
-      threadId: 'req-1',
-      shortenedUrl: 'https://test.io/xyz',
-    })
+    const message = new ShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
     ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.RequestReceived,
+    })
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     const providedExpires = new Date('2024-02-01T10:00:00.000Z')
 
     await api.sendShortenedUrl({
       connectionId: 'conn-1',
-      threadId: 'req-1',
+      recordId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
       expiresTime: providedExpires,
     })
 
-    expect(repository.save).toHaveBeenCalledWith(
+    expect(repository.update).toHaveBeenCalledWith(
       agentContext,
       expect.objectContaining({
         expiresTime: providedExpires,
+        shortenedUrl: 'https://test.io/xyz',
       }),
     )
+    expect(repository.save).not.toHaveBeenCalled()
     expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
-      threadId: 'req-1',
+      id: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
       expiresTime: providedExpires,
     })
