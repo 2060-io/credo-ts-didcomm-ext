@@ -156,10 +156,10 @@ describe('DidCommShortenUrlService', () => {
 
     const expiresAt = new Date('2024-11-27T12:00:00.000Z')
     const msg = new ShortenedUrlMessage({
-      threadId: 'req-1',
       shortenedUrl: 'https://s.io/xyz',
       expiresTime: expiresAt,
     })
+    msg.setThread({ threadId: 'req-1' })
 
     await service.processShortenedUrl(makeCtx(msg))
     expect(repository.update).toHaveBeenCalledWith(
@@ -184,7 +184,6 @@ describe('DidCommShortenUrlService', () => {
     const { service, emit, repository } = createService()
 
     const msg = new ShortenedUrlMessage({
-      threadId: 'req-1',
       shortenedUrl: 'https://s.io/xyz',
     })
     Reflect.set(msg, 'thread', undefined)
