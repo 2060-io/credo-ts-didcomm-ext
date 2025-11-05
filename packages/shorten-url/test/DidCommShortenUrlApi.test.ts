@@ -61,7 +61,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.InvalidationReceived,
     })
     ;(connectionService.findById as jest.Mock).mockResolvedValue({ id: 'conn-1' })
-    ;;(repository.getById as jest.Mock).mockResolvedValue(record)
+    ;(repository.getById as jest.Mock).mockResolvedValue(record)
 
     await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
     expect(repository.delete).toHaveBeenCalledWith(agentContext, record)

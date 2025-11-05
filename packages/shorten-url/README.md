@@ -84,14 +84,14 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
   DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
   async (e) => {
     const { shortenUrlRecord } = e.payload
-    const { connectionId, threadId, url } = shortenUrlRecord
+    const { connectionId, url } = shortenUrlRecord
 
     // your real shortener here
     const shortUrl = await myShortener(url!)
 
     await agent.modules.shortenUrl.sendShortenedUrl({
       connectionId,
-      threadId: threadId!,
+      recordId: shortenUrlRecord.id,
       shortenedUrl: shortUrl,
       // optional expiration time (Date). When omitted, we reuse the requester’s validity window if provided.
       // expiresTime: new Date(Date.now() + 60 * 60 * 1000),
@@ -133,7 +133,7 @@ requestShortenedUrl(options: {
 
 sendShortenedUrl(options: {
   connectionId: string
-  threadId: string
+  recordId: string
   shortenedUrl: string
   expiresTime?: Date
 }): Promise<{ messageId: string }>
@@ -150,7 +150,7 @@ deleteById(options: {
 ```
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
-- `sendShortenedUrl` throws if a short URL already exists for the same `threadId`. This avoids sending multiple short links for one flow. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
+- `sendShortenedUrl` throws if a short URL already exists for the same `threadId`. This avoids sending multiple short links for one flow. Pass the record id from the inbound event; if `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
 - `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
