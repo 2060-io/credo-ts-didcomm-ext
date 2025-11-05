@@ -4,7 +4,6 @@ import { IsDate, IsOptional, IsString } from 'class-validator'
 
 export interface ShortenedUrlMessageOptions {
   id?: string
-  threadId: string
   shortenedUrl: string
   expiresTime?: Date
 }
@@ -14,7 +13,6 @@ export class ShortenedUrlMessage extends AgentMessage {
     super()
     if (options) {
       this.id = options.id ?? this.generateId()
-      this.setThread({ threadId: options.threadId })
       this.shortenedUrl = options.shortenedUrl
       this.expiresTime = options.expiresTime
     }
@@ -45,7 +43,7 @@ export class ShortenedUrlMessage extends AgentMessage {
   })
   public expiresTime?: Date
 
-  @IsValidMessageType(ShortenedUrlMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/shorten-url/1.0/shortened-url')
+  @IsValidMessageType(ShortenedUrlMessage.type)
   public readonly type = ShortenedUrlMessage.type.messageTypeUri
 }

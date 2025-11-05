@@ -26,6 +26,15 @@ export class DidCommShortenUrlApi {
     this.registerMessageHandlers()
   }
 
+  /**
+   * Sends a RequestShortenedUrlMessage to the specified connection.
+   * @param options.connectionId - The ID of the connection to send the message to.
+   * @param options.url - The original URL to be shortened.
+   * @param options.goalCode - The goal code for the URL shortening request.
+   * @param options.requestedValiditySeconds - The requested validity period in seconds for the shortened URL.
+   * @param options.shortUrlSlug - (Optional) A custom slug for the shortened URL.
+   * @returns An object containing the ID of the sent message.
+   */
   public async requestShortenedUrl(options: {
     connectionId: string
     url: string
@@ -64,9 +73,17 @@ export class DidCommShortenUrlApi {
     return { messageId: message.id }
   }
 
+  /**
+   * Sends a ShortenedUrlMessage to the specified connection.
+   * @param options.connectionId - The ID of the connection to send the message to.
+   * @param options.recordId - The ID of the shorten-url record.
+   * @param options.shortenedUrl - The shortened URL to include in the message.
+   * @param options.expiresTime - (Optional) The expiration time of the shortened URL.
+   * @returns An object containing the ID of the sent message.
+   */
   public async sendShortenedUrl(options: {
     connectionId: string
-    threadId: string
+    recordId: string
     shortenedUrl: string
     expiresTime?: Date
   }) {
@@ -81,55 +98,48 @@ export class DidCommShortenUrlApi {
       expiresAt = options.expiresTime
     }
 
-    // Update or create record
-    const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
-      connectionId: connection.id,
-      threadId: options.threadId,
-      role: ShortenUrlRole.UrlShortener,
-    })
-    if (record) {
-      if (record.shortenedUrl) {
-        throw new CredoError(
-          `Shortened URL already generated for thread ${options.threadId} (existing shortened URL: ${record.shortenedUrl}).`,
-        )
-      }
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
 
-      if (record.state === ShortenUrlState.InvalidationSent) {
-        throw new CredoError(
-          `Cannot send shortened URL for thread ${options.threadId} because it was already invalidated.`,
-        )
-      }
-
-      if (record.state !== ShortenUrlState.RequestReceived) {
-        throw new CredoError(
-          `Shortened URL already generated for thread ${options.threadId} (current state: ${record.state}).`,
-        )
-      }
-
-      if (!expiresAt && record.requestedValiditySeconds && record.requestedValiditySeconds > 0) {
-        const createdAt = record.createdAt ?? new Date()
-        expiresAt = new Date(createdAt.getTime() + record.requestedValiditySeconds * 1000)
-      }
-
-      record.shortenedUrl = options.shortenedUrl
-      record.expiresTime = expiresAt
-      record.state = ShortenUrlState.ShortenedSent
-      await this.shortenUrlRepository.update(this.agentContext, record)
-    } else {
-      // Create new record
-      const newRecord = new DidCommShortenUrlRecord({
-        connectionId: connection.id,
-        threadId: options.threadId,
-        role: ShortenUrlRole.UrlShortener,
-        state: ShortenUrlState.ShortenedSent,
-        shortenedUrl: options.shortenedUrl,
-        expiresTime: expiresAt,
-      })
-      await this.shortenUrlRepository.save(this.agentContext, newRecord)
+    if (record.connectionId !== connection.id) {
+      throw new CredoError(
+        `Shorten-url record ${options.recordId} does not belong to connection ${options.connectionId}`,
+      )
     }
 
+    if (record.role !== ShortenUrlRole.UrlShortener) {
+      throw new CredoError(`Shorten-url record ${options.recordId} is not owned by the url-shortener role`)
+    }
+
+    if (record.shortenedUrl) {
+      throw new CredoError(
+        `Shortened URL already generated for record ${options.recordId} (existing shortened URL: ${record.shortenedUrl}).`,
+      )
+    }
+
+    if (record.state === ShortenUrlState.InvalidationSent) {
+      throw new CredoError(
+        `Cannot send shortened URL for record ${options.recordId} because it was already invalidated.`,
+      )
+    }
+
+    if (record.state !== ShortenUrlState.RequestReceived) {
+      throw new CredoError(
+        `Shortened URL already generated for record ${options.recordId} (current state: ${record.state}).`,
+      )
+    }
+
+    if (!expiresAt && record.requestedValiditySeconds && record.requestedValiditySeconds > 0) {
+      const createdAt = record.createdAt ?? new Date()
+      expiresAt = new Date(createdAt.getTime() + record.requestedValiditySeconds * 1000)
+    }
+
+    record.shortenedUrl = options.shortenedUrl
+    record.expiresTime = expiresAt
+    record.state = ShortenUrlState.ShortenedSent
+    await this.shortenUrlRepository.update(this.agentContext, record)
+
     const message = this.shortenService.createShortenedUrl({
-      threadId: options.threadId,
+      id: record.id,
       shortenedUrl: options.shortenedUrl,
       expiresTime: expiresAt,
     })
@@ -140,6 +150,12 @@ export class DidCommShortenUrlApi {
     return { messageId: message.id }
   }
 
+  /**
+   * Invalidates a previously sent shortened URL by sending an InvalidateShortenedUrlMessage.
+   * @param options.connectionId - The ID of the connection to send the invalidation message to.
+   * @param options.shortenedUrl - The shortened URL to be invalidated.
+   * @returns An object containing the ID of the sent invalidation message.
+   */
   public async invalidateShortenedUrl(options: { connectionId: string; shortenedUrl: string }) {
     const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
     if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
@@ -171,6 +187,12 @@ export class DidCommShortenUrlApi {
     return { messageId: message.id }
   }
 
+  /**
+   * Deletes a shorten-url record by its ID for a specific connection.
+   * @param options.connectionId - The ID of the connection.
+   * @param options.recordId - The ID of the shorten-url record to be deleted.
+   * @returns An object containing the ID of the deleted record.
+   */
   public async deleteById(options: { connectionId: string; recordId: string }) {
     const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
     if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
