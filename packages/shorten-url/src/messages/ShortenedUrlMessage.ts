@@ -13,6 +13,7 @@ export class ShortenedUrlMessage extends AgentMessage {
     super()
     if (options) {
       this.id = options.id ?? this.generateId()
+      this.setThread({ threadId: options.id })
       this.shortenedUrl = options.shortenedUrl
       this.expiresTime = options.expiresTime
     }
