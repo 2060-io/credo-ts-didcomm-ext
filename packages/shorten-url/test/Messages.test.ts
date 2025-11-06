@@ -108,6 +108,7 @@ describe('DIDComm Shorten URL Message models', () => {
       expect(toDidCommV2(msg)).toEqual({
         type: 'https://didcomm.org/shorten-url/1.0/shortened-url',
         id: msg.id,
+        thid: 'rec-123',
         body: {
           shortened_url: 'https://test.io/a1b2',
           expires_time: expiresAt.toISOString(),
