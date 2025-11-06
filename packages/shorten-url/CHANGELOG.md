@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.6...@2060.io/credo-ts-didcomm-shorten-url@v0.0.7) (2025-11-06)
+
+
+### Bug Fixes
+
+* Align docs with recordId usage ([#123](https://github.com/2060-io/credo-ts-didcomm-ext/issues/123)) ([c02b506](https://github.com/2060-io/credo-ts-didcomm-ext/commit/c02b506024be74fb011a88ce8edec17ec8ff008e))
+
 ## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.5...@2060.io/credo-ts-didcomm-shorten-url@v0.0.6) (2025-10-31)
 
 
