@@ -84,13 +84,12 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
   DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived,
   async (e) => {
     const { shortenUrlRecord } = e.payload
-    const { connectionId, url } = shortenUrlRecord
+    const { url } = shortenUrlRecord
 
     // your real shortener here
     const shortUrl = await myShortener(url!)
 
     await agent.modules.shortenUrl.sendShortenedUrl({
-      connectionId,
       recordId: shortenUrlRecord.id,
       shortenedUrl: shortUrl,
       // optional expiration time (Date). When omitted, we reuse the requester’s validity window if provided.
@@ -132,7 +131,6 @@ requestShortenedUrl(options: {
 }): Promise<{ messageId: string }>
 
 sendShortenedUrl(options: {
-  connectionId: string
   recordId: string
   shortenedUrl: string
   expiresTime?: Date
@@ -150,7 +148,7 @@ deleteById(options: {
 ```
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
-- `sendShortenedUrl` throws if the referenced record already has a shortened URL or was invalidated. Pass the record id from the inbound event; if `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
+- `sendShortenedUrl` throws if the referenced record already has a shortened URL or was invalidated. Pass the record id from the inbound event; the API automatically reuses the stored `connectionId`. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
 - `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
