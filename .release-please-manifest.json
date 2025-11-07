@@ -5,5 +5,5 @@
   "packages/mrtd": "0.0.18",
   "packages/reactions": "0.0.2",
   "packages/receipts": "0.0.7",
-  "packages/shorten-url": "0.0.8"
+  "packages/shorten-url": "0.0.9"
 }
