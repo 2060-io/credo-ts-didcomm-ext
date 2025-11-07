@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.8...@2060.io/credo-ts-didcomm-shorten-url@v0.0.9) (2025-11-07)
+
+
+### Features
+
+* drop connectionId from sendShortenedUrl API ([#127](https://github.com/2060-io/credo-ts-didcomm-ext/issues/127)) ([77a074d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/77a074db52f0917fc80ce77ccb1310e16fb9c7af))
+
 ## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.7...@2060.io/credo-ts-didcomm-shorten-url@v0.0.8) (2025-11-06)
 
 
