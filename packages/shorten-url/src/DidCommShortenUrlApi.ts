@@ -74,21 +74,20 @@ export class DidCommShortenUrlApi {
   }
 
   /**
-   * Sends a ShortenedUrlMessage to the specified connection.
-   * @param options.connectionId - The ID of the connection to send the message to.
+   * Sends a ShortenedUrlMessage on behalf of the record's connection.
    * @param options.recordId - The ID of the shorten-url record.
    * @param options.shortenedUrl - The shortened URL to include in the message.
    * @param options.expiresTime - (Optional) The expiration time of the shortened URL.
    * @returns An object containing the ID of the sent message.
    */
-  public async sendShortenedUrl(options: {
-    connectionId: string
-    recordId: string
-    shortenedUrl: string
-    expiresTime?: Date
-  }) {
-    const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
+  public async sendShortenedUrl(options: { recordId: string; shortenedUrl: string; expiresTime?: Date }) {
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
+    if (!record.connectionId) {
+      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
+    }
+
+    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
+    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
 
     let expiresAt: Date | undefined
     if (options.expiresTime) {
@@ -96,14 +95,6 @@ export class DidCommShortenUrlApi {
         throw new CredoError('expiresTime must be a valid Date instance')
       }
       expiresAt = options.expiresTime
-    }
-
-    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
-
-    if (record.connectionId !== connection.id) {
-      throw new CredoError(
-        `Shorten-url record ${options.recordId} does not belong to connection ${options.connectionId}`,
-      )
     }
 
     if (record.role !== ShortenUrlRole.UrlShortener) {

@@ -141,7 +141,7 @@ describe('DidCommShortenUrlApi', () => {
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
+    await api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
 
     const expectedExpires = new Date(existingRecord.createdAt!.getTime() + 300 * 1000)
     expect(repository.update).toHaveBeenCalledWith(
@@ -178,9 +178,9 @@ describe('DidCommShortenUrlApi', () => {
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
-    ).rejects.toThrow('Shortened URL already generated for record rec-1')
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'Shortened URL already generated for record rec-1',
+    )
   })
 
   it('sendShortenedUrl should error if record already contains shortenedUrl', async () => {
@@ -202,9 +202,9 @@ describe('DidCommShortenUrlApi', () => {
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
-    ).rejects.toThrow('Shortened URL already generated for record rec-1')
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'Shortened URL already generated for record rec-1',
+    )
   })
 
   it('sendShortenedUrl should error if the record was invalidated', async () => {
@@ -225,9 +225,9 @@ describe('DidCommShortenUrlApi', () => {
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await expect(
-      api.sendShortenedUrl({ connectionId: 'conn-1', recordId: 'rec-1', shortenedUrl: 'https://test.io/new' }),
-    ).rejects.toThrow('already invalidated')
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'already invalidated',
+    )
   })
 
   it('invalidateShortenedUrl should require existing record', async () => {
@@ -300,7 +300,6 @@ describe('DidCommShortenUrlApi', () => {
     const providedExpires = new Date('2024-02-01T10:00:00.000Z')
 
     await api.sendShortenedUrl({
-      connectionId: 'conn-1',
       recordId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
       expiresTime: providedExpires,
