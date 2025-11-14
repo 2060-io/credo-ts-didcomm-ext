@@ -200,7 +200,7 @@ describe('DidCommShortenUrlService', () => {
 
     const existingRecord = new DidCommShortenUrlRecord({
       connectionId: 'conn-1',
-      role: ShortenUrlRole.UrlShortener,
+      role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://s.io/xyz',
     })
@@ -221,6 +221,29 @@ describe('DidCommShortenUrlService', () => {
     expect(event.payload.connectionId).toBe('conn-1')
     expect(event.payload.shortenUrlRecord).toBe(existingRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.InvalidationReceived)
+  })
+
+  it('processInvalidate should still update record when expiresTime is in the past', async () => {
+    const { service, repository } = createService()
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.ShortenedReceived,
+      shortenedUrl: 'https://s.io/expired',
+      expiresTime: new Date(Date.now() - 5 * 60 * 1000),
+    })
+    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+
+    const msg = new InvalidateShortenedUrlMessage({
+      shortenedUrl: 'https://s.io/expired',
+    })
+
+    await service.processInvalidate(makeCtx(msg))
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({ state: ShortenUrlState.InvalidationReceived }),
+    )
   })
 
   it('processInvalidate should throw when record does not exist', async () => {

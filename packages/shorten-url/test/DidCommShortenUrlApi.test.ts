@@ -238,8 +238,8 @@ describe('DidCommShortenUrlApi', () => {
 
     const existingRecord = new DidCommShortenUrlRecord({
       connectionId: 'conn-1',
-      role: ShortenUrlRole.LongUrlProvider,
-      state: ShortenUrlState.ShortenedReceived,
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://test.io/xyz',
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
@@ -272,7 +272,7 @@ describe('DidCommShortenUrlApi', () => {
 
     const existingRecord = new DidCommShortenUrlRecord({
       connectionId: 'conn-1',
-      role: ShortenUrlRole.LongUrlProvider,
+      role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationSent,
       shortenedUrl: 'https://test.io/xyz',
     })
@@ -281,6 +281,30 @@ describe('DidCommShortenUrlApi', () => {
     await expect(
       api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' }),
     ).rejects.toThrow('already been invalidated')
+  })
+
+  it('invalidateShortenedUrl should allow invalidation even if the record is already expired', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.ShortenedSent,
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: new Date(Date.now() - 60 * 60 * 1000),
+    })
+    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+
+    await expect(
+      api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' }),
+    ).resolves.toEqual({ messageId: message.id })
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({ state: ShortenUrlState.InvalidationSent }),
+    )
   })
 
   it('sendShortenedUrl should store provided expiresTime on existing record', async () => {

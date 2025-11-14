@@ -158,7 +158,7 @@ export class DidCommShortenUrlApi {
     const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
       connectionId: connection.id,
       shortenedUrl: options.shortenedUrl,
-      role: ShortenUrlRole.LongUrlProvider,
+      role: ShortenUrlRole.UrlShortener,
     })
 
     if (!record) {
