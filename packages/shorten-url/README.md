@@ -101,10 +101,18 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
 
 ### 4) Optionally invalidate a shortened URL later
 
+When acting as the **url-shortener**, you can inform the long-url-provider that an issued short link is no longer valid:
+
 ```ts
 await agent.modules.shortenUrl.invalidateShortenedUrl({
   connectionId: 'conn-123',
   shortenedUrl: 'https://example.io/a1b2',
+})
+
+// On the requesting agent (the long-url-provider) subscribe to DidCommInvalidateShortenedUrlReceived
+agent.events.on(DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived, async (event) => {
+  const { shortenedUrl } = event.payload
+  console.log(`Partner revoked ${shortenedUrl}`)
 })
 ```
 
@@ -149,7 +157,7 @@ deleteById(options: {
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
 - `sendShortenedUrl` throws if the referenced record already has a shortened URL or was invalidated. Pass the record id from the inbound event; the API automatically reuses the stored `connectionId`. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
-- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent.
+- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent. The url-shortener invokes this API, and the requesting partner receives `DidCommInvalidateShortenedUrlReceived` even if the original shortened URL has already expired.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
 All operations persist `DidCommShortenUrlRecord` entries in the agent wallet so you can audit or resume the flow later. Records carry the connection, protocol role, the thread id (we store the `@id` of the original `request-shortened-url`), state, original URL details, shortened URL, and expiration metadata.
