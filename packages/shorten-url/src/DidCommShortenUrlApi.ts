@@ -143,31 +143,28 @@ export class DidCommShortenUrlApi {
 
   /**
    * Invalidates a previously sent shortened URL by sending an InvalidateShortenedUrlMessage.
-   * @param options.connectionId - The ID of the connection to send the invalidation message to.
    * @param options.shortenedUrl - The shortened URL to be invalidated.
    * @returns An object containing the ID of the sent invalidation message.
    */
-  public async invalidateShortenedUrl(options: { connectionId: string; shortenedUrl: string }) {
-    const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
+  public async invalidateShortenedUrl(options: { recordId: string }) {
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
 
-    const message = this.shortenService.createInvalidate({
-      shortenedUrl: options.shortenedUrl,
-    })
-    // Update record
-    const record = await this.shortenUrlRepository.findSingleByQuery(this.agentContext, {
-      connectionId: connection.id,
-      shortenedUrl: options.shortenedUrl,
-      role: ShortenUrlRole.UrlShortener,
-    })
+    if (!record.connectionId) {
+      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
+    }
 
-    if (!record) {
-      throw new CredoError('No shorten-url record found for the provided shortened_url on this connection')
+    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
+    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
+
+    if (!record.shortenedUrl) {
+      throw new CredoError(`Shortened URL record ${options.recordId} does not contain a shortened URL to invalidate`)
     }
 
     if (record.state === ShortenUrlState.InvalidationSent) {
-      throw new CredoError(`Shortened URL ${options.shortenedUrl} has already been invalidated on this connection`)
+      throw new CredoError(`Shortened URL ${record.shortenedUrl} has already been invalidated on this connection`)
     }
+
+    const message = this.shortenService.createInvalidate({ shortenedUrl: record.shortenedUrl })
 
     record.state = ShortenUrlState.InvalidationSent
     await this.shortenUrlRepository.update(this.agentContext, record)
@@ -180,20 +177,18 @@ export class DidCommShortenUrlApi {
 
   /**
    * Deletes a shorten-url record by its ID for a specific connection.
-   * @param options.connectionId - The ID of the connection.
    * @param options.recordId - The ID of the shorten-url record to be deleted.
    * @returns An object containing the ID of the deleted record.
    */
-  public async deleteById(options: { connectionId: string; recordId: string }) {
-    const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${options.connectionId}`)
-
+  public async deleteById(options: { recordId: string }) {
     const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
-    if (record.connectionId !== connection.id) {
-      throw new CredoError(
-        `Shortened URL record ${options.recordId} does not belong to connection ${options.connectionId}`,
-      )
+
+    if (!record.connectionId) {
+      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
     }
+
+    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
+    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
 
     await this.shortenUrlRepository.delete(this.agentContext, record)
     return { recordId: options.recordId }

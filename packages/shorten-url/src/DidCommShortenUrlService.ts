@@ -106,7 +106,7 @@ export class DidCommShortenUrlService {
     const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
       threadId,
-      role: ShortenUrlRole.LongUrlProvider,
+      role: ShortenUrlRole.UrlShortener,
     })
 
     const messageExpiresTime = inboundMessageContext.message.expiresTime
@@ -127,9 +127,10 @@ export class DidCommShortenUrlService {
       record = existingRecord
     } else {
       record = new DidCommShortenUrlRecord({
+        id: inboundMessageContext.message.id,
         connectionId: connection.id,
         threadId,
-        role: ShortenUrlRole.LongUrlProvider,
+        role: ShortenUrlRole.UrlShortener,
         state: ShortenUrlState.ShortenedReceived,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
         expiresTime: expiresAt,
@@ -155,7 +156,7 @@ export class DidCommShortenUrlService {
     const record = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
       shortenedUrl: inboundMessageContext.message.shortenedUrl,
-      role: ShortenUrlRole.LongUrlProvider,
+      role: ShortenUrlRole.UrlShortener,
     })
 
     if (!record) {
