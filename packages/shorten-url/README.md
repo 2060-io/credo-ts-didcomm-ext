@@ -19,6 +19,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
 - Optional maximum validity window for inbound requests (enforce by supplying a positive value)
 - Automatic DIDComm timestamp conversion for shortened-url responses (work with `Date`, sent as ISO strings)
 - Event emission for inbound messages so your app can plug in a real shortener
+- Automatic Ack replies for `invalidate-shortened-url` messages (long-url-provider role) to satisfy the 1.0 spec
 - Wallet records for each shorten-url exchange (full lifecycle saved in storage)
 - Protocol registration with configurable roles for feature discovery
 
@@ -101,20 +102,41 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
 
 ### 4) Optionally invalidate a shortened URL later
 
-When acting as the **url-shortener**, you can inform the long-url-provider that an issued short link is no longer valid:
+When acting as the **url-shortener**, you can inform the long-url-provider that an issued short link is no longer valid. Look up the stored record (for example, from the event emitted in step 3) and pass its id to the API:
 
 ```ts
-await agent.modules.shortenUrl.invalidateShortenedUrl({
-  connectionId: 'conn-123',
-  shortenedUrl: 'https://example.io/a1b2',
-})
-
-// On the requesting agent (the long-url-provider) subscribe to DidCommInvalidateShortenedUrlReceived
-agent.events.on(DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived, async (event) => {
-  const { shortenedUrl } = event.payload
-  console.log(`Partner revoked ${shortenedUrl}`)
-})
+const recordId = shortenUrlRecord.id
+const { messageId: invalidateMessageId } = await agent.modules.shortenUrl.invalidateShortenedUrl({ recordId })
+// Keep invalidateMessageId so you can correlate the Ack that comes back from the long-url-provider.
 ```
+
+On the requesting agent (the **long-url-provider**) subscribe to `DidCommInvalidateShortenedUrlReceived` so you can stop using the revoked URL. The handler automatically returns the DIDComm `ack` that the spec requires, so your app only needs to update its own state:
+
+```ts
+import {
+  DidCommInvalidateShortenedUrlReceivedEvent,
+  DidCommShortenUrlEventTypes,
+} from '@2060.io/credo-ts-didcomm-shorten-url'
+
+agent.events.on<DidCommInvalidateShortenedUrlReceivedEvent>(
+  DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
+  async ({ payload }) => {
+    const { shortenedUrl, shortenUrlRecord } = payload
+
+    await disableShortUrlLocally(shortenedUrl)
+    await agent.modules.shortenUrl.deleteById({ recordId: shortenUrlRecord.id })
+    // The Ack mandated by https://didcomm.org/shorten-url/1.0/ is already sent by the handler.
+  },
+)
+```
+
+> **Important:** Only the `url-shortener` role may call `invalidateShortenedUrl`. The long-url-provider receives the message, emits the event above, and automatically acknowledges it per the protocol. This keeps both agents aligned with the [invalidate-shortened-url](https://didcomm.org/shorten-url/1.0/#invalidate-shortened-url) flow.
+
+#### Confirming the Ack on the url-shortener
+
+Per the spec, the Ack sent by the long-url-provider carries the `~thread.thid` of the `invalidate-shortened-url` request. That value matches the `messageId` returned by `invalidateShortenedUrl`, so you can reconcile successful invalidations when the Ack arrives.
+
+This pattern keeps the url-shortener informed that the long-url-provider accepted and acknowledged the invalidation, mirroring the DIDComm 1.0 requirement without writing a custom Ack reply.
 
 ---
 
@@ -145,19 +167,17 @@ sendShortenedUrl(options: {
 }): Promise<{ messageId: string }>
 
 invalidateShortenedUrl(options: {
-  connectionId: string
-  shortenedUrl: string
+  recordId: string
 }): Promise<{ messageId: string }>
 
 deleteById(options: {
-  connectionId: string
   recordId: string
 }): Promise<{ recordId: string }>
 ```
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
 - `sendShortenedUrl` throws if the referenced record already has a shortened URL or was invalidated. Pass the record id from the inbound event; the API automatically reuses the stored `connectionId`. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
-- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed for that connection), ensuring the flow stays consistent. The url-shortener invokes this API, and the requesting partner receives `DidCommInvalidateShortenedUrlReceived` even if the original shortened URL has already expired.
+- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed) and ensures the record belongs to the `url-shortener` role before sending `invalidate-shortened-url`. Once the long-url-provider processes the message, the module returns the spec-defined Ack automatically.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
 All operations persist `DidCommShortenUrlRecord` entries in the agent wallet so you can audit or resume the flow later. Records carry the connection, protocol role, the thread id (we store the `@id` of the original `request-shortened-url`), state, original URL details, shortened URL, and expiration metadata.
@@ -213,6 +233,8 @@ enum DidCommShortenUrlEventTypes {
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
+
+  > The handler that raises this event already returned an `ack` with `status = ok` to the sender, fulfilling the DIDComm requirement while giving you a clean hook to update your business logic.
 
 ---
 
