@@ -24,6 +24,7 @@ describe('DidCommShortenUrlService', () => {
     }) as unknown as InboundMessageContext<T>
 
   const createService = () => {
+    const config = new DidCommShortenUrlModuleConfig()
     const emit = jest.fn()
     const eventEmitter = { emit } as unknown as EventEmitter
     const repository: jest.Mocked<Pick<DidCommShortenUrlRepository, 'save' | 'update' | 'findSingleByQuery'>> = {
@@ -32,7 +33,11 @@ describe('DidCommShortenUrlService', () => {
       findSingleByQuery: jest.fn().mockResolvedValue(null),
     }
 
-    const service = new DidCommShortenUrlService(eventEmitter, repository as unknown as DidCommShortenUrlRepository)
+    const service = new DidCommShortenUrlService(
+      eventEmitter,
+      repository as unknown as DidCommShortenUrlRepository,
+      config,
+    )
 
     return { service, emit, repository }
   }
