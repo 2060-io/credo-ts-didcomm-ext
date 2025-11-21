@@ -71,6 +71,7 @@ export class DidCommShortenUrlService {
     }
 
     const record = new DidCommShortenUrlRecord({
+      id: inboundMessageContext.message.id,
       connectionId: connection.id,
       threadId,
       role: ShortenUrlRole.UrlShortener,
@@ -103,10 +104,10 @@ export class DidCommShortenUrlService {
       throw new CredoError('shortened-url message MUST include the thread id of the related request')
     }
 
-    const existingRecord = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
+    const record = await this.repository.getSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
       threadId,
-      role: ShortenUrlRole.UrlShortener,
+      role: ShortenUrlRole.LongUrlProvider,
     })
 
     const messageExpiresTime = inboundMessageContext.message.expiresTime
@@ -118,25 +119,10 @@ export class DidCommShortenUrlService {
       expiresAt = messageExpiresTime
     }
 
-    let record: DidCommShortenUrlRecord
-    if (existingRecord) {
-      existingRecord.state = ShortenUrlState.ShortenedReceived
-      existingRecord.shortenedUrl = inboundMessageContext.message.shortenedUrl
-      existingRecord.expiresTime = expiresAt
-      await this.repository.update(inboundMessageContext.agentContext, existingRecord)
-      record = existingRecord
-    } else {
-      record = new DidCommShortenUrlRecord({
-        id: inboundMessageContext.message.id,
-        connectionId: connection.id,
-        threadId,
-        role: ShortenUrlRole.UrlShortener,
-        state: ShortenUrlState.ShortenedReceived,
-        shortenedUrl: inboundMessageContext.message.shortenedUrl,
-        expiresTime: expiresAt,
-      })
-      await this.repository.save(inboundMessageContext.agentContext, record)
-    }
+    record.state = ShortenUrlState.ShortenedReceived
+    record.shortenedUrl = inboundMessageContext.message.shortenedUrl
+    record.expiresTime = expiresAt
+    await this.repository.update(inboundMessageContext.agentContext, record)
 
     this.eventEmitter.emit<DidCommShortenedUrlReceivedEvent>(inboundMessageContext.agentContext, {
       type: DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived,

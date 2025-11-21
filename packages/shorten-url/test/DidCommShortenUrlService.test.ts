@@ -24,20 +24,18 @@ describe('DidCommShortenUrlService', () => {
     }) as unknown as InboundMessageContext<T>
 
   const createService = () => {
-    const config = new DidCommShortenUrlModuleConfig()
     const emit = jest.fn()
     const eventEmitter = { emit } as unknown as EventEmitter
-    const repository: jest.Mocked<Pick<DidCommShortenUrlRepository, 'save' | 'update' | 'findSingleByQuery'>> = {
+    const repository: jest.Mocked<
+      Pick<DidCommShortenUrlRepository, 'save' | 'update' | 'findSingleByQuery' | 'getSingleByQuery'>
+    > = {
       save: jest.fn().mockResolvedValue(undefined),
       update: jest.fn().mockResolvedValue(undefined),
       findSingleByQuery: jest.fn().mockResolvedValue(null),
+      getSingleByQuery: jest.fn().mockRejectedValue(new Error('not found')),
     }
 
-    const service = new DidCommShortenUrlService(
-      eventEmitter,
-      repository as unknown as DidCommShortenUrlRepository,
-      config,
-    )
+    const service = new DidCommShortenUrlService(eventEmitter, repository as unknown as DidCommShortenUrlRepository)
 
     return { service, emit, repository }
   }
@@ -157,7 +155,7 @@ describe('DidCommShortenUrlService', () => {
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.RequestSent,
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
     const expiresAt = new Date('2024-11-27T12:00:00.000Z')
     const msg = new ShortenedUrlMessage({
@@ -167,6 +165,11 @@ describe('DidCommShortenUrlService', () => {
     msg.setThread({ threadId: 'req-1' })
 
     await service.processShortenedUrl(makeCtx(msg))
+    expect(repository.getSingleByQuery).toHaveBeenCalledWith(agentContext, {
+      connectionId: 'conn-1',
+      threadId: 'req-1',
+      role: ShortenUrlRole.LongUrlProvider,
+    })
     expect(repository.update).toHaveBeenCalledWith(
       agentContext,
       expect.objectContaining({

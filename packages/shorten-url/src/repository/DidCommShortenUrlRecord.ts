@@ -53,7 +53,6 @@ export class DidCommShortenUrlRecord extends BaseRecord {
   public getTags() {
     return {
       ...this._tags,
-      id: this.id,
       connectionId: this.connectionId,
       role: this.role,
       state: this.state,

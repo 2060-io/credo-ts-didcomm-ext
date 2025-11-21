@@ -56,6 +56,7 @@ export class DidCommShortenUrlApi {
     })
     // Create and save record
     const record = new DidCommShortenUrlRecord({
+      id: message.id,
       connectionId: connection.id,
       threadId: message.id,
       role: ShortenUrlRole.LongUrlProvider,
@@ -160,8 +161,12 @@ export class DidCommShortenUrlApi {
       throw new CredoError(`Shortened URL record ${options.recordId} does not contain a shortened URL to invalidate`)
     }
 
+    if (record.role !== ShortenUrlRole.LongUrlProvider) {
+      throw new CredoError(`Shorten-url record ${options.recordId} is not owned by the long-url-provider role`)
+    }
+
     if (record.state === ShortenUrlState.InvalidationSent) {
-      throw new CredoError(`Shortened URL ${record.shortenedUrl} has already been invalidated on this connection`)
+      throw new CredoError(`Shortened URL ${record.shortenedUrl} has already been invalidated`)
     }
 
     const message = this.shortenService.createInvalidate({ shortenedUrl: record.shortenedUrl })
