@@ -131,7 +131,7 @@ agent.events.on<DidCommInvalidateShortenedUrlReceivedEvent>(
 ```
 
 > **Important:** Only the `long-url-provider` role may call `invalidateShortenedUrl`. The url-shortener receives the message, emits the event above, and automatically acknowledges it per the protocol. This keeps both agents aligned with the [invalidate-shortened-url](https://didcomm.org/shorten-url/1.0/#invalidate-shortened-url) flow.
-The Ack is fully handled for you; the returned `messageId` equals the `~thread.thid` if you need to correlate logs or metrics.
+> The Ack is fully handled for you; the returned `messageId` equals the `~thread.thid` if you need to correlate logs or metrics.
 
 ---
 
