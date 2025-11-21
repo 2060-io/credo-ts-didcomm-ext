@@ -53,43 +53,33 @@ describe('DidCommShortenUrlApi', () => {
   }
 
   it('deleteById should remove record when connection matches', async () => {
-    const { api, repository, connectionService } = createApi()
+    const { api, repository } = createApi()
     const record = new DidCommShortenUrlRecord({
       id: 'rec-1',
       connectionId: 'conn-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationReceived,
     })
-    ;(connectionService.findById as jest.Mock).mockResolvedValue({ id: 'conn-1' })
     ;(repository.getById as jest.Mock).mockResolvedValue(record)
 
-    await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
+    await expect(api.deleteById({ recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
     expect(repository.delete).toHaveBeenCalledWith(agentContext, record)
   })
 
-  it('deleteById should throw when record does not belong to connection', async () => {
+  it('deleteById should throw when record lacks connection data', async () => {
     const { api, repository } = createApi()
-    const existingRecord = new DidCommShortenUrlRecord({
+    const record = new DidCommShortenUrlRecord({
       id: 'rec-1',
-      connectionId: 'other-conn',
+      connectionId: undefined as unknown as string,
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationReceived,
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(record)
 
-    await expect(api.deleteById({ connectionId: 'conn-1', recordId: 'rec-1' })).rejects.toThrow(
-      'Shortened URL record rec-1 does not belong to connection conn-1',
+    await expect(api.deleteById({ recordId: 'rec-1' })).rejects.toThrow(
+      'Shorten-url record rec-1 does not have an associated connection.',
     )
     expect(repository.delete).not.toHaveBeenCalled()
-  })
-
-  it('deleteById should throw when connection does not exist', async () => {
-    const { api, connectionService } = createApi()
-    ;(connectionService.findById as jest.Mock).mockResolvedValue(null)
-
-    await expect(api.deleteById({ connectionId: 'missing', recordId: 'rec-1' })).rejects.toThrow(
-      'Connection not found with id missing',
-    )
   })
 
   it('requestShortenedUrl should store record and send message', async () => {
@@ -237,14 +227,15 @@ describe('DidCommShortenUrlApi', () => {
     ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.ShortenedReceived,
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' })
+    await api.invalidateShortenedUrl({ recordId: 'rec-1' })
 
     expect(repository.update).toHaveBeenCalledWith(
       agentContext,
@@ -252,16 +243,11 @@ describe('DidCommShortenUrlApi', () => {
     )
   })
 
-  it('invalidateShortenedUrl should throw if no record', async () => {
-    const { api, shortenService, repository } = createApi()
-    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(
-      new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' }),
-    )
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+  it('invalidateShortenedUrl should throw if record lookup fails', async () => {
+    const { api, repository } = createApi()
+    ;(repository.getById as jest.Mock).mockRejectedValue(new Error('not found'))
 
-    await expect(
-      api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' }),
-    ).rejects.toThrow('No shorten-url record found for the provided shortened_url on this connection')
+    await expect(api.invalidateShortenedUrl({ recordId: 'missing' })).rejects.toThrow('not found')
   })
 
   it('invalidateShortenedUrl should error if already invalidated', async () => {
@@ -271,16 +257,38 @@ describe('DidCommShortenUrlApi', () => {
     ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
       connectionId: 'conn-1',
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.InvalidationSent,
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
-    await expect(
-      api.invalidateShortenedUrl({ connectionId: 'conn-1', shortenedUrl: 'https://test.io/xyz' }),
-    ).rejects.toThrow('already been invalidated')
+    await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already been invalidated')
+  })
+
+  it('invalidateShortenedUrl should allow invalidation even if the record is already expired', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.ShortenedReceived,
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: new Date(Date.now() - 60 * 60 * 1000),
+    })
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+
+    await api.invalidateShortenedUrl({ recordId: 'rec-1' })
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({ state: ShortenUrlState.InvalidationSent }),
+    )
   })
 
   it('sendShortenedUrl should store provided expiresTime on existing record', async () => {
