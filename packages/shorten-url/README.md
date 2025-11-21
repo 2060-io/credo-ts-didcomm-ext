@@ -2,8 +2,8 @@
 
 DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This module lets an agent play either of the roles defined by the spec:
 
-- **long-url-provider** – asks for a shortened URL
-- **url-shortener** – returns a shortened URL and can later invalidate it
+- **long-url-provider** – asks for a shortened URL and can later invalidate it
+- **url-shortener** – returns a shortened URL and processes invalidate requests
 
 > Spec: <https://didcomm.org/shorten-url/1.0/>
 
@@ -19,7 +19,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
 - Optional maximum validity window for inbound requests (enforce by supplying a positive value)
 - Automatic DIDComm timestamp conversion for shortened-url responses (work with `Date`, sent as ISO strings)
 - Event emission for inbound messages so your app can plug in a real shortener
-- Automatic Ack replies for `invalidate-shortened-url` messages (long-url-provider role) to satisfy the 1.0 spec
+- Automatic Ack replies for `invalidate-shortened-url` messages (url-shortener role) to satisfy the 1.0 spec
 - Wallet records for each shorten-url exchange (full lifecycle saved in storage)
 - Protocol registration with configurable roles for feature discovery
 
@@ -102,15 +102,15 @@ agent.events.on<DidCommRequestShortenedUrlReceivedEvent>(
 
 ### 4) Optionally invalidate a shortened URL later
 
-When acting as the **url-shortener**, you can inform the long-url-provider that an issued short link is no longer valid. Look up the stored record (for example, from the event emitted in step 3) and pass its id to the API:
+When acting as the **long-url-provider**, you can ask the url-shortener to invalidate a previously issued short link. Look up the stored record from when you received the shortened URL (for example, from the `DidCommShortenedUrlReceived` event) and pass its id to the API:
 
 ```ts
 const recordId = shortenUrlRecord.id
 const { messageId: invalidateMessageId } = await agent.modules.shortenUrl.invalidateShortenedUrl({ recordId })
-// Keep invalidateMessageId so you can correlate the Ack that comes back from the long-url-provider.
+// Keep invalidateMessageId so you can correlate the Ack that comes back from the url-shortener.
 ```
 
-On the requesting agent (the **long-url-provider**) subscribe to `DidCommInvalidateShortenedUrlReceived` so you can stop using the revoked URL. The handler automatically returns the DIDComm `ack` that the spec requires, so your app only needs to update its own state:
+On the **url-shortener** agent subscribe to `DidCommInvalidateShortenedUrlReceived` so you can stop serving the revoked URL. The handler automatically returns the DIDComm `ack` that the spec requires, so your app only needs to update its own state:
 
 ```ts
 import {
@@ -125,18 +125,13 @@ agent.events.on<DidCommInvalidateShortenedUrlReceivedEvent>(
 
     await disableShortUrlLocally(shortenedUrl)
     await agent.modules.shortenUrl.deleteById({ recordId: shortenUrlRecord.id })
-    // The Ack mandated by https://didcomm.org/shorten-url/1.0/ is already sent by the handler.
+    // The Ack mandated by https://didcomm.org/shorten-url/1.0/ is already sent back to the long-url-provider by the handler.
   },
 )
 ```
 
-> **Important:** Only the `url-shortener` role may call `invalidateShortenedUrl`. The long-url-provider receives the message, emits the event above, and automatically acknowledges it per the protocol. This keeps both agents aligned with the [invalidate-shortened-url](https://didcomm.org/shorten-url/1.0/#invalidate-shortened-url) flow.
-
-#### Confirming the Ack on the url-shortener
-
-Per the spec, the Ack sent by the long-url-provider carries the `~thread.thid` of the `invalidate-shortened-url` request. That value matches the `messageId` returned by `invalidateShortenedUrl`, so you can reconcile successful invalidations when the Ack arrives.
-
-This pattern keeps the url-shortener informed that the long-url-provider accepted and acknowledged the invalidation, mirroring the DIDComm 1.0 requirement without writing a custom Ack reply.
+> **Important:** Only the `long-url-provider` role may call `invalidateShortenedUrl`. The url-shortener receives the message, emits the event above, and automatically acknowledges it per the protocol. This keeps both agents aligned with the [invalidate-shortened-url](https://didcomm.org/shorten-url/1.0/#invalidate-shortened-url) flow.
+The Ack is fully handled for you; the returned `messageId` equals the `~thread.thid` if you need to correlate logs or metrics.
 
 ---
 
@@ -177,7 +172,7 @@ deleteById(options: {
 
 - `requestShortenedUrl` throws if the same `threadId` (the request `@id`) was already processed, keeping the exchange idempotent.
 - `sendShortenedUrl` throws if the referenced record already has a shortened URL or was invalidated. Pass the record id from the inbound event; the API automatically reuses the stored `connectionId`. If `expiresTime` is omitted and the request contained `requested_validity_seconds`, the expiration is derived automatically (`createdAt + validity`) and sent as an ISO-8601 string per DIDComm best practices.
-- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed) and ensures the record belongs to the `url-shortener` role before sending `invalidate-shortened-url`. Once the long-url-provider processes the message, the module returns the spec-defined Ack automatically.
+- `invalidateShortenedUrl` throws if the link was already invalidated (or never existed) and only sends `invalidate-shortened-url` when the stored record belongs to the `long-url-provider` role. Once the url-shortener processes the message, it automatically responds with the spec-defined Ack.
 - `deleteById` validates the connection ownership before removing a stored record, so only the owner agent can clean up its shorten-url entries.
 
 All operations persist `DidCommShortenUrlRecord` entries in the agent wallet so you can audit or resume the flow later. Records carry the connection, protocol role, the thread id (we store the `@id` of the original `request-shortened-url`), state, original URL details, shortened URL, and expiration metadata.
@@ -261,7 +256,7 @@ States follow the DIDComm spec lifecycle:
 - `shortened-sent` / `shortened-received`
 - `invalidation-sent` / `invalidation-received`
 
-Invalidation calls will fail with an error if no record exists for the provided `shortened_url`, giving you a built-in safety check that only the party who created the short link can invalidate it.
+Invalidation calls will fail with an error if no record exists for the provided `shortened_url`, giving you a built-in safety check that only the agent that requested the short link (and still holds the record) can invalidate it.
 
 ### `request-shortened-url`
 
