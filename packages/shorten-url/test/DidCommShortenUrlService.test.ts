@@ -1,10 +1,16 @@
 import type { DidCommShortenUrlRepository } from '../src/repository'
 import type { AgentContext, AgentMessage, EventEmitter, InboundMessageContext } from '@credo-ts/core'
 
+import { AckStatus } from '@credo-ts/core'
 import { DidCommShortenUrlEventTypes } from '../src/DidCommShortenUrlEvents'
 import { DidCommShortenUrlModuleConfig } from '../src/DidCommShortenUrlModuleConfig'
 import { DidCommShortenUrlService } from '../src/DidCommShortenUrlService'
-import { RequestShortenedUrlMessage, ShortenedUrlMessage, InvalidateShortenedUrlMessage } from '../src/messages'
+import {
+  RequestShortenedUrlMessage,
+  ShortenedUrlMessage,
+  InvalidateShortenedUrlMessage,
+  ShortenUrlAckMessage,
+} from '../src/messages'
 import { ShortenUrlRole, ShortenUrlState } from '../src/models'
 import { DidCommShortenUrlRecord } from '../src/repository'
 
@@ -262,6 +268,47 @@ describe('DidCommShortenUrlService', () => {
 
     await expect(service.processInvalidate(makeCtx(msg))).rejects.toThrow(
       'No shorten-url record found for the provided shortened_url on this connection',
+    )
+  })
+
+  it('processAck should transition to Invalidated and emit event', async () => {
+    const { service, emit, repository } = createService()
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.InvalidationSent,
+      shortenedUrl: 'https://s.io/xyz',
+      invalidationMessageId: 'inv-1',
+      threadId: 'thread-1',
+    })
+    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+
+    const ack = new ShortenUrlAckMessage({ status: AckStatus.OK, threadId: 'inv-1' })
+
+    await service.processAck(makeCtx(ack))
+
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({ state: ShortenUrlState.Invalidated }),
+    )
+    const [, event] = emit.mock.calls[0]
+    expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommShortenedUrlInvalidated)
+    expect(event.payload.connectionId).toBe('conn-1')
+    expect(event.payload.shortenedUrl).toBe('https://s.io/xyz')
+    expect(event.payload.invalidationMessageId).toBe('inv-1')
+    expect(event.payload.threadId).toBe('thread-1')
+    expect(event.payload.shortenUrlRecord).toBe(existingRecord)
+    expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.Invalidated)
+  })
+
+  it('processAck should error when no matching record exists', async () => {
+    const { service, repository } = createService()
+    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+
+    const ack = new ShortenUrlAckMessage({ status: AckStatus.OK, threadId: 'unknown' })
+    await expect(service.processAck(makeCtx(ack))).rejects.toThrow(
+      'No shorten-url record found for the provided ack thread id on this connection',
     )
   })
 })
