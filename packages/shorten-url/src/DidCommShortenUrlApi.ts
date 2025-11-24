@@ -9,7 +9,12 @@ import {
 } from '@credo-ts/core'
 
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
-import { RequestShortenedUrlHandler, ShortenedUrlHandler, InvalidateShortenedUrlHandler, AckShortenUrlHandler } from './handlers'
+import {
+  RequestShortenedUrlHandler,
+  ShortenedUrlHandler,
+  InvalidateShortenedUrlHandler,
+  AckShortenUrlHandler,
+} from './handlers'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
 

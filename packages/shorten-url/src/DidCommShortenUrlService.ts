@@ -191,7 +191,9 @@ export class DidCommShortenUrlService {
     }
 
     if (!record.shortenedUrl) {
-      throw new CredoError('Cannot mark shortened-url record as invalidated because it does not contain a shortened URL')
+      throw new CredoError(
+        'Cannot mark shortened-url record as invalidated because it does not contain a shortened URL',
+      )
     }
 
     if (record.state === ShortenUrlState.Invalidated) return

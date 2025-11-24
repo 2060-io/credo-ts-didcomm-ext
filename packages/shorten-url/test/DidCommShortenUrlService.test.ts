@@ -2,6 +2,7 @@ import type { DidCommShortenUrlRepository } from '../src/repository'
 import type { AgentContext, AgentMessage, EventEmitter, InboundMessageContext } from '@credo-ts/core'
 
 import { AckStatus } from '@credo-ts/core'
+
 import { DidCommShortenUrlEventTypes } from '../src/DidCommShortenUrlEvents'
 import { DidCommShortenUrlModuleConfig } from '../src/DidCommShortenUrlModuleConfig'
 import { DidCommShortenUrlService } from '../src/DidCommShortenUrlService'
