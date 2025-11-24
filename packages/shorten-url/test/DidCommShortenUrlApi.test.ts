@@ -239,7 +239,10 @@ describe('DidCommShortenUrlApi', () => {
 
     expect(repository.update).toHaveBeenCalledWith(
       agentContext,
-      expect.objectContaining({ state: ShortenUrlState.InvalidationSent }),
+      expect.objectContaining({
+        state: ShortenUrlState.InvalidationSent,
+        invalidationMessageId: message.id,
+      }),
     )
   })
 
@@ -266,6 +269,24 @@ describe('DidCommShortenUrlApi', () => {
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
     await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already been invalidated')
+  })
+
+  it('invalidateShortenedUrl should error if already marked invalidated', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.Invalidated,
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+
+    await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already marked as invalidated')
   })
 
   it('invalidateShortenedUrl should allow invalidation even if the record is already expired', async () => {
