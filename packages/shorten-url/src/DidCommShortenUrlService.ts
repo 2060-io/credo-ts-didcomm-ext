@@ -1,13 +1,19 @@
-import { CredoError, EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
+import { AckStatus, CredoError, EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
 
 import {
   DidCommInvalidateShortenedUrlReceivedEvent,
   DidCommRequestShortenedUrlReceivedEvent,
   DidCommShortenUrlEventTypes,
   DidCommShortenedUrlReceivedEvent,
+  DidCommShortenedUrlInvalidatedEvent,
 } from './DidCommShortenUrlEvents'
 import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
-import { InvalidateShortenedUrlMessage, RequestShortenedUrlMessage, ShortenedUrlMessage } from './messages'
+import {
+  InvalidateShortenedUrlMessage,
+  RequestShortenedUrlMessage,
+  ShortenedUrlMessage,
+  ShortenUrlAckMessage,
+} from './messages'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
 
@@ -157,6 +163,53 @@ export class DidCommShortenUrlService {
       payload: {
         connectionId: connection.id,
         shortenedUrl: inboundMessageContext.message.shortenedUrl,
+        shortenUrlRecord: record,
+      },
+    })
+  }
+
+  public async processAck(inboundMessageContext: InboundMessageContext<ShortenUrlAckMessage>) {
+    const connection = inboundMessageContext.assertReadyConnection()
+    const threadId = inboundMessageContext.message.threadId
+
+    if (!threadId) {
+      throw new CredoError('shorten-url ack MUST include the thread id of the related invalidation message')
+    }
+
+    if (inboundMessageContext.message.status !== AckStatus.OK) {
+      throw new CredoError(`Unexpected ack status ${inboundMessageContext.message.status} for shorten-url invalidation`)
+    }
+
+    const record = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
+      connectionId: connection.id,
+      role: ShortenUrlRole.LongUrlProvider,
+      invalidationMessageId: threadId,
+    })
+
+    if (!record) {
+      throw new CredoError('No shorten-url record found for the provided ack thread id on this connection')
+    }
+
+    if (!record.shortenedUrl) {
+      throw new CredoError('Cannot mark shortened-url record as invalidated because it does not contain a shortened URL')
+    }
+
+    if (record.state === ShortenUrlState.Invalidated) return
+
+    if (record.state !== ShortenUrlState.InvalidationSent) {
+      throw new CredoError(`Received shorten-url ack in unexpected state ${record.state}`)
+    }
+
+    record.state = ShortenUrlState.Invalidated
+    await this.repository.update(inboundMessageContext.agentContext, record)
+
+    this.eventEmitter.emit<DidCommShortenedUrlInvalidatedEvent>(inboundMessageContext.agentContext, {
+      type: DidCommShortenUrlEventTypes.DidCommShortenedUrlInvalidated,
+      payload: {
+        connectionId: connection.id,
+        shortenedUrl: record.shortenedUrl,
+        invalidationMessageId: threadId,
+        threadId: record.threadId,
         shortenUrlRecord: record,
       },
     })

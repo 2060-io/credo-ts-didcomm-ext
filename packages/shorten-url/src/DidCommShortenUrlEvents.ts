@@ -5,6 +5,7 @@ export enum DidCommShortenUrlEventTypes {
   DidCommRequestShortenedUrlReceived = 'DidCommRequestShortenedUrlReceived',
   DidCommShortenedUrlReceived = 'DidCommShortenedUrlReceived',
   DidCommInvalidateShortenedUrlReceived = 'DidCommInvalidateShortenedUrlReceived',
+  DidCommShortenedUrlInvalidated = 'DidCommShortenedUrlInvalidated',
 }
 
 export interface DidCommRequestShortenedUrlReceivedEvent extends BaseEvent {
@@ -36,6 +37,17 @@ export interface DidCommInvalidateShortenedUrlReceivedEvent extends BaseEvent {
   payload: {
     connectionId: string
     shortenedUrl: string
+    shortenUrlRecord: DidCommShortenUrlRecord
+  }
+}
+
+export interface DidCommShortenedUrlInvalidatedEvent extends BaseEvent {
+  type: DidCommShortenUrlEventTypes.DidCommShortenedUrlInvalidated
+  payload: {
+    connectionId: string
+    shortenedUrl: string
+    invalidationMessageId: string
+    threadId?: string
     shortenUrlRecord: DidCommShortenUrlRecord
   }
 }

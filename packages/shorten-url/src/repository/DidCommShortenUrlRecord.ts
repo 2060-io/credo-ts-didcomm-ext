@@ -15,6 +15,7 @@ export interface DidCommShortenUrlRecordProps {
   requestedValiditySeconds?: number
   shortUrlSlug?: string
   expiresTime?: Date
+  invalidationMessageId?: string
 }
 
 export class DidCommShortenUrlRecord extends BaseRecord {
@@ -28,6 +29,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
   public requestedValiditySeconds?: number
   public shortUrlSlug?: string
   public expiresTime?: Date
+  public invalidationMessageId?: string
 
   public static readonly type = 'DidCommShortenUrlRecord'
   public readonly type = DidCommShortenUrlRecord.type
@@ -47,6 +49,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       this.requestedValiditySeconds = props.requestedValiditySeconds
       this.shortUrlSlug = props.shortUrlSlug
       this.expiresTime = props.expiresTime
+      this.invalidationMessageId = props.invalidationMessageId
     }
   }
 
@@ -61,6 +64,7 @@ export class DidCommShortenUrlRecord extends BaseRecord {
       url: this.url,
       goalCode: this.goalCode,
       shortUrlSlug: this.shortUrlSlug,
+      invalidationMessageId: this.invalidationMessageId,
     }
   }
 }

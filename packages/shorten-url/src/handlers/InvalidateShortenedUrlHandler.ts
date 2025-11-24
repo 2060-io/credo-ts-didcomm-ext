@@ -1,9 +1,9 @@
 import type { DidCommShortenUrlService } from '../DidCommShortenUrlService'
 import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
-import { getOutboundMessageContext, AckMessage, AckStatus } from '@credo-ts/core'
+import { getOutboundMessageContext, AckStatus } from '@credo-ts/core'
 
-import { InvalidateShortenedUrlMessage } from '../messages'
+import { InvalidateShortenedUrlMessage, ShortenUrlAckMessage } from '../messages'
 
 export class InvalidateShortenedUrlHandler implements MessageHandler {
   public supportedMessages = [InvalidateShortenedUrlMessage]
@@ -13,7 +13,7 @@ export class InvalidateShortenedUrlHandler implements MessageHandler {
 
     // Send the explicit Ack required by the protocol once the shortened URL is invalidated
     const connection = inbound.assertReadyConnection()
-    const ack = new AckMessage({
+    const ack = new ShortenUrlAckMessage({
       status: AckStatus.OK,
       threadId: inbound.message.id,
     })

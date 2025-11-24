@@ -9,7 +9,7 @@ import {
 } from '@credo-ts/core'
 
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
-import { RequestShortenedUrlHandler, ShortenedUrlHandler, InvalidateShortenedUrlHandler } from './handlers'
+import { RequestShortenedUrlHandler, ShortenedUrlHandler, InvalidateShortenedUrlHandler, AckShortenUrlHandler } from './handlers'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
 
@@ -169,9 +169,14 @@ export class DidCommShortenUrlApi {
       throw new CredoError(`Shortened URL ${record.shortenedUrl} has already been invalidated`)
     }
 
+    if (record.state === ShortenUrlState.Invalidated) {
+      throw new CredoError(`Shortened URL ${record.shortenedUrl} is already marked as invalidated`)
+    }
+
     const message = this.shortenService.createInvalidate({ shortenedUrl: record.shortenedUrl })
 
     record.state = ShortenUrlState.InvalidationSent
+    record.invalidationMessageId = message.id
     await this.shortenUrlRepository.update(this.agentContext, record)
 
     await this.messageSender.sendMessage(
@@ -203,5 +208,6 @@ export class DidCommShortenUrlApi {
     this.messageHandlerRegistry.registerMessageHandler(new RequestShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new ShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new InvalidateShortenedUrlHandler(this.shortenService))
+    this.messageHandlerRegistry.registerMessageHandler(new AckShortenUrlHandler(this.shortenService))
   }
 }
