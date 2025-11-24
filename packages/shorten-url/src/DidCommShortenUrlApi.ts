@@ -87,13 +87,8 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the sent message.
    */
   public async sendShortenedUrl(options: { recordId: string; shortenedUrl: string; expiresTime?: Date }) {
-    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
-    if (!record.connectionId) {
-      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
-    }
-
-    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
+    const record = await this.getUrlRecord(options.recordId)
+    const connection = await this.getConnection(record.connectionId)
 
     let expiresAt: Date | undefined
     if (options.expiresTime) {
@@ -153,14 +148,8 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the sent invalidation message.
    */
   public async invalidateShortenedUrl(options: { recordId: string }) {
-    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
-
-    if (!record.connectionId) {
-      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
-    }
-
-    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
+    const record = await this.getUrlRecord(options.recordId)
+    const connection = await this.getConnection(record.connectionId)
 
     if (!record.shortenedUrl) {
       throw new CredoError(`Shortened URL record ${options.recordId} does not contain a shortened URL to invalidate`)
@@ -196,14 +185,8 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the deleted record.
    */
   public async deleteById(options: { recordId: string }) {
-    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
-
-    if (!record.connectionId) {
-      throw new CredoError(`Shorten-url record ${options.recordId} does not have an associated connection.`)
-    }
-
-    const connection = await this.connectionService.findById(this.agentContext, record.connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${record.connectionId}`)
+    const record = await this.getUrlRecord(options.recordId)
+    await this.getConnection(record.connectionId)
 
     await this.shortenUrlRepository.delete(this.agentContext, record)
     return { recordId: options.recordId }
@@ -214,5 +197,31 @@ export class DidCommShortenUrlApi {
     this.messageHandlerRegistry.registerMessageHandler(new ShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new InvalidateShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new AckShortenUrlHandler(this.shortenService))
+  }
+
+  /**
+   * Retrieves a shorten-url record by its ID and ensures it has an associated connection.
+   * @param recordId - The ID of the shorten-url record to retrieve.
+   * @returns The retrieved shorten-url record.
+   * @throws CredoError if the record does not have an associated connection.
+   */
+  private async getUrlRecord(recordId: string) {
+    const record = await this.shortenUrlRepository.getById(this.agentContext, recordId)
+    if (!record.connectionId) {
+      throw new CredoError(`Shorten-url record ${recordId} does not have an associated connection.`)
+    }
+    return record
+  }
+
+  /**
+   * Retrieves a connection by its ID.
+   * @param connectionId - The ID of the connection to retrieve.
+   * @returns The retrieved connection.
+   * @throws CredoError if the connection is not found.
+   */
+  private async getConnection(connectionId: string) {
+    const connection = await this.connectionService.findById(this.agentContext, connectionId)
+    if (!connection) throw new CredoError(`Connection not found with id ${connectionId}`)
+    return connection
   }
 }
