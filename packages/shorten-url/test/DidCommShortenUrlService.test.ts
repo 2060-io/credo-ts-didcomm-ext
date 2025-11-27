@@ -111,10 +111,6 @@ describe('DidCommShortenUrlService', () => {
     expect(emit).toHaveBeenCalledTimes(1)
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived)
-    expect(event.payload.connectionId).toBe('conn-1')
-    expect(event.payload.url).toBe('https://example.com?oob=abc')
-    expect(event.payload.goalCode).toBe('shorten.oobv1')
-    expect(event.payload.requestedValiditySeconds).toBe(600)
     const savedRecord = (repository.save as jest.Mock).mock.calls[0][1] as DidCommShortenUrlRecord
     expect(event.payload.shortenUrlRecord).toBe(savedRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.RequestReceived)
@@ -188,11 +184,9 @@ describe('DidCommShortenUrlService', () => {
     )
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommShortenedUrlReceived)
-    expect(event.payload.threadId).toBe('req-1')
-    expect(event.payload.shortenedUrl).toBe('https://s.io/xyz')
-    expect(event.payload.expiresTime?.toISOString()).toBe(expiresAt.toISOString())
     expect(event.payload.shortenUrlRecord).toBe(existingRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.ShortenedReceived)
+    expect(event.payload.shortenUrlRecord.expiresTime?.toISOString()).toBe(expiresAt.toISOString())
   })
 
   it('processShortenedUrl should throw if thread id is missing', async () => {
@@ -232,8 +226,6 @@ describe('DidCommShortenUrlService', () => {
     )
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived)
-    expect(event.payload.shortenedUrl).toBe('https://s.io/xyz')
-    expect(event.payload.connectionId).toBe('conn-1')
     expect(event.payload.shortenUrlRecord).toBe(existingRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.InvalidationReceived)
   })
@@ -295,10 +287,6 @@ describe('DidCommShortenUrlService', () => {
     )
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommShortenedUrlInvalidated)
-    expect(event.payload.connectionId).toBe('conn-1')
-    expect(event.payload.shortenedUrl).toBe('https://s.io/xyz')
-    expect(event.payload.invalidationMessageId).toBe('inv-1')
-    expect(event.payload.threadId).toBe('thread-1')
     expect(event.payload.shortenUrlRecord).toBe(existingRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.Invalidated)
   })

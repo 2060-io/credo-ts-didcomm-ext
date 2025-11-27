@@ -115,8 +115,8 @@ import { DidCommShortenUrlEventTypes, DidCommShortenedUrlInvalidatedEvent } from
 agent.events.on<DidCommShortenedUrlInvalidatedEvent>(
   DidCommShortenUrlEventTypes.DidCommShortenedUrlInvalidated,
   ({ payload }) => {
-    // payload.shortenedUrl, payload.invalidationMessageId (ack thread id), payload.shortenUrlRecord.state === 'invalidated'
-    console.log('Short link invalidated:', payload.shortenedUrl)
+    const { shortenUrlRecord } = payload
+    console.log('Short link invalidated:', shortenUrlRecord.shortenedUrl)
   },
 )
 ```
@@ -132,9 +132,9 @@ import {
 agent.events.on<DidCommInvalidateShortenedUrlReceivedEvent>(
   DidCommShortenUrlEventTypes.DidCommInvalidateShortenedUrlReceived,
   async ({ payload }) => {
-    const { shortenedUrl, shortenUrlRecord } = payload
+    const { shortenUrlRecord } = payload
 
-    await disableShortUrlLocally(shortenedUrl)
+    await disableShortUrlLocally(shortenUrlRecord.shortenedUrl!)
     await agent.modules.shortenUrl.deleteById({ recordId: shortenUrlRecord.id })
     // The Ack mandated by https://didcomm.org/shorten-url/1.0/ is already sent back to the long-url-provider by the handler.
   },
@@ -209,12 +209,6 @@ enum DidCommShortenUrlEventTypes {
 
   ```ts
   {
-    connectionId: string
-    threadId?: string
-    url: string
-    goalCode: string
-    requestedValiditySeconds: number
-    shortUrlSlug?: string
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
@@ -223,10 +217,6 @@ enum DidCommShortenUrlEventTypes {
 
   ```ts
   {
-    connectionId: string
-    threadId: string
-    shortenedUrl: string
-    expiresTime?: Date
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
@@ -235,8 +225,6 @@ enum DidCommShortenUrlEventTypes {
 
   ```ts
   {
-    connectionId: string
-    shortenedUrl: string
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
@@ -247,10 +235,6 @@ enum DidCommShortenUrlEventTypes {
 
   ```ts
   {
-    connectionId: string
-    shortenedUrl: string
-    invalidationMessageId: string // id of the invalidate-shortened-url message (ack thread id)
-    threadId?: string // original request thread (if stored on the record)
     shortenUrlRecord: DidCommShortenUrlRecord
   }
   ```
