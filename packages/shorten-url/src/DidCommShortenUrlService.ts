@@ -180,15 +180,11 @@ export class DidCommShortenUrlService {
       throw new CredoError(`Unexpected ack status ${inboundMessageContext.message.status} for shorten-url invalidation`)
     }
 
-    const record = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
+    const record = await this.repository.getSingleByQuery(inboundMessageContext.agentContext, {
       connectionId: connection.id,
       role: ShortenUrlRole.LongUrlProvider,
       invalidationMessageId: threadId,
     })
-
-    if (!record) {
-      throw new CredoError('No shorten-url record found for the provided ack thread id on this connection')
-    }
 
     if (!record.shortenedUrl) {
       throw new CredoError(
