@@ -59,6 +59,7 @@ describe('DidCommShortenUrlApi', () => {
       connectionId: 'conn-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationReceived,
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(record)
 
@@ -73,6 +74,7 @@ describe('DidCommShortenUrlApi', () => {
       connectionId: undefined as unknown as string,
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationReceived,
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(record)
 
@@ -128,6 +130,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.RequestReceived,
       requestedValiditySeconds: 300,
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -165,6 +168,7 @@ describe('DidCommShortenUrlApi', () => {
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://test.io/xyz',
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -189,6 +193,7 @@ describe('DidCommShortenUrlApi', () => {
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.RequestReceived,
       shortenedUrl: 'https://test.io/old',
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -212,6 +217,7 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'req-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.InvalidationSent,
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -302,6 +308,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.ShortenedReceived,
       shortenedUrl: 'https://test.io/xyz',
       expiresTime: new Date(Date.now() - 60 * 60 * 1000),
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -323,6 +330,7 @@ describe('DidCommShortenUrlApi', () => {
       connectionId: 'conn-1',
       role: ShortenUrlRole.UrlShortener,
       state: ShortenUrlState.RequestReceived,
+      url: 'https://example.com',
     })
     ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
 

@@ -157,6 +157,7 @@ describe('DidCommShortenUrlService', () => {
       threadId: 'req-1',
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.RequestSent,
+      url: 'https://example.com',
     })
     ;(repository.getSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -212,6 +213,7 @@ describe('DidCommShortenUrlService', () => {
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://s.io/xyz',
+      url: 'https://example.com',
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -239,6 +241,7 @@ describe('DidCommShortenUrlService', () => {
       state: ShortenUrlState.ShortenedReceived,
       shortenedUrl: 'https://s.io/expired',
       expiresTime: new Date(Date.now() - 5 * 60 * 1000),
+      url: 'https://example.com',
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
@@ -274,6 +277,7 @@ describe('DidCommShortenUrlService', () => {
       shortenedUrl: 'https://s.io/xyz',
       invalidationMessageId: 'inv-1',
       threadId: 'thread-1',
+      url: 'https://example.com',
     })
     ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
 
