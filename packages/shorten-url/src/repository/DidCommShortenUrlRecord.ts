@@ -6,7 +6,7 @@ export interface DidCommShortenUrlRecordProps {
   id?: string
   createdAt?: Date
   connectionId: string
-  threadId?: string
+  threadId: string
   role: ShortenUrlRole
   state: ShortenUrlState
   url: string
@@ -20,7 +20,7 @@ export interface DidCommShortenUrlRecordProps {
 
 export class DidCommShortenUrlRecord extends BaseRecord {
   public connectionId!: string
-  public threadId?: string
+  public threadId!: string
   public role!: ShortenUrlRole
   public state!: ShortenUrlState
   public url!: string

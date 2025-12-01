@@ -53,7 +53,7 @@ export class DidCommShortenUrlService {
   public async processRequest(inboundMessageContext: InboundMessageContext<RequestShortenedUrlMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
     const requestedValiditySeconds = inboundMessageContext.message.requestedValiditySeconds
-    const threadId = inboundMessageContext.message.id
+    const threadId = inboundMessageContext.message.threadId
     if (!Number.isInteger(requestedValiditySeconds) || requestedValiditySeconds < 0) {
       throw new CredoError('request-shortened-url MUST include a non-negative integer requested_validity_seconds')
     }
@@ -77,7 +77,6 @@ export class DidCommShortenUrlService {
     }
 
     const record = new DidCommShortenUrlRecord({
-      id: inboundMessageContext.message.id,
       connectionId: connection.id,
       threadId,
       role: ShortenUrlRole.UrlShortener,

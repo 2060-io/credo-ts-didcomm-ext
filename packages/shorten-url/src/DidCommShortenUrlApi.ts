@@ -61,7 +61,6 @@ export class DidCommShortenUrlApi {
     })
     // Create and save record
     const record = new DidCommShortenUrlRecord({
-      id: message.id,
       connectionId: connection.id,
       threadId: message.id,
       role: ShortenUrlRole.LongUrlProvider,
@@ -87,7 +86,7 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the sent message.
    */
   public async sendShortenedUrl(options: { recordId: string; shortenedUrl: string; expiresTime?: Date }) {
-    const record = await this.getUrlRecord(options.recordId)
+    const record = await this.getByThreadId(options.recordId)
     const connection = await this.getConnection(record.connectionId)
 
     let expiresAt: Date | undefined
@@ -131,7 +130,7 @@ export class DidCommShortenUrlApi {
     await this.shortenUrlRepository.update(this.agentContext, record)
 
     const message = this.shortenService.createShortenedUrl({
-      id: record.id,
+      id: record.threadId,
       shortenedUrl: options.shortenedUrl,
       expiresTime: expiresAt,
     })
@@ -148,7 +147,7 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the sent invalidation message.
    */
   public async invalidateShortenedUrl(options: { recordId: string }) {
-    const record = await this.getUrlRecord(options.recordId)
+    const record = await this.getByThreadId(options.recordId)
     const connection = await this.getConnection(record.connectionId)
 
     if (!record.shortenedUrl) {
@@ -185,10 +184,7 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the deleted record.
    */
   public async deleteById(options: { recordId: string }) {
-    const record = await this.getUrlRecord(options.recordId)
-    await this.getConnection(record.connectionId)
-
-    await this.shortenUrlRepository.delete(this.agentContext, record)
+    await this.shortenUrlRepository.deleteById(this.agentContext, options.recordId)
     return { recordId: options.recordId }
   }
 
@@ -201,14 +197,14 @@ export class DidCommShortenUrlApi {
 
   /**
    * Retrieves a shorten-url record by its ID and ensures it has an associated connection.
-   * @param recordId - The ID of the shorten-url record to retrieve.
+   * @param threadId - The threadId of the shorten-url record to retrieve.
    * @returns The retrieved shorten-url record.
    * @throws CredoError if the record does not have an associated connection.
    */
-  private async getUrlRecord(recordId: string) {
-    const record = await this.shortenUrlRepository.getById(this.agentContext, recordId)
+  private async getByThreadId(recordId: string) {
+    const record = await this.shortenUrlRepository.getSingleByQuery(this.agentContext, { threadId: recordId })
     if (!record.connectionId) {
-      throw new CredoError(`Shorten-url record ${recordId} does not have an associated connection.`)
+      throw new CredoError(`Shorten-url record ${recordId} does not have an associated connectionId.`)
     }
     return record
   }
