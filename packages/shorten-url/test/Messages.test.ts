@@ -76,7 +76,8 @@ describe('DIDComm Shorten URL Message models', () => {
     it('should expose shortened_url / expires_time (DATE) in JSON', () => {
       const expiresAt = new Date('2024-11-27T12:00:00.000Z')
       const msg = new ShortenedUrlMessage({
-        id: 'rec-123',
+        id: 'msg-123',
+        threadId: 'rec-123',
         shortenedUrl: 'https://test.io/a1b2',
         expiresTime: expiresAt,
       })
@@ -100,7 +101,8 @@ describe('DIDComm Shorten URL Message models', () => {
     it('should project to DIDComm V2 structure', () => {
       const expiresAt = new Date('2024-11-27T12:00:00.000Z')
       const msg = new ShortenedUrlMessage({
-        id: 'rec-123',
+        id: 'msg-123',
+        threadId: 'rec-123',
         shortenedUrl: 'https://test.io/a1b2',
         expiresTime: expiresAt,
       })
