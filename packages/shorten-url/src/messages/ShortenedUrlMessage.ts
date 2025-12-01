@@ -4,7 +4,7 @@ import { IsDate, IsOptional, IsString } from 'class-validator'
 
 export interface ShortenedUrlMessageOptions {
   id?: string
-  threadId?: string
+  threadId: string
   shortenedUrl: string
   expiresTime?: Date
 }
