@@ -4,6 +4,7 @@ import { IsDate, IsOptional, IsString } from 'class-validator'
 
 export interface ShortenedUrlMessageOptions {
   id?: string
+  threadId: string
   shortenedUrl: string
   expiresTime?: Date
 }
@@ -13,7 +14,7 @@ export class ShortenedUrlMessage extends AgentMessage {
     super()
     if (options) {
       this.id = options.id ?? this.generateId()
-      this.setThread({ threadId: options.id })
+      this.setThread({ threadId: options.threadId })
       this.shortenedUrl = options.shortenedUrl
       this.expiresTime = options.expiresTime
     }

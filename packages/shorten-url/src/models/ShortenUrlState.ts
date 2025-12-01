@@ -6,4 +6,5 @@ export enum ShortenUrlState {
   ShortenedReceived = 'shortened-received',
   InvalidationSent = 'invalidation-sent',
   InvalidationReceived = 'invalidation-received',
+  Invalidated = 'invalidated',
 }
