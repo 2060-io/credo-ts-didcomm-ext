@@ -87,7 +87,7 @@ export class DidCommShortenUrlApi {
    */
   public async sendShortenedUrl(options: { recordId: string; shortenedUrl: string; expiresTime?: Date }) {
     const record = await this.getByThreadId(options.recordId)
-    const connection = await this.getConnection(record.connectionId)
+    const connection = await this.connectionService.getById(this.agentContext, record.connectionId)
 
     let expiresAt: Date | undefined
     if (options.expiresTime) {
@@ -119,6 +119,10 @@ export class DidCommShortenUrlApi {
       )
     }
 
+    if (!record.threadId) {
+      throw new CredoError(`Shorten-url record ${options.recordId} does not contain a thread id`)
+    }
+
     if (!expiresAt && record.requestedValiditySeconds && record.requestedValiditySeconds > 0) {
       const createdAt = record.createdAt ?? new Date()
       expiresAt = new Date(createdAt.getTime() + record.requestedValiditySeconds * 1000)
@@ -130,7 +134,7 @@ export class DidCommShortenUrlApi {
     await this.shortenUrlRepository.update(this.agentContext, record)
 
     const message = this.shortenService.createShortenedUrl({
-      id: record.threadId,
+      threadId: record.threadId,
       shortenedUrl: options.shortenedUrl,
       expiresTime: expiresAt,
     })
@@ -148,7 +152,7 @@ export class DidCommShortenUrlApi {
    */
   public async invalidateShortenedUrl(options: { recordId: string }) {
     const record = await this.getByThreadId(options.recordId)
-    const connection = await this.getConnection(record.connectionId)
+    const connection = await this.connectionService.getById(this.agentContext, record.connectionId)
 
     if (!record.shortenedUrl) {
       throw new CredoError(`Shortened URL record ${options.recordId} does not contain a shortened URL to invalidate`)
@@ -207,17 +211,5 @@ export class DidCommShortenUrlApi {
       throw new CredoError(`Shorten-url record ${recordId} does not have an associated connectionId.`)
     }
     return record
-  }
-
-  /**
-   * Retrieves a connection by its ID.
-   * @param connectionId - The ID of the connection to retrieve.
-   * @returns The retrieved connection.
-   * @throws CredoError if the connection is not found.
-   */
-  private async getConnection(connectionId: string) {
-    const connection = await this.connectionService.findById(this.agentContext, connectionId)
-    if (!connection) throw new CredoError(`Connection not found with id ${connectionId}`)
-    return connection
   }
 }

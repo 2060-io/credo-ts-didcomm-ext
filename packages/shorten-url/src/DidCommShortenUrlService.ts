@@ -37,9 +37,10 @@ export class DidCommShortenUrlService {
     return new RequestShortenedUrlMessage(options)
   }
 
-  public createShortenedUrl(options: { id: string; shortenedUrl: string; expiresTime?: Date }) {
+  public createShortenedUrl(options: { threadId: string; shortenedUrl: string; expiresTime?: Date; id?: string }) {
     return new ShortenedUrlMessage({
       id: options.id,
+      threadId: options.threadId,
       shortenedUrl: options.shortenedUrl,
       expiresTime: options.expiresTime,
     })
