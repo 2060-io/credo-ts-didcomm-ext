@@ -1,6 +1,6 @@
 {
   "name": "@2060.io/credo-ts-didcomm-shorten-url",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "DIDComm Shorten URL protocol implementation for @credo-ts/core",
   "license": "Apache-2.0",
   "main": "build/index",
