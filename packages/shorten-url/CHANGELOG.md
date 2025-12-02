@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.11](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.10...@2060.io/credo-ts-didcomm-shorten-url@v0.0.11) (2025-12-02)
+
+
+### Bug Fixes
+
+* Remove the getByThreadId from the DidCommShortenUrlApi ([#133](https://github.com/2060-io/credo-ts-didcomm-ext/issues/133)) ([ae4b164](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ae4b1649f77ce371c29cfc437528612c5ee6eb61))
+
 ## [0.0.10](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.9...@2060.io/credo-ts-didcomm-shorten-url@v0.0.10) (2025-12-02)
 
 
