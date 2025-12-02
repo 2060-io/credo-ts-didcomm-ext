@@ -86,7 +86,7 @@ export class DidCommShortenUrlApi {
    * @returns An object containing the ID of the sent message.
    */
   public async sendShortenedUrl(options: { recordId: string; shortenedUrl: string; expiresTime?: Date }) {
-    const record = await this.getByThreadId(options.recordId)
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
     const connection = await this.connectionService.getById(this.agentContext, record.connectionId)
 
     let expiresAt: Date | undefined
@@ -147,11 +147,11 @@ export class DidCommShortenUrlApi {
 
   /**
    * Invalidates a previously sent shortened URL by sending an InvalidateShortenedUrlMessage.
-   * @param options.shortenedUrl - The shortened URL to be invalidated.
+   * @param options.recordId - The ID of the shorten-url record.
    * @returns An object containing the ID of the sent invalidation message.
    */
   public async invalidateShortenedUrl(options: { recordId: string }) {
-    const record = await this.getByThreadId(options.recordId)
+    const record = await this.shortenUrlRepository.getById(this.agentContext, options.recordId)
     const connection = await this.connectionService.getById(this.agentContext, record.connectionId)
 
     if (!record.shortenedUrl) {
@@ -197,19 +197,5 @@ export class DidCommShortenUrlApi {
     this.messageHandlerRegistry.registerMessageHandler(new ShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new InvalidateShortenedUrlHandler(this.shortenService))
     this.messageHandlerRegistry.registerMessageHandler(new AckShortenUrlHandler(this.shortenService))
-  }
-
-  /**
-   * Retrieves a shorten-url record by its ID and ensures it has an associated connection.
-   * @param threadId - The threadId of the shorten-url record to retrieve.
-   * @returns The retrieved shorten-url record.
-   * @throws CredoError if the record does not have an associated connection.
-   */
-  private async getByThreadId(recordId: string) {
-    const record = await this.shortenUrlRepository.getSingleByQuery(this.agentContext, { threadId: recordId })
-    if (!record.connectionId) {
-      throw new CredoError(`Shorten-url record ${recordId} does not have an associated connectionId.`)
-    }
-    return record
   }
 }
