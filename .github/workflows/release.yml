@@ -8,7 +8,7 @@ on:
 # Ideally we only add this to the 'release' job so it doesn't limit PR runs, but github can't guarantee the job order in that case:
 # "When concurrency is specified at the job level, order is not guaranteed for jobs or runs that queue within 5 minutes of each other."
 concurrency:
-  group: credo-ts-didcomm-${{ github.ref }}-${{ github.repository }}-${{ github.event_name }}
+  group: credo-ts-didcomm-${{ github.ref }}-${{ github.repository }}-${{ github.event_name }}-release
   cancel-in-progress: true
 
 permissions:
