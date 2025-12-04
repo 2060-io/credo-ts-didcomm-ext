@@ -45,7 +45,7 @@ jobs:
     if: needs.ci-trigger.outputs.triggered == 'true'
     steps:
       - name: Checkout credo-ts-didcomm-ext
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup node v22
         uses: actions/setup-node@v6
@@ -79,7 +79,7 @@ jobs:
 
     steps:
       - name: Checkout credo-ts-didcomm-ext
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup node ${{ matrix.node-version }}
         uses: actions/setup-node@v6
