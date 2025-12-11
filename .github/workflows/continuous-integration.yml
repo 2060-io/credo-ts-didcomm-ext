@@ -50,7 +50,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.3
+          version: 10.23.0
 
       - name: Setup node v22
         uses: actions/setup-node@v6
@@ -90,7 +90,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.3
+          version: 10.23.0
 
       - name: Setup node ${{ matrix.node-version }}
         uses: actions/setup-node@v6
