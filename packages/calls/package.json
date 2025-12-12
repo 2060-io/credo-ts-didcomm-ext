@@ -1,7 +1,15 @@
 {
   "name": "@2060.io/credo-ts-didcomm-calls",
-  "main": "build/index",
-  "types": "build/index",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
   "version": "0.0.10",
   "files": [
     "build"
@@ -18,11 +26,11 @@
     "directory": "packages/calls"
   },
   "scripts": {
-    "build": "yarn run clean && yarn run compile",
+    "build": "tsdown --config ./tsdown.config.ts",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "yarn run build",
-    "test": "jest"
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@hyperledger/aries-askar-nodejs": "^0.2.3",
