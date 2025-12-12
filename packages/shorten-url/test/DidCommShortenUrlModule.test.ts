@@ -1,4 +1,7 @@
-import type { DependencyManager, FeatureRegistry } from '@credo-ts/core'
+import type { AgentContext, DependencyManager } from '@credo-ts/core'
+
+import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry } from '@credo-ts/didcomm'
+import { vi, describe } from 'vitest'
 
 import { DidCommShortenUrlApi } from '../src/DidCommShortenUrlApi'
 import { DidCommShortenUrlModule } from '../src/DidCommShortenUrlModule'
@@ -44,45 +47,63 @@ describe('DidCommShortenUrlModuleConfig', () => {
 describe('DidCommShortenUrlModule', () => {
   const createDependencies = () => {
     const dependencyManagerMock = {
-      registerContextScoped: jest.fn(),
-      registerInstance: jest.fn(),
-      registerSingleton: jest.fn(),
-    }
-
-    const featureRegistryMock = {
-      register: jest.fn(),
+      registerContextScoped: vi.fn(),
+      registerInstance: vi.fn(),
+      registerSingleton: vi.fn(),
+      resolve: vi.fn(),
     }
 
     return {
       dependencyManager: dependencyManagerMock as unknown as DependencyManager,
-      featureRegistry: featureRegistryMock as unknown as FeatureRegistry,
       dependencyManagerMock,
-      featureRegistryMock,
     }
   }
 
   it('registers defaults when no config is provided', () => {
     const module = new DidCommShortenUrlModule()
-    const { dependencyManager, featureRegistry, dependencyManagerMock, featureRegistryMock } = createDependencies()
+    const { dependencyManager, dependencyManagerMock } = createDependencies()
 
-    module.register(dependencyManager, featureRegistry)
+    module.register(dependencyManager)
 
     expect(dependencyManagerMock.registerContextScoped).toHaveBeenCalledWith(DidCommShortenUrlApi)
     expect(dependencyManagerMock.registerInstance).toHaveBeenCalledWith(DidCommShortenUrlModuleConfig, module.config)
     expect(dependencyManagerMock.registerSingleton).toHaveBeenNthCalledWith(1, DidCommShortenUrlRepository)
     expect(dependencyManagerMock.registerSingleton).toHaveBeenNthCalledWith(2, DidCommShortenUrlService)
-
-    const protocol = featureRegistryMock.register.mock.calls[0][0]
-    expect(protocol.roles).toEqual([ShortenUrlRole.UrlShortener, ShortenUrlRole.LongUrlProvider])
   })
 
   it('registers provided roles from config options', () => {
     const module = new DidCommShortenUrlModule({ roles: [ShortenUrlRole.LongUrlProvider] })
-    const { dependencyManager, featureRegistry, featureRegistryMock } = createDependencies()
+    const { dependencyManager } = createDependencies()
 
-    module.register(dependencyManager, featureRegistry)
+    module.register(dependencyManager)
 
-    const protocol = featureRegistryMock.register.mock.calls[0][0]
-    expect(protocol.roles).toEqual([ShortenUrlRole.LongUrlProvider])
+    expect(module.config.roles).toEqual([ShortenUrlRole.LongUrlProvider])
+  })
+
+  it('initializes protocol and handlers with the agent context', async () => {
+    const module = new DidCommShortenUrlModule()
+    const featureRegistryMock = { register: vi.fn() }
+    const messageHandlerRegistryMock = { registerMessageHandlers: vi.fn() }
+    const serviceMock = {} as DidCommShortenUrlService
+
+    const dependencyManager = {
+      resolve: vi.fn((token) => {
+        if (token === DidCommFeatureRegistry) return featureRegistryMock
+        if (token === DidCommMessageHandlerRegistry) return messageHandlerRegistryMock
+        if (token === DidCommShortenUrlService) return serviceMock
+        throw new Error(`Unexpected resolve token ${String(token)}`)
+      }),
+    }
+
+    const agentContext = { dependencyManager } as unknown as AgentContext
+    await module.initialize(agentContext)
+
+    expect(featureRegistryMock.register).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'https://didcomm.org/shorten-url/1.0',
+        roles: [ShortenUrlRole.UrlShortener, ShortenUrlRole.LongUrlProvider],
+      }),
+    )
+    expect(messageHandlerRegistryMock.registerMessageHandlers).toHaveBeenCalled()
   })
 })

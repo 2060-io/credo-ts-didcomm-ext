@@ -51,24 +51,27 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['jest.config.ts', '.eslintrc.js'],
+      files: ['jest.config.ts', '.eslintrc.js', 'vitest.config.*', '**/vitest.config.*', '**/tsdown.config.*'],
       env: {
         node: true,
-      },
-    },
-    {
-      files: ['*.test.ts', '**/__tests__/**', '**/tests/**', 'jest.*.ts', '**/samples/**'],
-      env: {
-        jest: true,
-        node: false,
       },
       rules: {
         'import/no-extraneous-dependencies': [
           'error',
           {
             devDependencies: true,
+            packageDir: ['./', 'packages/*'],
           },
         ],
+      },
+    },
+    {
+      files: ['*.test.ts', '**/__tests__/**', '**/tests/**', '**/test/**', 'jest.*.ts', '**/samples/**'],
+      env: {
+        node: false,
+      },
+      rules: {
+        'import/no-extraneous-dependencies': 'off',
       },
     },
   ],

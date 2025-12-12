@@ -1,8 +1,20 @@
 {
   "name": "@2060.io/credo-ts-didcomm-mrtd",
-  "main": "build/index",
-  "types": "build/index",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "version": "0.0.18",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    },
+    "./esm": {
+      "types": "./build/esm/index.d.mts",
+      "default": "./build/esm/index.mjs"
+    }
+  },
   "files": [
     "build"
   ],
@@ -19,13 +31,13 @@
   },
   "scripts": {
     "deps": "rm -f src/esm/bundle.js && esbuild --platform=node src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
-    "prebuild": "yarn run deps",
+    "prebuild": "pnpm run deps",
     "copy-esm": "cp src/esm/bundle.js build/esm/",
-    "build": "yarn run clean && yarn run compile && yarn run copy-esm",
+    "build": "tsdown --config ./tsdown.config.ts",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "yarn run build",
-    "test": "yarn run deps && jest"
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@credo-ts/askar": "^0.5.13",

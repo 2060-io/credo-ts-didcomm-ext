@@ -1,5 +1,5 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
-import { DateTransformer } from '@credo-ts/core/build/utils/transformers'
+import { DateTransformer } from '@credo-ts/core'
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 import { Expose } from 'class-transformer'
 import { IsDate, IsOptional, IsString } from 'class-validator'
 
@@ -14,7 +14,7 @@ interface CallOfferMessageOptions {
   parameters: Record<string, unknown>
 }
 
-export class CallOfferMessage extends AgentMessage {
+export class CallOfferMessage extends DidCommMessage {
   public constructor(options: CallOfferMessageOptions) {
     super()
 
@@ -49,7 +49,7 @@ export class CallOfferMessage extends AgentMessage {
 
   public parameters!: Record<string, unknown>
 
-  @IsValidMessageType(CallOfferMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/calls/1.0/call-offer')
+  @IsValidMessageType(CallOfferMessage.type)
   public readonly type = CallOfferMessage.type.messageTypeUri
 }

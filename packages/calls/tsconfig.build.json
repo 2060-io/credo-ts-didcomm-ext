@@ -3,7 +3,10 @@
 
   "compilerOptions": {
     "outDir": "./build",
-    "types": ["node"]
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2020"
   },
 
   "include": ["src/**/*"]

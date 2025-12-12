@@ -1,12 +1,14 @@
-import { AckStatus, CredoError, EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
-
-import {
+import type {
   DidCommInvalidateShortenedUrlReceivedEvent,
   DidCommRequestShortenedUrlReceivedEvent,
-  DidCommShortenUrlEventTypes,
-  DidCommShortenedUrlReceivedEvent,
   DidCommShortenedUrlInvalidatedEvent,
+  DidCommShortenedUrlReceivedEvent,
 } from './DidCommShortenUrlEvents'
+
+import { CredoError, EventEmitter, injectable } from '@credo-ts/core'
+import { AckStatus, DidCommInboundMessageContext } from '@credo-ts/didcomm'
+
+import { DidCommShortenUrlEventTypes } from './DidCommShortenUrlEvents'
 import { DidCommShortenUrlModuleConfig } from './DidCommShortenUrlModuleConfig'
 import {
   InvalidateShortenedUrlMessage,
@@ -51,7 +53,7 @@ export class DidCommShortenUrlService {
   }
 
   // Process inbound messages and emit events
-  public async processRequest(inboundMessageContext: InboundMessageContext<RequestShortenedUrlMessage>) {
+  public async processRequest(inboundMessageContext: DidCommInboundMessageContext<RequestShortenedUrlMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
     const requestedValiditySeconds = inboundMessageContext.message.requestedValiditySeconds
     const threadId = inboundMessageContext.message.threadId
@@ -95,7 +97,7 @@ export class DidCommShortenUrlService {
     })
   }
 
-  public async processShortenedUrl(inboundMessageContext: InboundMessageContext<ShortenedUrlMessage>) {
+  public async processShortenedUrl(inboundMessageContext: DidCommInboundMessageContext<ShortenedUrlMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
     const threadId = inboundMessageContext.message.thread?.threadId
     if (!threadId) {
@@ -128,7 +130,7 @@ export class DidCommShortenUrlService {
     })
   }
 
-  public async processInvalidate(inboundMessageContext: InboundMessageContext<InvalidateShortenedUrlMessage>) {
+  public async processInvalidate(inboundMessageContext: DidCommInboundMessageContext<InvalidateShortenedUrlMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
 
     const record = await this.repository.findSingleByQuery(inboundMessageContext.agentContext, {
@@ -150,7 +152,7 @@ export class DidCommShortenUrlService {
     })
   }
 
-  public async processAck(inboundMessageContext: InboundMessageContext<ShortenUrlAckMessage>) {
+  public async processAck(inboundMessageContext: DidCommInboundMessageContext<ShortenUrlAckMessage>) {
     const connection = inboundMessageContext.assertReadyConnection()
     const threadId = inboundMessageContext.message.threadId
 
