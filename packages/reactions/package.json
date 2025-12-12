@@ -1,8 +1,16 @@
 {
   "name": "@2060.io/credo-ts-didcomm-reactions",
-  "main": "build/index",
-  "types": "build/index",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "version": "0.0.2",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
   "files": [
     "build"
   ],
@@ -18,14 +26,14 @@
     "directory": "packages/reactions"
   },
   "scripts": {
-    "build": "yarn run clean && yarn run compile",
+    "build": "tsdown --config ./tsdown.config.ts",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "yarn run build",
+    "prepublishOnly": "pnpm run build",
     "check-types": "tsc --noEmit -p tsconfig.build.json",
-    "check-format": "yarn prettier --check",
+    "check-format": "pnpm prettier --check",
     "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
-    "test": "jest"
+    "test": "vitest run"
   },
   "bugs": {
     "url": "https://github.com/2060-io/credo-ts-didcomm-ext/issues"
