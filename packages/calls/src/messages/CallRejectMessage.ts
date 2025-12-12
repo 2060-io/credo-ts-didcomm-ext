@@ -1,11 +1,11 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 
 interface CallRejectMessageOptions {
   id?: string
   threadId?: string
 }
 
-export class CallRejectMessage extends AgentMessage {
+export class CallRejectMessage extends DidCommMessage {
   public constructor(options: CallRejectMessageOptions) {
     super()
 

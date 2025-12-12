@@ -1,6 +1,6 @@
-import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
+import type { DependencyManager, Module, AgentContext } from '@credo-ts/core'
 
-import { Protocol } from '@credo-ts/core'
+import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { DidCommCallsService } from './DidCommCallsService'
 import { DidCommCallsApi } from './DidcommCallsApi'
@@ -10,13 +10,18 @@ import { DidCommCallRole } from './models'
 export class DidCommCallsModule implements Module {
   public readonly api = DidCommCallsApi
 
-  public register(dependencyManager: DependencyManager, featureRegistry: FeatureRegistry): void {
+  public register(dependencyManager: DependencyManager): void {
     dependencyManager.registerContextScoped(DidCommCallsApi)
 
     dependencyManager.registerSingleton(DidCommCallsService)
+  }
+
+  public async initialize(agentContext: AgentContext): Promise<void> {
+    const featureRegistry = agentContext.dependencyManager.resolve(DidCommFeatureRegistry)
+    const messageHandlerRegistry = agentContext.dependencyManager.resolve(DidCommMessageHandlerRegistry)
 
     featureRegistry.register(
-      new Protocol({
+      new DidCommProtocol({
         id: 'https://didcomm.org/calls/1.0',
         roles: [
           DidCommCallRole.VideoCaller,
@@ -27,7 +32,7 @@ export class DidCommCallsModule implements Module {
       }),
     )
 
-    dependencyManager.registerMessageHandlers([
+    messageHandlerRegistry.registerMessageHandlers([
       new CallAcceptHandler(),
       new CallRejectHandler(),
       new CallOfferHandler(),

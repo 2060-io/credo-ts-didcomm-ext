@@ -10,7 +10,7 @@ import {
 
 import { DidCommReactionsService } from './DidCommReactionsService'
 import { MessageReactionsHandler } from './handlers'
-import { MessageReaction, MessageReactionOptions } from './messages/MessageReactionsMessage'
+import { MessageReaction, type MessageReactionOptions } from './messages/MessageReactionsMessage'
 
 @injectable()
 export class DidCommReactionsApi {

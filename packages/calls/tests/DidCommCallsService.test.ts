@@ -1,25 +1,20 @@
-import type { Agent } from '@credo-ts/core'
-
 import { JsonTransformer } from '@credo-ts/core'
+import { describe, test, expect, beforeAll, afterAll } from 'vitest'
 
 import { DidCommCallsService } from '../src/DidCommCallsService'
 
-import { setupAgent } from './utils/agent'
+import { agent } from './utils/agent'
 
 describe('Didcomm Calls', () => {
-  let agent: Agent
   let didcommCallsService: DidCommCallsService
 
   beforeAll(async () => {
-    agent = await setupAgent({
-      name: 'calls service test',
-    })
+    await agent.initialize()
     didcommCallsService = agent.dependencyManager.resolve(DidCommCallsService)
   })
 
   afterAll(async () => {
     await agent.shutdown()
-    await agent.wallet.delete()
   })
 
   describe('Offer message', () => {

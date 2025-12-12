@@ -33,18 +33,29 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@hyperledger/aries-askar-nodejs": "^0.2.3",
-    "@credo-ts/askar": "^0.5.13",
-    "@credo-ts/core": "^0.5.13",
-    "@credo-ts/node": "^0.5.13",
-    "ts-node-dev": "^2.0.0"
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@credo-ts/askar": "^0.6.0",
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/didcomm": "^0.6.0",
+    "@credo-ts/node": "^0.6.0",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^3.10.1",
+    "tsdown": "^0.16.8",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.7"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.5.13"
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/didcomm": "^0.6.0"
   },
   "dependencies": {
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "tsyringe": "^4.8.0"
+  },
+  "resolutions": {
+    "@2060.io/ffi-napi": "4.0.9",
+    "@jest/types": "^29.5.0",
+    "@types/node": "^18.0.0"
   }
 }
