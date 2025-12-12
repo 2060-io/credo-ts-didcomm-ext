@@ -4,20 +4,13 @@
   "description": "DIDComm Shorten URL protocol implementation for @credo-ts/core",
   "license": "Apache-2.0",
   "type": "module",
-  "main": "./build/index.cjs",
+  "main": "./build/index.mjs",
   "module": "./build/index.mjs",
   "types": "./build/index.d.mts",
   "exports": {
     ".": {
       "types": "./build/index.d.mts",
-      "import": {
-        "types": "./build/index.d.mts",
-        "default": "./build/index.mjs"
-      },
-      "require": {
-        "types": "./build/index.d.cts",
-        "default": "./build/index.cjs"
-      }
+      "default": "./build/index.mjs"
     }
   },
   "files": [
