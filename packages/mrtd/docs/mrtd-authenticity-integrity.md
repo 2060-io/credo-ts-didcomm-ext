@@ -19,21 +19,17 @@ This module adds authenticity and integrity verification for electronic Machine 
 ## Architecture (high level)
 
 - **`CscaMasterListService`**
-
   - Lazily resolves `DidCommMrtdModuleConfig` and `FileSystem` inside `initialize()`.
 
 - If `masterListCscaLocation` is an **HTTP(S) URL**, downloads once to `FileSystem.cachePath` and reuses the cached file. A metadata file records the original filename so the cache can be refreshed whenever the configured source name changes.
-
   - Extracts all CSCA certificates from the LDIF Master List into an internal trust store.
 
 - **`SodVerifierService`**
-
   - Depends on `CscaMasterListService`.
   - `verifySod(sodBuffer: Buffer, dataGroups: Record<string, Buffer>)` → `{ authenticity, integrity, details? }`.
   - Parses SOD (CMS SignedData), extracts LDS hashes, checks DG integrity, and validates DSC chain against CSCA anchors.
 
 - **`DidCommMrtdService`**
-
   - `processEMrtdData(...)` parses base64 DGs, ensures the Master List is initialized once, delegates SOD verification to `SodVerifierService`, then emits `EMrtdDataReceived` with both parsed fields and the verification outcome.
   - Event payload shape:
 

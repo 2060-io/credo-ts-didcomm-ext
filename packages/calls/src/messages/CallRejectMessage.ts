@@ -17,7 +17,7 @@ export class CallRejectMessage extends AgentMessage {
 
   public parameters!: Record<string, unknown>
 
-  @IsValidMessageType(CallRejectMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/calls/1.0/call-reject')
+  @IsValidMessageType(CallRejectMessage.type)
   public readonly type = CallRejectMessage.type.messageTypeUri
 }
