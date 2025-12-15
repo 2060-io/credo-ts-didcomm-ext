@@ -3,9 +3,9 @@ import type {
   RequestMediaSharingRecordOptions,
   ShareMediaSharingRecordOptions,
 } from './MediaSharingServiceOptions'
+import type { Query, QueryOptions } from '@credo-ts/core'
 
 import { AgentContext, CredoError, EventEmitter } from '@credo-ts/core'
-import type { Query, QueryOptions } from '@credo-ts/core'
 import { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 import { Lifecycle, scoped } from 'tsyringe'
 

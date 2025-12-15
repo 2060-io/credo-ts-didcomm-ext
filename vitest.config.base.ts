@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     watch: false,
     testTimeout: 15000,
-    pool: 'threads',
+    pool: 'forks',
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

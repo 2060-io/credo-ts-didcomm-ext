@@ -1,7 +1,11 @@
-import { EventEmitter, InboundMessageContext, injectable } from '@credo-ts/core'
+import type { MessageReactionsReceivedEvent } from './DidcommReactionsEvents'
+import type { MessageReactionsMessageOptions } from './messages'
+import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 
-import { MessageReactionsReceivedEvent, ReactionsEventTypes } from './DidcommReactionsEvents'
-import { MessageReactionsMessageOptions, MessageReactionsMessage } from './messages'
+import { EventEmitter, injectable } from '@credo-ts/core'
+
+import { ReactionsEventTypes } from './DidcommReactionsEvents'
+import { MessageReactionsMessage } from './messages'
 
 @injectable()
 export class DidCommReactionsService {
@@ -17,7 +21,7 @@ export class DidCommReactionsService {
     return message
   }
 
-  public async processReactions(messageContext: InboundMessageContext<MessageReactionsMessage>) {
+  public async processReactions(messageContext: DidCommInboundMessageContext<MessageReactionsMessage>) {
     const { message } = messageContext
     const connection = messageContext.assertReadyConnection()
 

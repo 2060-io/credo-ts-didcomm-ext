@@ -4,8 +4,8 @@
   "compilerOptions": {
     "outDir": "./build",
     "types": ["node"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "target": "ES2020"
   },
 

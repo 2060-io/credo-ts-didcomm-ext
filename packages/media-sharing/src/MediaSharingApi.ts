@@ -1,5 +1,6 @@
-import { AgentContext, injectable } from '@credo-ts/core'
 import type { Query, QueryOptions } from '@credo-ts/core'
+
+import { AgentContext, injectable } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
 import { MediaSharingRecord, SharedMediaItem, type SharedMediaItemOptions } from './repository'
