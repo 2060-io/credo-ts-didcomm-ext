@@ -8,7 +8,7 @@ export default mergeConfig(
     test: {
       name: 'media-sharing',
       root: __dirname,
-      include: ['tests/**/*.test.ts'],
+      include: ['test/**/*.test.ts'],
     },
   }),
 )

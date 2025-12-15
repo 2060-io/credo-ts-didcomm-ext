@@ -1,4 +1,5 @@
-import { EventEmitter, InjectionSymbols, Repository, StorageService } from '@credo-ts/core'
+import type { StorageService } from '@credo-ts/core'
+import { EventEmitter, InjectionSymbols, Repository } from '@credo-ts/core'
 import { inject, scoped, Lifecycle } from 'tsyringe'
 
 import { MediaSharingRecord } from './MediaSharingRecord'

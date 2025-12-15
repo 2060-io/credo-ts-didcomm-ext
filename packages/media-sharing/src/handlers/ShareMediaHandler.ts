@@ -1,9 +1,13 @@
 import type { MediaSharingService } from '../services'
-import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
+import type {
+  DidCommMessageHandler,
+  DidCommMessageHandlerInboundMessage,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { ShareMediaMessage } from '../messages/ShareMediaMessage'
 
-export class ShareMediaHandler implements MessageHandler {
+export class ShareMediaHandler implements DidCommMessageHandler {
   public supportedMessages = [ShareMediaMessage]
   private mediaSharingService: MediaSharingService
 
@@ -11,9 +15,12 @@ export class ShareMediaHandler implements MessageHandler {
     this.mediaSharingService = mediaSharingService
   }
 
-  public async handle(inboundMessage: MessageHandlerInboundMessage<ShareMediaHandler>) {
+  public async handle(
+    inboundMessage: DidCommMessageHandlerInboundMessage<ShareMediaHandler>,
+  ): Promise<DidCommOutboundMessageContext | undefined> {
     inboundMessage.assertReadyConnection()
 
     await this.mediaSharingService.processShareMedia(inboundMessage)
+    return undefined
   }
 }

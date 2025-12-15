@@ -1,5 +1,4 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
-import { DateParser } from '@credo-ts/core/build/utils/transformers'
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Transform } from 'class-transformer'
 import { IsDate, IsOptional, IsString } from 'class-validator'
 
@@ -11,8 +10,19 @@ export interface RequestMediaMessageOptions {
   description?: string
   itemIds: string[]
 }
+// Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
 
-export class RequestMediaMessage extends AgentMessage {
+const toDate = (value: unknown) => {
+  // Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
+  if (value instanceof Date) return value
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value)
+    return Number.isNaN(parsed.getTime()) ? value : parsed
+  }
+  return value
+}
+
+export class RequestMediaMessage extends DidCommMessage {
   public constructor(options?: RequestMediaMessageOptions) {
     super()
 
@@ -42,13 +52,13 @@ export class RequestMediaMessage extends AgentMessage {
   public description?: string
 
   @Expose({ name: 'sent_time' })
-  @Transform(({ value }) => DateParser(value))
+  @Transform(({ value }) => toDate(value))
   @IsDate()
   public sentTime!: Date
 
   public itemIds!: string[]
 
+  public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/request-media')
   @IsValidMessageType(RequestMediaMessage.type)
   public readonly type = RequestMediaMessage.type.messageTypeUri
-  public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/request-media')
 }

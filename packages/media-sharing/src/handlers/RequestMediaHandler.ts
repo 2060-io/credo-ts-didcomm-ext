@@ -1,9 +1,13 @@
 import type { MediaSharingService } from '../services'
-import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
+import type {
+  DidCommMessageHandler,
+  DidCommMessageHandlerInboundMessage,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { RequestMediaMessage } from '../messages'
 
-export class RequestMediaHandler implements MessageHandler {
+export class RequestMediaHandler implements DidCommMessageHandler {
   public supportedMessages = [RequestMediaMessage]
   private mediaSharingService: MediaSharingService
 
@@ -11,9 +15,12 @@ export class RequestMediaHandler implements MessageHandler {
     this.mediaSharingService = mediaSharingService
   }
 
-  public async handle(inboundMessage: MessageHandlerInboundMessage<RequestMediaHandler>) {
+  public async handle(
+    inboundMessage: DidCommMessageHandlerInboundMessage<RequestMediaHandler>,
+  ): Promise<DidCommOutboundMessageContext | undefined> {
     inboundMessage.assertReadyConnection()
 
     // Nothing to do internally. Will be handled by the controller
+    return
   }
 }

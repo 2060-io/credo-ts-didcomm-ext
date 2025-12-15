@@ -17,7 +17,7 @@
     "prettier": "prettier '**/*.+(js|json|ts|tsx|md|yml|yaml)'",
     "format": "pnpm prettier --write",
     "check-format": "pnpm prettier --list-different",
-    "test": "vitest -c vitest.config.mts run",
+    "test": "vitest -c vitest.config.base.ts run",
     "lint": "eslint --ignore-path .gitignore --ignore-pattern '**/esm/' .",
     "validate": "pnpm lint && pnpm check-types && pnpm check-format"
   },

@@ -1,9 +1,8 @@
-import { AgentMessage, Attachment, IsValidMessageType, parseMessageType } from '@credo-ts/core'
-import { DateParser } from '@credo-ts/core/build/utils/transformers'
+import type { CipheringInfo, SharedMediaItem } from '../repository'
+
+import { DidCommAttachment, DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Transform, Type } from 'class-transformer'
 import { IsDate, IsOptional, IsString } from 'class-validator'
-
-import { CipheringInfo, SharedMediaItem } from '../repository'
 
 interface SharedMediaItemDescriptorOptions {
   id: string
@@ -44,7 +43,18 @@ export interface ShareMediaMessageOptions {
   items: SharedMediaItem[]
 }
 
-export class ShareMediaMessage extends AgentMessage {
+// helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
+const toDate = (value: unknown) => {
+  // Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
+  if (value instanceof Date) return value
+  if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value)
+    return Number.isNaN(parsed.getTime()) ? value : parsed
+  }
+  return value
+}
+
+export class ShareMediaMessage extends DidCommMessage {
   public constructor(options?: ShareMediaMessageOptions) {
     super()
 
@@ -71,7 +81,7 @@ export class ShareMediaMessage extends AgentMessage {
       for (let i = 0; i < options.items.length; i++) {
         const item = options.items[i]
         this.addAppendedAttachment(
-          new Attachment({
+          new DidCommAttachment({
             id: i.toString(),
             data: { links: [item.uri] },
             byteCount: item.byteCount,
@@ -95,14 +105,14 @@ export class ShareMediaMessage extends AgentMessage {
   public description?: string
 
   @Expose({ name: 'sent_time' })
-  @Transform(({ value }) => DateParser(value))
+  @Transform(({ value }) => toDate(value))
   @IsDate()
   public sentTime!: Date
 
   @Type(() => SharedMediaItemDescriptor)
   public items!: SharedMediaItemDescriptor[]
 
+  public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/share-media')
   @IsValidMessageType(ShareMediaMessage.type)
   public readonly type = ShareMediaMessage.type.messageTypeUri
-  public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/share-media')
 }

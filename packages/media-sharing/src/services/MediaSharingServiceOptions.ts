@@ -1,8 +1,8 @@
+import type { DidCommConnectionRecord } from '@credo-ts/didcomm'
 import type { MediaSharingRecord, SharedMediaItem } from '../repository'
-import type { ConnectionRecord } from '@credo-ts/core'
 
 export interface CreateMediaSharingRecordOptions {
-  connectionRecord: ConnectionRecord
+  connectionRecord: DidCommConnectionRecord
   parentThreadId?: string
   description?: string
   items?: SharedMediaItem[]
