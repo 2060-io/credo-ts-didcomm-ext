@@ -1,34 +1,36 @@
+import { AgentContext, CredoError, injectable } from '@credo-ts/core'
 import {
-  CredoError,
-  ConnectionService,
-  injectable,
-  MessageSender,
-  AgentContext,
-  OutboundMessageContext,
-} from '@credo-ts/core'
+  DidCommConnectionService,
+  DidCommMessageHandlerRegistry,
+  DidCommMessageSender,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { MessageReceiptsHandler, RequestReceiptsHandler } from './handlers'
-import { MessageReceipt, MessageReceiptOptions, RequestedReceipt, RequestedReceiptOptions } from './messages'
+import { MessageReceipt, RequestedReceipt } from './messages'
+import type { MessageReceiptOptions, RequestedReceiptOptions } from './messages'
 import { ReceiptsService } from './services'
 
 @injectable()
 export class ReceiptsApi {
-  private messageSender: MessageSender
+  private messageSender: DidCommMessageSender
   private receiptsService: ReceiptsService
-  private connectionService: ConnectionService
+  private connectionService: DidCommConnectionService
   private agentContext: AgentContext
 
   public constructor(
     agentContext: AgentContext,
-    messageSender: MessageSender,
+    messageSender: DidCommMessageSender,
     receiptsService: ReceiptsService,
-    connectionService: ConnectionService,
+    connectionService: DidCommConnectionService,
+    messageHandlerRegistry: DidCommMessageHandlerRegistry,
   ) {
     this.agentContext = agentContext
     this.messageSender = messageSender
     this.receiptsService = receiptsService
     this.connectionService = connectionService
-    this.agentContext.dependencyManager.registerMessageHandlers([
+
+    messageHandlerRegistry.registerMessageHandlers([
       new MessageReceiptsHandler(this.receiptsService),
       new RequestReceiptsHandler(this.receiptsService),
     ])
@@ -46,7 +48,7 @@ export class ReceiptsApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
   }
 
@@ -62,7 +64,7 @@ export class ReceiptsApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
   }
 }

@@ -1,15 +1,17 @@
-import { EventEmitter, MessageHandlerInboundMessage } from '@credo-ts/core'
+import { EventEmitter } from '@credo-ts/core'
+import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 import { Lifecycle, scoped } from 'tsyringe'
 
 import { MessageReceiptsHandler, RequestReceiptsHandler } from '../handlers'
 import {
   MessageReceiptsMessage,
-  MessageReceiptsMessageOptions,
+  type MessageReceiptsMessageOptions,
   RequestReceiptsMessage,
-  RequestReceiptsMessageOptions,
+  type RequestReceiptsMessageOptions,
 } from '../messages'
 
-import { MessageReceiptsReceivedEvent, ReceiptsEventTypes, RequestReceiptsReceivedEvent } from './ReceiptsEvents'
+import type { MessageReceiptsReceivedEvent, RequestReceiptsReceivedEvent } from './ReceiptsEvents'
+import { ReceiptsEventTypes } from './ReceiptsEvents'
 
 @scoped(Lifecycle.ContainerScoped)
 export class ReceiptsService {
@@ -25,7 +27,7 @@ export class ReceiptsService {
     return message
   }
 
-  public async processReceipts(messageContext: MessageHandlerInboundMessage<MessageReceiptsHandler>) {
+  public async processReceipts(messageContext: DidCommInboundMessageContext<MessageReceiptsMessage>) {
     const { message } = messageContext
     const connection = messageContext.assertReadyConnection()
 
@@ -44,7 +46,7 @@ export class ReceiptsService {
     return message
   }
 
-  public async processRequestReceipts(messageContext: MessageHandlerInboundMessage<RequestReceiptsHandler>) {
+  public async processRequestReceipts(messageContext: DidCommInboundMessageContext<RequestReceiptsMessage>) {
     const { message } = messageContext
     const connection = messageContext.assertReadyConnection()
 

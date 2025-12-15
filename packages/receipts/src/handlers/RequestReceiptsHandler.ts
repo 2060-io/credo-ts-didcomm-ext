@@ -1,9 +1,13 @@
 import type { ReceiptsService } from '../services'
-import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
+import type {
+  DidCommMessageHandler,
+  DidCommMessageHandlerInboundMessage,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { RequestReceiptsMessage } from '../messages'
 
-export class RequestReceiptsHandler implements MessageHandler {
+export class RequestReceiptsHandler implements DidCommMessageHandler {
   public supportedMessages = [RequestReceiptsMessage]
   private receiptsService: ReceiptsService
 
@@ -11,7 +15,10 @@ export class RequestReceiptsHandler implements MessageHandler {
     this.receiptsService = receiptsService
   }
 
-  public async handle(inboundMessage: MessageHandlerInboundMessage<RequestReceiptsHandler>) {
-    return await this.receiptsService.processRequestReceipts(inboundMessage)
+  public async handle(
+    inboundMessage: DidCommMessageHandlerInboundMessage<RequestReceiptsHandler>,
+  ): Promise<DidCommOutboundMessageContext | undefined> {
+    await this.receiptsService.processRequestReceipts(inboundMessage)
+    return
   }
 }

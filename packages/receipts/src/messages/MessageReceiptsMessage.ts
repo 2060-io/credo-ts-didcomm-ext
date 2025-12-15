@@ -1,4 +1,5 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import type { ParsedMessageType } from '@credo-ts/didcomm'
+import { DidCommMessage, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Transform, TransformationType, Type } from 'class-transformer'
 import { IsArray, IsInstance, IsString, IsDate, IsEnum, ValidateNested } from 'class-validator'
 
@@ -44,7 +45,7 @@ export interface MessageReceiptsMessageOptions {
   receipts: MessageReceipt[]
 }
 
-export class MessageReceiptsMessage extends AgentMessage {
+export class MessageReceiptsMessage extends DidCommMessage {
   public constructor(options?: MessageReceiptsMessageOptions) {
     super()
 
@@ -54,9 +55,8 @@ export class MessageReceiptsMessage extends AgentMessage {
     }
   }
 
-  @IsValidMessageType(MessageReceiptsMessage.type)
   public readonly type = MessageReceiptsMessage.type.messageTypeUri
-  public static readonly type = parseMessageType('https://didcomm.org/receipts/1.0/message-receipts')
+  public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/receipts/1.0/message-receipts')
 
   @Type(() => MessageReceipt)
   @IsArray()
