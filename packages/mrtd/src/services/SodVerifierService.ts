@@ -1,9 +1,9 @@
+import type { SodVerification } from '../models/SodVerification'
+
 import { Hasher, inject, injectable, InjectionSymbols, TypedArrayEncoder, type Logger } from '@credo-ts/core'
 import { X509Certificate, X509ChainBuilder } from '@peculiar/x509'
 import { fromBER, Sequence, OctetString, ObjectIdentifier, Integer } from 'asn1js'
 import { Certificate, ContentInfo, SignedData } from 'pkijs'
-
-import { SodVerification } from '../models/SodVerification'
 
 import { CscaMasterListService } from './CscaMasterListService'
 

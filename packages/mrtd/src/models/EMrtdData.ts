@@ -1,5 +1,5 @@
 import type { SodVerification } from './SodVerification'
-import type tsemrtd from '@li0ard/tsemrtd'
+import type * as tsemrtd from '@li0ard/tsemrtd'
 import type { SecurityInfos } from '@li0ard/tsemrtd/dist/asn1/eac'
 import type { CSCAMasterList } from '@li0ard/tsemrtd/dist/asn1/pkd'
 import type {

@@ -52,10 +52,5 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "tsyringe": "^4.8.0"
-  },
-  "resolutions": {
-    "@2060.io/ffi-napi": "4.0.9",
-    "@jest/types": "^29.5.0",
-    "@types/node": "^18.0.0"
   }
 }

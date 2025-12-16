@@ -1,36 +1,35 @@
-import type { InitConfig } from '@credo-ts/core'
-
 import { AskarModule } from '@credo-ts/askar'
-import { Agent, HttpOutboundTransport, WsOutboundTransport } from '@credo-ts/core'
+import { Agent } from '@credo-ts/core'
+import { DidCommModule } from '@credo-ts/didcomm'
 import { agentDependencies } from '@credo-ts/node'
-import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
+import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 
-import { DidCommMrtdModule } from '../../src'
+import { DidCommMrtdModule } from '../../src/DidCommMrtdModule'
 
-export const setupAgent = async ({ name }: { name: string }) => {
-  const agentConfig: InitConfig = {
-    label: name,
-    walletConfig: {
-      id: name,
-      key: 'someKey',
-    },
+export const agent: Agent<{ askar: AskarModule; didcomm: DidCommModule; mrtd: DidCommMrtdModule }> = new Agent({
+  config: {
     autoUpdateStorageOnStartup: true,
-  }
-
-  const agent = new Agent({
-    config: agentConfig,
-    dependencies: agentDependencies,
-    modules: {
-      askar: new AskarModule({
-        ariesAskar,
-      }),
-      mrtd: new DidCommMrtdModule(),
-    },
-  })
-
-  agent.registerOutboundTransport(new HttpOutboundTransport())
-  agent.registerOutboundTransport(new WsOutboundTransport())
-
-  await agent.initialize()
-  return agent
-}
+  },
+  dependencies: agentDependencies,
+  modules: {
+    askar: new AskarModule({
+      askar: askarNodeJS,
+      store: {
+        id: 'mrtd-service-test',
+        key: 'mrtd-service-test-key',
+        database: { type: 'sqlite', config: { inMemory: true } },
+      },
+    }),
+    didcomm: new DidCommModule({
+      endpoints: [],
+      transports: { inbound: [], outbound: [] },
+      credentials: false,
+      proofs: false,
+      messagePickup: false,
+      mediator: false,
+      mediationRecipient: false,
+      basicMessages: false,
+    }),
+    mrtd: new DidCommMrtdModule(),
+  },
+})

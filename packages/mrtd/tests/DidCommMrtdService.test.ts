@@ -1,44 +1,40 @@
 import type { EMrtdDataReceivedEvent, MrtdProblemReportEvent } from '../src/DidCommMrtdEvents'
 import type { MrtdProblemReportMessage } from '../src/messages'
-import type { Agent } from '@credo-ts/core'
+import './setup'
 
+import { AgentContext, EventEmitter, JsonTransformer } from '@credo-ts/core'
 import {
-  AgentContext,
-  ConnectionRecord,
-  DidExchangeRole,
-  DidExchangeState,
-  EventEmitter,
-  InboundMessageContext,
-  JsonTransformer,
-} from '@credo-ts/core'
+  DidCommConnectionRecord,
+  DidCommDidExchangeRole,
+  DidCommDidExchangeState,
+  DidCommInboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { MrtdEventTypes } from '../src/DidCommMrtdEvents'
 import { EMrtdDataMessage } from '../src/messages'
 import { MrtdProblemReportReason } from '../src/models'
 import { DidCommMrtdService } from '../src/services/DidCommMrtdService'
 
-import { setupAgent } from './utils/agent'
+import { agent } from './utils/agent'
 
 const passport = {} // For testing purposes, replace this value with a JSON file that contains the attributes: COM, DG1, DG2, DG11, and SOD.
 
 const isPassportEmpty = !passport || (passport && Object.keys(passport).length === 0)
 
 describe('Didcomm MRTD', () => {
-  let agent: Agent
   let didcommMrtdService: DidCommMrtdService
   let agentContext: AgentContext
 
   beforeAll(async () => {
-    agent = await setupAgent({
-      name: 'mrtd service test',
-    })
+    await agent.initialize()
     didcommMrtdService = agent.dependencyManager.resolve(DidCommMrtdService)
     agentContext = agent.dependencyManager.resolve(AgentContext)
   })
 
   afterAll(async () => {
-    await agent.shutdown()
-    await agent.wallet.delete()
+    if (agent?.isInitialized) {
+      await agent.shutdown()
+    }
   })
 
   describe('MRZ Data message', () => {
@@ -96,13 +92,13 @@ describe('Didcomm MRTD', () => {
         dataGroups: passport,
       })
 
-      const mockConnectionRecord = new ConnectionRecord({
+      const mockConnectionRecord = new DidCommConnectionRecord({
         id: 'mockConnectionId',
-        state: DidExchangeState.Completed,
-        role: DidExchangeRole.Responder,
+        state: DidCommDidExchangeState.Completed,
+        role: DidCommDidExchangeRole.Responder,
       })
 
-      const inboundMessageContext = new InboundMessageContext<EMrtdDataMessage>(emrtdDataMessage, {
+      const inboundMessageContext = new DidCommInboundMessageContext<EMrtdDataMessage>(emrtdDataMessage, {
         agentContext: agentContext,
         connection: mockConnectionRecord,
       })
@@ -153,13 +149,13 @@ describe('Didcomm MRTD', () => {
         reason: MrtdProblemReportReason.EmrtdRefused,
       })
 
-      const mockConnectionRecord = new ConnectionRecord({
+      const mockConnectionRecord = new DidCommConnectionRecord({
         id: 'mockConnectionId',
-        state: DidExchangeState.Completed,
-        role: DidExchangeRole.Responder,
+        state: DidCommDidExchangeState.Completed,
+        role: DidCommDidExchangeRole.Responder,
       })
 
-      const inboundMessageContext = new InboundMessageContext<MrtdProblemReportMessage>(
+      const inboundMessageContext = new DidCommInboundMessageContext<MrtdProblemReportMessage>(
         await mrtdProblemReportMessage,
         {
           agentContext: agentContext,

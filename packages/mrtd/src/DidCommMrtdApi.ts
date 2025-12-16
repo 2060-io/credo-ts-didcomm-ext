@@ -1,21 +1,13 @@
+import { AgentContext, injectable } from '@credo-ts/core'
 import {
-  OutboundMessageContext,
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-  FeatureRegistry,
-  DiscoverFeaturesApi,
-  Feature,
-} from '@credo-ts/core'
+  DidCommConnectionService,
+  DidCommDiscoverFeaturesApi,
+  DidCommFeature,
+  DidCommFeatureRegistry,
+  DidCommMessageSender,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
-import {
-  EMrtdDataHandler,
-  EMrtdDataRequestHandler,
-  MrtdProblemReportHandler,
-  MrzDataHandler,
-  MrzDataRequestHandler,
-} from './handlers'
 import { Capability } from './models/Capability'
 import { MrtdCapabilities } from './models/MrtdCapabilities'
 import { MrtdProblemReportReason } from './models/ProblemReportReason'
@@ -23,29 +15,21 @@ import { DidCommMrtdService } from './services/DidCommMrtdService'
 
 @injectable()
 export class DidCommMrtdApi {
-  private messageSender: MessageSender
+  private messageSender: DidCommMessageSender
   private didcommMrtdService: DidCommMrtdService
-  private connectionService: ConnectionService
+  private connectionService: DidCommConnectionService
   private agentContext: AgentContext
 
   public constructor(
-    messageSender: MessageSender,
+    messageSender: DidCommMessageSender,
     didcommMrtdService: DidCommMrtdService,
-    connectionService: ConnectionService,
+    connectionService: DidCommConnectionService,
     agentContext: AgentContext,
   ) {
     this.messageSender = messageSender
     this.didcommMrtdService = didcommMrtdService
     this.connectionService = connectionService
     this.agentContext = agentContext
-
-    this.agentContext.dependencyManager.registerMessageHandlers([
-      new MrzDataHandler(this.didcommMrtdService),
-      new MrzDataRequestHandler(this.didcommMrtdService),
-      new EMrtdDataHandler(this.didcommMrtdService),
-      new EMrtdDataRequestHandler(this.didcommMrtdService),
-      new MrtdProblemReportHandler(this.didcommMrtdService),
-    ])
   }
 
   public async sendMrzString(options: { connectionId: string; mrzData: string | string[]; threadId?: string }) {
@@ -55,7 +39,7 @@ export class DidCommMrtdApi {
 
     const message = this.didcommMrtdService.createMrzData({ mrzData, threadId })
 
-    const outbound = new OutboundMessageContext(message, {
+    const outbound = new DidCommOutboundMessageContext(message, {
       agentContext: this.agentContext,
       connection: connection,
     })
@@ -71,7 +55,7 @@ export class DidCommMrtdApi {
 
     const message = this.didcommMrtdService.createMrzRequest({ parentThreadId })
 
-    const outbound = new OutboundMessageContext(message, {
+    const outbound = new DidCommOutboundMessageContext(message, {
       agentContext: this.agentContext,
       connection: connection,
     })
@@ -87,7 +71,7 @@ export class DidCommMrtdApi {
 
     const message = this.didcommMrtdService.createEMrtdData({ dataGroups, threadId })
 
-    const outbound = new OutboundMessageContext(message, {
+    const outbound = new DidCommOutboundMessageContext(message, {
       agentContext: this.agentContext,
       connection: connection,
     })
@@ -103,7 +87,7 @@ export class DidCommMrtdApi {
 
     const message = this.didcommMrtdService.createEMrtdDataRequest({ parentThreadId })
 
-    const outbound = new OutboundMessageContext(message, {
+    const outbound = new DidCommOutboundMessageContext(message, {
       agentContext: this.agentContext,
       connection: connection,
     })
@@ -127,7 +111,7 @@ export class DidCommMrtdApi {
 
     const message = await this.didcommMrtdService.createProblemReport({ parentThreadId: threadId, reason })
 
-    const outbound = new OutboundMessageContext(message, {
+    const outbound = new DidCommOutboundMessageContext(message, {
       agentContext: this.agentContext,
       connection: connection,
     })
@@ -142,11 +126,11 @@ export class DidCommMrtdApi {
    * @param options: eMrtdReadSupported: boolean indicating if the device supports eMRTD reading
    */
   public async setMrtdCapabilities(options: { eMrtdReadSupported: boolean }) {
-    const featureRegistry = this.agentContext.dependencyManager.resolve(FeatureRegistry)
+    const featureRegistry = this.agentContext.dependencyManager.resolve<DidCommFeatureRegistry>(DidCommFeatureRegistry)
 
     // TODO: This is a hack to allow features to be overwritten. This should be fixed in Credo
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const features = (featureRegistry as any).features as Feature[]
+    const features = (featureRegistry as any).features as DidCommFeature[]
 
     const existingItemIndex = features.findIndex((item) => item.id === MrtdCapabilities.EMrtdReadSupport)
     if (existingItemIndex !== -1) {
@@ -170,7 +154,8 @@ export class DidCommMrtdApi {
     awaitDisclosureTimeoutMs?: number
   }) {
     const { connectionId, awaitDisclosure, awaitDisclosureTimeoutMs } = options
-    const discoverFeatures = this.agentContext.dependencyManager.resolve(DiscoverFeaturesApi)
+    const discoverFeatures =
+      this.agentContext.dependencyManager.resolve<DidCommDiscoverFeaturesApi>(DidCommDiscoverFeaturesApi)
 
     const disclosures = await discoverFeatures.queryFeatures({
       connectionId,

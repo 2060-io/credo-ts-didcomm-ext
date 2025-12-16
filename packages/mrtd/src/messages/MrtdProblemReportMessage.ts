@@ -1,11 +1,15 @@
-import { ProblemReportMessageOptions, ProblemReportMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import type { DidCommProblemReportMessageOptions, ParsedMessageType } from '@credo-ts/didcomm'
 
-export type MrtdProblemReportMessageOptions = ProblemReportMessageOptions
+import { DidCommProblemReportMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
+
+export type MrtdProblemReportMessageOptions = DidCommProblemReportMessageOptions
 
 /**
  * @see TODO
  */
-export class MrtdProblemReportMessage extends ProblemReportMessage {
+export class MrtdProblemReportMessage extends DidCommProblemReportMessage {
+  public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/mrtd/1.0/problem-report')
+
   /**
    * Create new MrtdProblemReportMessage instance.
    * @param options
@@ -16,5 +20,4 @@ export class MrtdProblemReportMessage extends ProblemReportMessage {
 
   @IsValidMessageType(MrtdProblemReportMessage.type)
   public readonly type = MrtdProblemReportMessage.type.messageTypeUri
-  public static readonly type = parseMessageType('https://didcomm.org/mrtd/1.0/problem-report')
 }
