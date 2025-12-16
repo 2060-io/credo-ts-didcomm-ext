@@ -1,3 +1,5 @@
+import type { MessageReceiptOptions, RequestedReceiptOptions } from './messages'
+
 import { AgentContext, CredoError, injectable } from '@credo-ts/core'
 import {
   DidCommConnectionService,
@@ -8,7 +10,6 @@ import {
 
 import { MessageReceiptsHandler, RequestReceiptsHandler } from './handlers'
 import { MessageReceipt, RequestedReceipt } from './messages'
-import type { MessageReceiptOptions, RequestedReceiptOptions } from './messages'
 import { ReceiptsService } from './services'
 
 @injectable()

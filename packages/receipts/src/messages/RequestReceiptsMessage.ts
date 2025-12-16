@@ -1,4 +1,5 @@
 import type { ParsedMessageType } from '@credo-ts/didcomm'
+
 import { DidCommMessage, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Type } from 'class-transformer'
 import { IsArray, IsInstance, IsString, ValidateNested } from 'class-validator'

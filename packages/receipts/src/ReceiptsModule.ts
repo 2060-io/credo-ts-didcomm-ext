@@ -1,4 +1,5 @@
 import type { AgentContext, DependencyManager, Module } from '@credo-ts/core'
+
 import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { ReceiptsApi } from './ReceiptsApi'
