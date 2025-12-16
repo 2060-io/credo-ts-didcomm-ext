@@ -33,14 +33,17 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@hyperledger/aries-askar-nodejs": "^0.2.3",
-    "@credo-ts/askar": "^0.5.13",
-    "@credo-ts/core": "^0.5.13",
-    "@credo-ts/node": "^0.5.13",
+    "@credo-ts/askar": "^0.6.0",
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/didcomm": "^0.6.0",
+    "@credo-ts/node": "^0.6.0",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-shared": "^0.4.3",
     "ts-node-dev": "^1.1.8"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.5.13"
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/didcomm": "^0.6.0"
   },
   "dependencies": {
     "class-transformer": "0.5.1",

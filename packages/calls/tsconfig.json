@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "types": ["vitest/globals", "vitest/importMeta", "node"],
-    "module": "nodenext"
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
   }
 }

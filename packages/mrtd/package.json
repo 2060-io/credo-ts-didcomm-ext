@@ -1,18 +1,14 @@
 {
   "name": "@2060.io/credo-ts-didcomm-mrtd",
   "type": "module",
+  "version": "0.0.18",
   "main": "./build/index.mjs",
   "module": "./build/index.mjs",
   "types": "./build/index.d.mts",
-  "version": "0.0.18",
   "exports": {
     ".": {
       "types": "./build/index.d.mts",
       "default": "./build/index.mjs"
-    },
-    "./esm": {
-      "types": "./build/esm/index.d.mts",
-      "default": "./build/esm/index.mjs"
     }
   },
   "files": [
@@ -30,8 +26,9 @@
     "directory": "packages/mrtd"
   },
   "scripts": {
-    "deps": "rm -f src/esm/bundle.js && esbuild --platform=node src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
+    "deps": "rm -f src/esm/bundle.js && pnpm esbuild --platform=node --format=esm src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
     "prebuild": "pnpm run deps",
+    "pretest": "pnpm run deps",
     "copy-esm": "cp src/esm/bundle.js build/esm/",
     "build": "tsdown --config ./tsdown.config.ts",
     "clean": "rimraf -rf ./build",
@@ -40,14 +37,16 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@credo-ts/askar": "^0.5.13",
-    "@credo-ts/core": "^0.5.13",
-    "@credo-ts/node": "^0.5.13",
-    "@hyperledger/aries-askar-nodejs": "^0.2.3",
+    "@credo-ts/askar": "^0.6.0",
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/node": "^0.6.0",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-shared": "^0.4.3",
     "ts-node-dev": "^1.1.8"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.5.13"
+    "@credo-ts/core": "^0.6.0",
+    "@credo-ts/didcomm": "^0.6.0"
   },
   "dependencies": {
     "@li0ard/tsemrtd": "^0.2.2",
