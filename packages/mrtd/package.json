@@ -29,12 +29,12 @@
     "deps": "rm -f src/esm/bundle.js && pnpm esbuild --platform=node --format=esm src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
     "prebuild": "pnpm run deps",
     "pretest": "pnpm run deps",
-    "copy-esm": "cp src/esm/bundle.js build/esm/",
-    "build": "tsdown --config ./tsdown.config.ts",
+    "copy-esm": "mkdir -p build/esm && cp src/esm/bundle.js build/esm/bundle.js",
+    "build": "tsdown --config ./tsdown.config.ts && pnpm run deps && pnpm run copy-esm",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "pnpm run build",
-    "test": "vitest run"
+    "test": "pnpm deps && vitest run"
   },
   "devDependencies": {
     "@credo-ts/askar": "^0.6.0",
