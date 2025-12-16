@@ -1,27 +1,31 @@
-import { AgentContext, ConnectionRecord, ConnectionService, EventEmitter, InboundMessageContext } from '@credo-ts/core'
-import { Lifecycle, scoped } from 'tsyringe'
-
-import { UserProfileModuleConfig } from '../UserProfileModuleConfig'
-import { RequestProfileMessage, GetProfileMessageOptions, ProfileMessage, ProfileMessageOptions } from '../messages'
-import { UserProfileData, getConnectionProfile, setConnectionProfile } from '../model'
-import { UserProfileRepository, UserProfileRecord } from '../repository'
-
-import {
+import type { GetProfileMessageOptions, ProfileMessageOptions } from '../messages'
+import type { UserProfileData } from '../model'
+import type {
   ConnectionProfileUpdatedEvent,
-  ProfileEventTypes,
   UserProfileRequestedEvent,
   UserProfileUpdatedEvent,
 } from './UserProfileEvents'
 
+import { AgentContext, EventEmitter } from '@credo-ts/core'
+import { DidCommConnectionService, DidCommInboundMessageContext, DidCommConnectionRecord } from '@credo-ts/didcomm'
+import { Lifecycle, scoped } from 'tsyringe'
+
+import { UserProfileModuleConfig } from '../UserProfileModuleConfig'
+import { RequestProfileMessage, ProfileMessage } from '../messages'
+import { getConnectionProfile, setConnectionProfile } from '../model'
+import { UserProfileRepository, UserProfileRecord } from '../repository'
+
+import { ProfileEventTypes } from './UserProfileEvents'
+
 @scoped(Lifecycle.ContainerScoped)
 export class UserProfileService {
   private userProfileRepository: UserProfileRepository
-  private connectionService: ConnectionService
+  private connectionService: DidCommConnectionService
   private eventEmitter: EventEmitter
 
   public constructor(
     userProfileRepository: UserProfileRepository,
-    connectionService: ConnectionService,
+    connectionService: DidCommConnectionService,
     eventEmitter: EventEmitter,
   ) {
     this.userProfileRepository = userProfileRepository
@@ -81,7 +85,7 @@ export class UserProfileService {
     return userProfileRecord
   }
 
-  public async processProfile(messageContext: InboundMessageContext<ProfileMessage>) {
+  public async processProfile(messageContext: DidCommInboundMessageContext<ProfileMessage>) {
     const connection = messageContext.assertReadyConnection()
 
     const agentContext = messageContext.agentContext
@@ -157,7 +161,7 @@ export class UserProfileService {
     return message
   }
 
-  public async processRequestProfile(messageContext: InboundMessageContext<RequestProfileMessage>) {
+  public async processRequestProfile(messageContext: DidCommInboundMessageContext<RequestProfileMessage>) {
     const connection = messageContext.assertReadyConnection()
 
     this.eventEmitter.emit<UserProfileRequestedEvent>(messageContext.agentContext, {
@@ -183,7 +187,7 @@ export class UserProfileService {
 
   private async createProfileMessageAsReply(
     agentContext: AgentContext,
-    connection: ConnectionRecord,
+    connection: DidCommConnectionRecord,
     threadId: string,
   ) {
     const userProfile = await this.getUserProfile(agentContext)

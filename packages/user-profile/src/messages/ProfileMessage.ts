@@ -1,8 +1,9 @@
-import { AgentMessage, Attachment, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import type { PictureData, UserProfileData } from '../model'
+import type { ParsedMessageType } from '@credo-ts/didcomm'
+
+import { DidCommAttachment, DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 import { Expose } from 'class-transformer'
 import { IsBoolean, IsOptional } from 'class-validator'
-
-import { PictureData, UserProfileData } from '../model'
 
 export interface ProfileMessageOptions {
   id?: string
@@ -20,7 +21,7 @@ class ProfileForExchange {
   public preferredLanguage?: string
 }
 
-export class ProfileMessage extends AgentMessage {
+export class ProfileMessage extends DidCommMessage {
   public constructor(options?: ProfileMessageOptions) {
     super()
 
@@ -40,7 +41,7 @@ export class ProfileMessage extends AgentMessage {
         const pictureData = options.profile.displayPicture as PictureData
         // If there is a display picture, we need to add an attachment including picture data
         this.addAppendedAttachment(
-          new Attachment({
+          new DidCommAttachment({
             id: 'displayPicture',
             mimeType: pictureData.mimeType,
             data: {
@@ -55,7 +56,7 @@ export class ProfileMessage extends AgentMessage {
         // If there is a display icon, we need to add an attachment including picture data
         const pictureData = options.profile.displayIcon as PictureData
         this.addAppendedAttachment(
-          new Attachment({
+          new DidCommAttachment({
             id: 'displayIcon',
             mimeType: pictureData.mimeType,
             data: {
@@ -70,9 +71,9 @@ export class ProfileMessage extends AgentMessage {
     }
   }
 
+  public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/user-profile/1.0/profile')
   @IsValidMessageType(ProfileMessage.type)
-  public readonly type = ProfileMessage.type.messageTypeUri
-  public static readonly type = parseMessageType('https://didcomm.org/user-profile/1.0/profile')
+  public readonly type: string = ProfileMessage.type.messageTypeUri
 
   public profile!: ProfileForExchange | Record<string, unknown>
 

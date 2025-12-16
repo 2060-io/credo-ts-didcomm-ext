@@ -1,6 +1,6 @@
 import type { UserProfileData, PictureData } from '../model'
 
-import { BaseRecord, utils } from '@credo-ts/core'
+import { BaseRecord, utils, type TagsBase } from '@credo-ts/core'
 
 export interface UserProfileStorageProps extends UserProfileData {
   id?: string
@@ -32,7 +32,7 @@ export class UserProfileRecord extends BaseRecord implements UserProfileStorageP
     }
   }
 
-  public getTags() {
+  public getTags(): TagsBase {
     return {
       ...this._tags,
     }

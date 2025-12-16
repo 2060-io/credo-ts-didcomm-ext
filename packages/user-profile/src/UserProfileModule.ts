@@ -1,9 +1,10 @@
-import type { DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
+import type { DependencyManager, Module, AgentContext } from '@credo-ts/core'
 
-import { Protocol } from '@credo-ts/core'
+import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { UserProfileApi } from './UserProfileApi'
 import { UserProfileModuleConfig } from './UserProfileModuleConfig'
+import { ProfileHandler, RequestProfileHandler } from './handlers'
 import { UserProfileService } from './services'
 
 export class UserProfileModule implements Module {
@@ -17,7 +18,7 @@ export class UserProfileModule implements Module {
   /**
    * Registers the dependencies of the question answer module on the dependency manager.
    */
-  public register(dependencyManager: DependencyManager, featureRegistry: FeatureRegistry) {
+  public register(dependencyManager: DependencyManager) {
     // Api
     dependencyManager.registerContextScoped(UserProfileApi)
 
@@ -26,12 +27,21 @@ export class UserProfileModule implements Module {
 
     // Services
     dependencyManager.registerSingleton(UserProfileService)
+  }
 
-    // Feature Registry
+  public async initialize(agentContext: AgentContext) {
+    const featureRegistry = agentContext.dependencyManager.resolve(DidCommFeatureRegistry)
+    const messageHandlerRegistry = agentContext.dependencyManager.resolve(DidCommMessageHandlerRegistry)
+
     featureRegistry.register(
-      new Protocol({
+      new DidCommProtocol({
         id: 'https://didcomm.org/user-profile/1.0',
       }),
     )
+
+    messageHandlerRegistry.registerMessageHandlers([
+      new ProfileHandler(agentContext.dependencyManager.resolve(UserProfileService)),
+      new RequestProfileHandler(agentContext.dependencyManager.resolve(UserProfileService)),
+    ])
   }
 }

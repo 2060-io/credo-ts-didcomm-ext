@@ -1,11 +1,14 @@
 import type { UserProfileService } from '../services'
-import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
 
-import { OutboundMessageContext } from '@credo-ts/core'
+import {
+  type DidCommMessageHandler,
+  type DidCommMessageHandlerInboundMessage,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { ProfileMessage } from '../messages'
 
-export class ProfileHandler implements MessageHandler {
+export class ProfileHandler implements DidCommMessageHandler {
   public supportedMessages = [ProfileMessage]
   private userProfileService: UserProfileService
 
@@ -13,13 +16,15 @@ export class ProfileHandler implements MessageHandler {
     this.userProfileService = userProfileService
   }
 
-  public async handle(inboundMessage: MessageHandlerInboundMessage<ProfileHandler>) {
+  public async handle(
+    inboundMessage: DidCommMessageHandlerInboundMessage<ProfileHandler>,
+  ): Promise<DidCommOutboundMessageContext | undefined> {
     const connection = inboundMessage.assertReadyConnection()
 
     const payload = await this.userProfileService.processProfile(inboundMessage)
 
     if (payload) {
-      return new OutboundMessageContext(payload, { agentContext: inboundMessage.agentContext, connection })
+      return new DidCommOutboundMessageContext(payload, { agentContext: inboundMessage.agentContext, connection })
     }
   }
 }

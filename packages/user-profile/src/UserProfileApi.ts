@@ -1,25 +1,18 @@
-import { injectable, MessageSender, AgentContext, OutboundMessageContext, ConnectionsApi } from '@credo-ts/core'
+import type { UserProfileData, GetUserProfileDataReturnType } from './model'
 
-import { ProfileHandler, RequestProfileHandler } from './handlers'
-import { UserProfileData, GetUserProfileDataReturnType } from './model'
+import { AgentContext, injectable } from '@credo-ts/core'
+import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
+
 import { UserProfileService } from './services'
 
 @injectable()
 export class UserProfileApi {
-  private messageSender: MessageSender
-  private userProfileService: UserProfileService
-  private agentContext: AgentContext
-
-  public constructor(agentContext: AgentContext, messageSender: MessageSender, userProfileService: UserProfileService) {
-    this.agentContext = agentContext
-    this.messageSender = messageSender
-    this.userProfileService = userProfileService
-
-    this.agentContext.dependencyManager.registerMessageHandlers([
-      new ProfileHandler(this.userProfileService),
-      new RequestProfileHandler(this.userProfileService),
-    ])
-  }
+  public constructor(
+    private readonly agentContext: AgentContext,
+    private readonly messageSender: DidCommMessageSender,
+    private readonly userProfileService: UserProfileService,
+    private readonly connectionService: DidCommConnectionService,
+  ) {}
 
   /**
    * Request the user profile for a given connection. It will store received UserProfileData into ConnectionRecord metadata
@@ -28,12 +21,13 @@ export class UserProfileApi {
    * @param options
    */
   public async requestUserProfile(options: { connectionId: string }) {
-    const connection = await this.agentContext.dependencyManager.resolve(ConnectionsApi).getById(options.connectionId)
+    const connection = await this.connectionService.getById(this.agentContext, options.connectionId)
+    connection.assertReady()
 
     const message = await this.userProfileService.createRequestProfileMessage({})
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
   }
 
@@ -53,7 +47,8 @@ export class UserProfileApi {
     sendBackYours?: boolean
   }) {
     const { connectionId, profileData, sendBackYours, threadId, parentThreadId } = options
-    const connection = await this.agentContext.dependencyManager.resolve(ConnectionsApi).getById(connectionId)
+    const connection = await this.connectionService.getById(this.agentContext, connectionId)
+    connection.assertReady()
 
     const myProfile = await this.userProfileService.getUserProfile(this.agentContext)
     const message = await this.userProfileService.createProfileMessage({
@@ -70,7 +65,7 @@ export class UserProfileApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
   }
 
