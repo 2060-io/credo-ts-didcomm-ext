@@ -55,7 +55,7 @@ export class CscaMasterListService {
 
     this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
 
-    this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    this.fileSystem = this.agentContext.dependencyManager.resolve(InjectionSymbols.FileSystem)
     const expectedFileName = this.getMasterListFileName(this.sourceLocation)
 
     let ldifContent: string
