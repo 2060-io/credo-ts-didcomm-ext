@@ -52,9 +52,8 @@ export class DidCommMrtdModule implements Module {
    * Initializes the module (e.g. by pre-loading the CSCA Master List if configured).
    */
   public async initialize(agentContext: AgentContext): Promise<void> {
-    const featureRegistry = agentContext.dependencyManager.resolve<DidCommFeatureRegistry>(DidCommFeatureRegistry)
-    const messageHandlerRegistry =
-      agentContext.dependencyManager.resolve<DidCommMessageHandlerRegistry>(DidCommMessageHandlerRegistry)
+    const featureRegistry = agentContext.dependencyManager.resolve(DidCommFeatureRegistry)
+    const messageHandlerRegistry = agentContext.dependencyManager.resolve(DidCommMessageHandlerRegistry)
     const mrtdService = agentContext.dependencyManager.resolve(DidCommMrtdService)
 
     // Register DIDComm MRTD protocol and roles

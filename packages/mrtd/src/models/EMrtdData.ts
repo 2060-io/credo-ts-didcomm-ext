@@ -28,8 +28,8 @@ export type ParsedEMrtdData = {
   images: DecodedImage[]
   fingerprints?: DecodedFingerprint[]
   iris?: DecodedIris[]
-  displayedImages?: Buffer[]
-  signatureImages?: Buffer[]
+  displayedImages?: Uint8Array[]
+  signatureImages?: Uint8Array[]
   additionalPersonalData?: DecodedAdditionalPersonalData
   additionalDocumentData?: DecodedAdditionalDocumentData
   securityInfos?: SecurityInfos
@@ -66,10 +66,10 @@ export function parseEMrtdData(input: Record<EMrtdDataGroup, string>): ParsedEMr
         parsedData.iris = DG4.load(decodedValue)
         break
       case EMrtdDataGroup.DG5:
-        parsedData.displayedImages = DG5.load(decodedValue).map((image) => Buffer.from(image))
+        parsedData.displayedImages = DG5.load(decodedValue)
         break
       case EMrtdDataGroup.DG7:
-        parsedData.signatureImages = DG7.load(decodedValue).map((image) => Buffer.from(image))
+        parsedData.signatureImages = DG7.load(decodedValue)
         break
       case EMrtdDataGroup.DG11:
         parsedData.additionalPersonalData = DG11.load(decodedValue)

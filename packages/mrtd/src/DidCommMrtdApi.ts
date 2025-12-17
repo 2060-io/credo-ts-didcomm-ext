@@ -126,7 +126,7 @@ export class DidCommMrtdApi {
    * @param options: eMrtdReadSupported: boolean indicating if the device supports eMRTD reading
    */
   public async setMrtdCapabilities(options: { eMrtdReadSupported: boolean }) {
-    const featureRegistry = this.agentContext.dependencyManager.resolve<DidCommFeatureRegistry>(DidCommFeatureRegistry)
+    const featureRegistry = this.agentContext.dependencyManager.resolve(DidCommFeatureRegistry)
 
     // TODO: This is a hack to allow features to be overwritten. This should be fixed in Credo
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,8 +154,7 @@ export class DidCommMrtdApi {
     awaitDisclosureTimeoutMs?: number
   }) {
     const { connectionId, awaitDisclosure, awaitDisclosureTimeoutMs } = options
-    const discoverFeatures =
-      this.agentContext.dependencyManager.resolve<DidCommDiscoverFeaturesApi>(DidCommDiscoverFeaturesApi)
+    const discoverFeatures = this.agentContext.dependencyManager.resolve(DidCommDiscoverFeaturesApi)
 
     const disclosures = await discoverFeatures.queryFeatures({
       connectionId,
