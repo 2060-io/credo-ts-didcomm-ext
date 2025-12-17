@@ -12,8 +12,6 @@ import { CallOfferMessage } from '../messages/CallOfferMessage'
  */
 export class CallOfferHandler implements DidCommMessageHandler {
   public supportedMessages = [CallOfferMessage]
-  public constructor(private readonly _callsService?: DidCommCallsService) {}
-
   /**
   /* We don't really need to do anything with this at the moment
   /* The result can be hooked into through the generic message processed event
