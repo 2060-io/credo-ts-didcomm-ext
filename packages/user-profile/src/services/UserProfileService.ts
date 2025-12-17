@@ -1,4 +1,4 @@
-import type { GetProfileMessageOptions, ProfileMessageOptions } from '../messages'
+import type { DidCommGetProfileMessageOptions, DidCommProfileMessageOptions } from '../messages'
 import type { UserProfileData } from '../model'
 import type {
   ConnectionProfileUpdatedEvent,
@@ -10,15 +10,15 @@ import { AgentContext, EventEmitter } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommInboundMessageContext, DidCommConnectionRecord } from '@credo-ts/didcomm'
 import { Lifecycle, scoped } from 'tsyringe'
 
-import { UserProfileModuleConfig } from '../UserProfileModuleConfig'
-import { RequestProfileMessage, ProfileMessage } from '../messages'
+import { UserProfileModuleConfig } from '../DidCommUserProfileModuleConfig'
+import { DidCommRequestProfileMessage, DidCommProfileMessage } from '../messages'
 import { getConnectionProfile, setConnectionProfile } from '../model'
 import { UserProfileRepository, UserProfileRecord } from '../repository'
 
 import { ProfileEventTypes } from './UserProfileEvents'
 
 @scoped(Lifecycle.ContainerScoped)
-export class UserProfileService {
+export class DidCommUserProfileService {
   private userProfileRepository: UserProfileRepository
   private connectionService: DidCommConnectionService
   private eventEmitter: EventEmitter
@@ -85,7 +85,7 @@ export class UserProfileService {
     return userProfileRecord
   }
 
-  public async processProfile(messageContext: DidCommInboundMessageContext<ProfileMessage>) {
+  public async processProfile(messageContext: DidCommInboundMessageContext<DidCommProfileMessage>) {
     const connection = messageContext.assertReadyConnection()
 
     const agentContext = messageContext.agentContext
@@ -149,19 +149,19 @@ export class UserProfileService {
     }
   }
 
-  public async createProfileMessage(options: ProfileMessageOptions) {
-    const message = new ProfileMessage(options)
+  public async createProfileMessage(options: DidCommProfileMessageOptions) {
+    const message = new DidCommProfileMessage(options)
 
     return message
   }
 
-  public async createRequestProfileMessage(options: GetProfileMessageOptions) {
-    const message = new RequestProfileMessage(options)
+  public async createRequestProfileMessage(options: DidCommGetProfileMessageOptions) {
+    const message = new DidCommRequestProfileMessage(options)
 
     return message
   }
 
-  public async processRequestProfile(messageContext: DidCommInboundMessageContext<RequestProfileMessage>) {
+  public async processRequestProfile(messageContext: DidCommInboundMessageContext<DidCommRequestProfileMessage>) {
     const connection = messageContext.assertReadyConnection()
 
     this.eventEmitter.emit<UserProfileRequestedEvent>(messageContext.agentContext, {

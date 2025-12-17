@@ -1,4 +1,4 @@
-import type { UserProfileKey } from '../messages'
+import type { DidCommUserProfileKey } from '../messages'
 import type { UserProfileData } from '../model'
 import type { UserProfileRecord } from '../repository'
 import type { BaseEvent } from '@credo-ts/core'
@@ -14,7 +14,7 @@ export interface UserProfileRequestedEvent extends BaseEvent {
   type: ProfileEventTypes.UserProfileRequested
   payload: {
     connection: DidCommConnectionRecord
-    query?: UserProfileKey[]
+    query?: DidCommUserProfileKey[]
     threadId: string
     parentThreadId?: string
   }

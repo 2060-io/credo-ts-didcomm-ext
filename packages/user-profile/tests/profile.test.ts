@@ -10,7 +10,7 @@ import { agentDependencies } from '@credo-ts/node'
 import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
 
-import { UserProfileModule } from '../src/UserProfileModule'
+import { DidCommUserProfileModule } from '../src/DidCommUserProfileModule'
 import { getConnectionProfile } from '../src/model'
 import { ProfileEventTypes } from '../src/services'
 
@@ -22,8 +22,8 @@ const logger = new ConsoleLogger(LogLevel.off)
 export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 
 describe('profile test', () => {
-  let aliceAgent: Agent<{ askar: AskarModule; profile: UserProfileModule; didcomm: DidCommModule }>
-  let bobAgent: Agent<{ askar: AskarModule; profile: UserProfileModule; didcomm: DidCommModule }>
+  let aliceAgent: Agent<{ askar: AskarModule; profile: DidCommUserProfileModule; didcomm: DidCommModule }>
+  let bobAgent: Agent<{ askar: AskarModule; profile: DidCommUserProfileModule; didcomm: DidCommModule }>
   let aliceConnectionRecord: DidCommConnectionRecord
   let bobConnectionRecord: DidCommConnectionRecord
 
@@ -65,7 +65,7 @@ describe('profile test', () => {
             mediationRecipient: false,
             basicMessages: false,
           }),
-          profile: new UserProfileModule(),
+          profile: new DidCommUserProfileModule(),
         },
       })
 

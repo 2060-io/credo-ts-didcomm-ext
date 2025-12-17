@@ -3,16 +3,16 @@ import type { ParsedMessageType } from '@credo-ts/didcomm'
 
 import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 
-export type UserProfileKey = string | keyof UserProfileData
+export type DidCommUserProfileKey = string | keyof UserProfileData
 
-export interface GetProfileMessageOptions {
+export interface DidCommGetProfileMessageOptions {
   id?: string
   threadId?: string
-  query?: UserProfileKey[]
+  query?: DidCommUserProfileKey[]
 }
 
-export class RequestProfileMessage extends DidCommMessage {
-  public constructor(options?: GetProfileMessageOptions) {
+export class DidCommRequestProfileMessage extends DidCommMessage {
+  public constructor(options?: DidCommGetProfileMessageOptions) {
     super()
 
     if (options) {
@@ -27,8 +27,8 @@ export class RequestProfileMessage extends DidCommMessage {
   public static readonly type: ParsedMessageType = parseMessageType(
     'https://didcomm.org/user-profile/1.0/request-profile',
   )
-  @IsValidMessageType(RequestProfileMessage.type)
-  public readonly type: string = RequestProfileMessage.type.messageTypeUri
+  @IsValidMessageType(DidCommRequestProfileMessage.type)
+  public readonly type: string = DidCommRequestProfileMessage.type.messageTypeUri
 
-  public query?: UserProfileKey[]
+  public query?: DidCommUserProfileKey[]
 }

@@ -1,4 +1,4 @@
-import type { UserProfileService } from '../services'
+import type { DidCommUserProfileService } from '../services'
 
 import {
   type DidCommMessageHandler,
@@ -6,18 +6,18 @@ import {
   DidCommOutboundMessageContext,
 } from '@credo-ts/didcomm'
 
-import { ProfileMessage } from '../messages'
+import { DidCommProfileMessage } from '../messages'
 
-export class ProfileHandler implements DidCommMessageHandler {
-  public supportedMessages = [ProfileMessage]
-  private userProfileService: UserProfileService
+export class DidCommProfileHandler implements DidCommMessageHandler {
+  public supportedMessages = [DidCommProfileMessage]
+  private userProfileService: DidCommUserProfileService
 
-  public constructor(userProfileService: UserProfileService) {
+  public constructor(userProfileService: DidCommUserProfileService) {
     this.userProfileService = userProfileService
   }
 
   public async handle(
-    inboundMessage: DidCommMessageHandlerInboundMessage<ProfileHandler>,
+    inboundMessage: DidCommMessageHandlerInboundMessage<DidCommProfileHandler>,
   ): Promise<DidCommOutboundMessageContext | undefined> {
     const connection = inboundMessage.assertReadyConnection()
 

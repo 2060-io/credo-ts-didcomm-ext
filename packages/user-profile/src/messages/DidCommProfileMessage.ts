@@ -5,7 +5,7 @@ import { DidCommAttachment, DidCommMessage, IsValidMessageType, parseMessageType
 import { Expose } from 'class-transformer'
 import { IsBoolean, IsOptional } from 'class-validator'
 
-export interface ProfileMessageOptions {
+export interface DidCommProfileMessageOptions {
   id?: string
   profile: Partial<UserProfileData> | Record<string, unknown>
   threadId?: string
@@ -13,7 +13,7 @@ export interface ProfileMessageOptions {
   sendBackYours?: boolean
 }
 
-class ProfileForExchange {
+class DidCommProfileForExchange {
   public displayName?: string
   public displayPicture?: string | null
   public displayIcon?: string | null
@@ -21,8 +21,8 @@ class ProfileForExchange {
   public preferredLanguage?: string
 }
 
-export class ProfileMessage extends DidCommMessage {
-  public constructor(options?: ProfileMessageOptions) {
+export class DidCommProfileMessage extends DidCommMessage {
+  public constructor(options?: DidCommProfileMessageOptions) {
     super()
 
     if (options) {
@@ -72,10 +72,10 @@ export class ProfileMessage extends DidCommMessage {
   }
 
   public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/user-profile/1.0/profile')
-  @IsValidMessageType(ProfileMessage.type)
-  public readonly type: string = ProfileMessage.type.messageTypeUri
+  @IsValidMessageType(DidCommProfileMessage.type)
+  public readonly type: string = DidCommProfileMessage.type.messageTypeUri
 
-  public profile!: ProfileForExchange | Record<string, unknown>
+  public profile!: DidCommProfileForExchange | Record<string, unknown>
 
   @IsOptional()
   @IsBoolean()

@@ -3,14 +3,14 @@ import type { UserProfileData, GetUserProfileDataReturnType } from './model'
 import { AgentContext, injectable } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
-import { UserProfileService } from './services'
+import { DidCommUserProfileService } from './services'
 
 @injectable()
-export class UserProfileApi {
+export class DidCommUserProfileApi {
   public constructor(
     private readonly agentContext: AgentContext,
     private readonly messageSender: DidCommMessageSender,
-    private readonly userProfileService: UserProfileService,
+    private readonly userProfileService: DidCommUserProfileService,
     private readonly connectionService: DidCommConnectionService,
   ) {}
 
