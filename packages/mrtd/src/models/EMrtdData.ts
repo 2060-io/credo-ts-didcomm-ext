@@ -1,5 +1,4 @@
 import type { SodVerification } from './SodVerification'
-import type * as tsemrtd from '@li0ard/tsemrtd'
 import type { SecurityInfos } from '@li0ard/tsemrtd/dist/asn1/eac'
 import type { CSCAMasterList } from '@li0ard/tsemrtd/dist/asn1/pkd'
 import type {
@@ -13,9 +12,7 @@ import type {
 } from '@li0ard/tsemrtd/dist/consts/interfaces'
 import type { SubjectPublicKeyInfo } from '@peculiar/asn1-x509'
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } =
-  require('../esm/bundle.js') as typeof tsemrtd
+import { COM, DG1, DG2, DG3, DG4, DG5, DG7, DG11, DG12, DG14, DG15, SOD, PKD } from '@li0ard/tsemrtd'
 
 import { EMrtdDataGroup } from './EMrtdDataGroup'
 
@@ -69,10 +66,10 @@ export function parseEMrtdData(input: Record<EMrtdDataGroup, string>): ParsedEMr
         parsedData.iris = DG4.load(decodedValue)
         break
       case EMrtdDataGroup.DG5:
-        parsedData.displayedImages = DG5.load(decodedValue)
+        parsedData.displayedImages = DG5.load(decodedValue).map((image) => Buffer.from(image))
         break
       case EMrtdDataGroup.DG7:
-        parsedData.signatureImages = DG7.load(decodedValue)
+        parsedData.signatureImages = DG7.load(decodedValue).map((image) => Buffer.from(image))
         break
       case EMrtdDataGroup.DG11:
         parsedData.additionalPersonalData = DG11.load(decodedValue)

@@ -180,8 +180,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.1(typescript@5.9.3)
       '@li0ard/tsemrtd':
-        specifier: ^0.2.2
-        version: 0.2.2(typescript@5.9.3)
+        specifier: ^0.3.4
+        version: 0.3.4(typescript@5.9.3)
       '@peculiar/asn1-x509':
         specifier: ^2.6.0
         version: 2.6.0
@@ -729,8 +729,13 @@ packages:
     peerDependencies:
       '@js-joda/core': '>=1.11.0'
 
-  '@li0ard/tsemrtd@0.2.2':
-    resolution: {integrity: sha512-u+xw2AbsyMMyGx5tJI9chmwRiVcmJWCy3eO2fTx0BTL3sgQl0FwqmPWgbNqmREtZxrXv2SO4hkKvl2BXGGay6Q==}
+  '@li0ard/tinytlv@0.1.1':
+    resolution: {integrity: sha512-gDo3uZ23Ad5OP4VloKJLdR/l2GKV+xavhZPQwqvFqn3O8gJa8/qnLPAFjCxk0aX6Uzbq0edmFp7Pmxm/oftiDA==}
+    peerDependencies:
+      typescript: ^5.0.0
+
+  '@li0ard/tsemrtd@0.3.4':
+    resolution: {integrity: sha512-/4eGgk8vb9DVTVkGNylFmDc+gfrxROcjZKIlWmOZQMD1AqHDKpXCosrefpuMJBUzpvt2+ztIUmrzyXB7ZqI7Yw==}
     peerDependencies:
       typescript: ^5.0.0
 
@@ -2705,9 +2710,6 @@ packages:
     resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
     hasBin: true
 
-  node-tlv@1.5.14:
-    resolution: {integrity: sha512-mazCWLJl0Z4TYfIx1DN7CwmQ4bZGyrobBjXxg2i6QoB/idkL2u5GgQvbAYfoe4T68+rpM0gNniwzA/dfIONiRA==}
-
   nopt@5.0.0:
     resolution: {integrity: sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==}
     engines: {node: '>=6'}
@@ -4097,12 +4099,16 @@ snapshots:
     dependencies:
       '@js-joda/core': 5.6.3
 
-  '@li0ard/tsemrtd@0.2.2(typescript@5.9.3)':
+  '@li0ard/tinytlv@0.1.1(typescript@5.9.3)':
     dependencies:
+      typescript: 5.9.3
+
+  '@li0ard/tsemrtd@0.3.4(typescript@5.9.3)':
+    dependencies:
+      '@li0ard/tinytlv': 0.1.1(typescript@5.9.3)
       '@peculiar/asn1-cms': 2.6.0
       '@peculiar/asn1-schema': 2.6.0
       '@peculiar/asn1-x509': 2.6.0
-      node-tlv: 1.5.14
       typescript: 5.9.3
 
   '@mapbox/node-pre-gyp@1.0.11':
@@ -6214,8 +6220,6 @@ snapshots:
       whatwg-url: 5.0.0
 
   node-gyp-build@4.8.4: {}
-
-  node-tlv@1.5.14: {}
 
   nopt@5.0.0:
     dependencies:
