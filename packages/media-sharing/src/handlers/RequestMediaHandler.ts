@@ -19,8 +19,6 @@ export class RequestMediaHandler implements DidCommMessageHandler {
     inboundMessage: DidCommMessageHandlerInboundMessage<RequestMediaHandler>,
   ): Promise<DidCommOutboundMessageContext | undefined> {
     inboundMessage.assertReadyConnection()
-
-    // Nothing to do internally. Will be handled by the controller
     return
   }
 }

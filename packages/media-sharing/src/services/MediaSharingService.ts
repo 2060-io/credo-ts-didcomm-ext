@@ -10,8 +10,6 @@ import { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 import { Lifecycle, scoped } from 'tsyringe'
 
 import { MediaSharingEventTypes, type MediaSharingStateChangedEvent } from '../MediaSharingEvents'
-import { RequestMediaHandler } from '../handlers/RequestMediaHandler'
-import { ShareMediaHandler } from '../handlers/ShareMediaHandler'
 import { RequestMediaMessage, ShareMediaMessage } from '../messages'
 import { MediaSharingRole, MediaSharingState } from '../model'
 import { MediaSharingRepository, MediaSharingRecord, SharedMediaItem } from '../repository'
@@ -24,14 +22,6 @@ export class MediaSharingService {
   public constructor(mediaSharingRepository: MediaSharingRepository, eventEmitter: EventEmitter) {
     this.mediaSharingRepository = mediaSharingRepository
     this.eventEmitter = eventEmitter
-  }
-
-  public getShareHandler() {
-    return new ShareMediaHandler(this)
-  }
-
-  public getRequestHandler() {
-    return new RequestMediaHandler(this)
   }
 
   /**

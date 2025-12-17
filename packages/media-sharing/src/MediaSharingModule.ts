@@ -3,6 +3,7 @@ import type { AgentContext, DependencyManager, Module } from '@credo-ts/core'
 import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { MediaSharingApi } from './MediaSharingApi'
+import { RequestMediaHandler, ShareMediaHandler } from './handlers'
 import { MediaSharingRole } from './model'
 import { MediaSharingRepository } from './repository'
 import { MediaSharingService } from './services'
@@ -37,8 +38,8 @@ export class MediaSharingModule implements Module {
     )
 
     messageHandlerRegistry.registerMessageHandlers([
-      mediaSharingService.getShareHandler(),
-      mediaSharingService.getRequestHandler(),
+      new ShareMediaHandler(mediaSharingService),
+      new RequestMediaHandler(mediaSharingService),
     ])
   }
 }

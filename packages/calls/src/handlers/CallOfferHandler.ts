@@ -1,4 +1,3 @@
-import type { DidCommCallsService } from '../DidCommCallsService'
 import type {
   DidCommMessageHandler,
   DidCommMessageHandlerInboundMessage,

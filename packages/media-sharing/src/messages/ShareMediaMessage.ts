@@ -4,6 +4,8 @@ import { DidCommAttachment, DidCommMessage, IsValidMessageType, parseMessageType
 import { Expose, Transform, Type } from 'class-transformer'
 import { IsDate, IsOptional, IsString } from 'class-validator'
 
+import { toDate } from '../utils/utils'
+
 interface SharedMediaItemDescriptorOptions {
   id: string
   attachmentId: string
@@ -41,17 +43,6 @@ export interface ShareMediaMessageOptions {
   sentTime?: Date
   description?: string
   items: SharedMediaItem[]
-}
-
-// helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
-const toDate = (value: unknown) => {
-  // Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
-  if (value instanceof Date) return value
-  if (typeof value === 'string' || typeof value === 'number') {
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime()) ? value : parsed
-  }
-  return value
 }
 
 export class ShareMediaMessage extends DidCommMessage {

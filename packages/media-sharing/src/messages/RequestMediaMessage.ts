@@ -2,6 +2,8 @@ import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/
 import { Expose, Transform } from 'class-transformer'
 import { IsDate, IsOptional, IsString } from 'class-validator'
 
+import { toDate } from '../utils/utils'
+
 export interface RequestMediaMessageOptions {
   id?: string
   threadId?: string
@@ -9,17 +11,6 @@ export interface RequestMediaMessageOptions {
   sentTime?: Date
   description?: string
   itemIds: string[]
-}
-// Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
-
-const toDate = (value: unknown) => {
-  // Local helper: credo-ts/didcomm’s DateParser isn’t a public export; importing from build/* breaks bundlers/resolvers.
-  if (value instanceof Date) return value
-  if (typeof value === 'string' || typeof value === 'number') {
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime()) ? value : parsed
-  }
-  return value
 }
 
 export class RequestMediaMessage extends DidCommMessage {

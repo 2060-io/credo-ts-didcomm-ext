@@ -19,8 +19,7 @@ export class ShareMediaHandler implements DidCommMessageHandler {
     inboundMessage: DidCommMessageHandlerInboundMessage<ShareMediaHandler>,
   ): Promise<DidCommOutboundMessageContext | undefined> {
     inboundMessage.assertReadyConnection()
-
     await this.mediaSharingService.processShareMedia(inboundMessage)
-    return undefined
+    return
   }
 }
