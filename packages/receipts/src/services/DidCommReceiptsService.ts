@@ -5,29 +5,29 @@ import { EventEmitter } from '@credo-ts/core'
 import { Lifecycle, scoped } from 'tsyringe'
 
 import {
-  MessageReceiptsMessage,
-  type MessageReceiptsMessageOptions,
-  RequestReceiptsMessage,
-  type RequestReceiptsMessageOptions,
+  DidCommMessageReceiptsMessage,
+  type DidCommMessageReceiptsMessageOptions,
+  DidCommRequestReceiptsMessage,
+  type DidCommRequestReceiptsMessageOptions,
 } from '../messages'
 
 import { ReceiptsEventTypes } from './ReceiptsEvents'
 
 @scoped(Lifecycle.ContainerScoped)
-export class ReceiptsService {
+export class DidCommReceiptsService {
   private eventEmitter: EventEmitter
 
   public constructor(eventEmitter: EventEmitter) {
     this.eventEmitter = eventEmitter
   }
 
-  public async createReceiptsMessage(options: MessageReceiptsMessageOptions) {
-    const message = new MessageReceiptsMessage(options)
+  public async createReceiptsMessage(options: DidCommMessageReceiptsMessageOptions) {
+    const message = new DidCommMessageReceiptsMessage(options)
 
     return message
   }
 
-  public async processReceipts(messageContext: DidCommInboundMessageContext<MessageReceiptsMessage>) {
+  public async processReceipts(messageContext: DidCommInboundMessageContext<DidCommMessageReceiptsMessage>) {
     const { message } = messageContext
     const connection = messageContext.assertReadyConnection()
 
@@ -40,13 +40,13 @@ export class ReceiptsService {
     })
   }
 
-  public async createRequestReceiptsMessage(options: RequestReceiptsMessageOptions) {
-    const message = new RequestReceiptsMessage(options)
+  public async createRequestReceiptsMessage(options: DidCommRequestReceiptsMessageOptions) {
+    const message = new DidCommRequestReceiptsMessage(options)
 
     return message
   }
 
-  public async processRequestReceipts(messageContext: DidCommInboundMessageContext<RequestReceiptsMessage>) {
+  public async processRequestReceipts(messageContext: DidCommInboundMessageContext<DidCommRequestReceiptsMessage>) {
     const { message } = messageContext
     const connection = messageContext.assertReadyConnection()
 

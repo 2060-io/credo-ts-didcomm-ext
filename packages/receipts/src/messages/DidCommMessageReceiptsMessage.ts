@@ -6,14 +6,14 @@ import { IsArray, IsInstance, IsString, IsDate, IsEnum, ValidateNested } from 'c
 
 import { MessageState } from './MessageState'
 
-export interface MessageReceiptOptions {
+export interface DidCommMessageReceiptOptions {
   messageId: string
   state: MessageState
   timestamp?: Date
 }
 
-export class MessageReceipt {
-  public constructor(options: MessageReceiptOptions) {
+export class DidCommMessageReceipt {
+  public constructor(options: DidCommMessageReceiptOptions) {
     if (options) {
       this.messageId = options.messageId
       this.state = options.state
@@ -41,13 +41,13 @@ export class MessageReceipt {
   public timestamp!: Date
 }
 
-export interface MessageReceiptsMessageOptions {
+export interface DidCommMessageReceiptsMessageOptions {
   id?: string
-  receipts: MessageReceipt[]
+  receipts: DidCommMessageReceipt[]
 }
 
-export class MessageReceiptsMessage extends DidCommMessage {
-  public constructor(options?: MessageReceiptsMessageOptions) {
+export class DidCommMessageReceiptsMessage extends DidCommMessage {
+  public constructor(options?: DidCommMessageReceiptsMessageOptions) {
     super()
 
     if (options) {
@@ -56,12 +56,12 @@ export class MessageReceiptsMessage extends DidCommMessage {
     }
   }
 
-  public readonly type = MessageReceiptsMessage.type.messageTypeUri
+  public readonly type = DidCommMessageReceiptsMessage.type.messageTypeUri
   public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/receipts/1.0/message-receipts')
 
-  @Type(() => MessageReceipt)
+  @Type(() => DidCommMessageReceipt)
   @IsArray()
   @ValidateNested()
-  @IsInstance(MessageReceipt, { each: true })
-  public receipts!: MessageReceipt[]
+  @IsInstance(DidCommMessageReceipt, { each: true })
+  public receipts!: DidCommMessageReceipt[]
 }

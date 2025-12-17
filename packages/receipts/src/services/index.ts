@@ -1,2 +1,2 @@
-export * from './ReceiptsService'
+export * from './DidCommReceiptsService'
 export * from './ReceiptsEvents'

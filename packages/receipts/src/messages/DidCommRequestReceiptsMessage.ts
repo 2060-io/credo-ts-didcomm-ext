@@ -6,13 +6,13 @@ import { IsArray, IsInstance, IsString, ValidateNested } from 'class-validator'
 
 import { MessageState } from './MessageState'
 
-export interface RequestedReceiptOptions {
+export interface DidCommRequestedReceiptOptions {
   messageType: string
   states?: MessageState[]
 }
 
-export class RequestedReceipt {
-  public constructor(options: RequestedReceiptOptions) {
+export class DidCommRequestedReceipt {
+  public constructor(options: DidCommRequestedReceiptOptions) {
     if (options) {
       this.messageType = options.messageType
       this.states = options.states
@@ -27,13 +27,13 @@ export class RequestedReceipt {
   public states?: MessageState[]
 }
 
-export interface RequestReceiptsMessageOptions {
+export interface DidCommRequestReceiptsMessageOptions {
   id?: string
-  requestedReceipts: RequestedReceipt[]
+  requestedReceipts: DidCommRequestedReceipt[]
 }
 
-export class RequestReceiptsMessage extends DidCommMessage {
-  public constructor(options?: RequestReceiptsMessageOptions) {
+export class DidCommRequestReceiptsMessage extends DidCommMessage {
+  public constructor(options?: DidCommRequestReceiptsMessageOptions) {
     super()
 
     if (options) {
@@ -42,13 +42,13 @@ export class RequestReceiptsMessage extends DidCommMessage {
     }
   }
 
-  public readonly type = RequestReceiptsMessage.type.messageTypeUri
+  public readonly type = DidCommRequestReceiptsMessage.type.messageTypeUri
   public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/receipts/1.0/request-receipts')
 
   @Expose({ name: 'requested_receipts' })
-  @Type(() => RequestedReceipt)
+  @Type(() => DidCommRequestedReceipt)
   @IsArray()
   @ValidateNested()
-  @IsInstance(RequestedReceipt, { each: true })
-  public requestedReceipts!: RequestedReceipt[]
+  @IsInstance(DidCommRequestedReceipt, { each: true })
+  public requestedReceipts!: DidCommRequestedReceipt[]
 }

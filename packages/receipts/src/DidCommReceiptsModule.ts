@@ -2,29 +2,29 @@ import type { AgentContext, DependencyManager, Module } from '@credo-ts/core'
 
 import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
-import { ReceiptsApi } from './ReceiptsApi'
-import { MessageReceiptsHandler, RequestReceiptsHandler } from './handlers'
-import { ReceiptsService } from './services'
+import { DidCommReceiptsApi } from './DidCommReceiptsApi'
+import { DidCommMessageReceiptsHandler, DidCommRequestReceiptsHandler } from './handlers'
+import { DidCommReceiptsService } from './services'
 
-export class ReceiptsModule implements Module {
-  public readonly api = ReceiptsApi
+export class DidCommReceiptsModule implements Module {
+  public readonly api = DidCommReceiptsApi
 
   /**
    * Registers the dependencies of the question answer module on the dependency manager.
    */
   public register(dependencyManager: DependencyManager) {
     // Api
-    dependencyManager.registerContextScoped(ReceiptsApi)
+    dependencyManager.registerContextScoped(DidCommReceiptsApi)
 
     // Services
-    dependencyManager.registerSingleton(ReceiptsService)
+    dependencyManager.registerSingleton(DidCommReceiptsService)
   }
 
   public async initialize(agentContext: AgentContext): Promise<void> {
     const featureRegistry = agentContext.dependencyManager.resolve<DidCommFeatureRegistry>(DidCommFeatureRegistry)
     const messageHandlerRegistry =
       agentContext.dependencyManager.resolve<DidCommMessageHandlerRegistry>(DidCommMessageHandlerRegistry)
-    const receiptsService = agentContext.dependencyManager.resolve(ReceiptsService)
+    const receiptsService = agentContext.dependencyManager.resolve(DidCommReceiptsService)
 
     featureRegistry.register(
       new DidCommProtocol({
@@ -33,8 +33,8 @@ export class ReceiptsModule implements Module {
     )
 
     messageHandlerRegistry.registerMessageHandlers([
-      new MessageReceiptsHandler(receiptsService),
-      new RequestReceiptsHandler(receiptsService),
+      new DidCommMessageReceiptsHandler(receiptsService),
+      new DidCommRequestReceiptsHandler(receiptsService),
     ])
   }
 }

@@ -10,7 +10,7 @@ import { agentDependencies } from '@credo-ts/node'
 import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
 
-import { ReceiptsModule } from '../src/ReceiptsModule'
+import { DidCommReceiptsModule } from '../src/DidCommReceiptsModule'
 import { MessageState } from '../src/messages'
 import { ReceiptsEventTypes } from '../src/services'
 
@@ -22,8 +22,8 @@ const logger = new ConsoleLogger(LogLevel.off)
 export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 
 describe('receipts test', () => {
-  let aliceAgent: Agent<{ receipts: ReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
-  let bobAgent: Agent<{ receipts: ReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
+  let aliceAgent: Agent<{ receipts: DidCommReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
+  let bobAgent: Agent<{ receipts: DidCommReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
   let aliceConnectionRecord: DidCommConnectionRecord
   let bobConnectionRecord: DidCommConnectionRecord
 
@@ -65,7 +65,7 @@ describe('receipts test', () => {
             mediationRecipient: false,
             basicMessages: false,
           }),
-          receipts: new ReceiptsModule(),
+          receipts: new DidCommReceiptsModule(),
         },
       })
 

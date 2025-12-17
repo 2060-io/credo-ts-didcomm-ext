@@ -1,32 +1,10 @@
-<p align="center">
-  <br />
-  <img
-    alt="Credo logo"
-    src="https://github.com/openwallet-foundation/credo-ts/blob/c7886cb8377ceb8ee4efe8d264211e561a75072d/images/credo-logo.png"
-    height="250px"
-  />
-</p>
-<h1 align="center"><b>Credo extension module for Message Receipts protocol</b></h1>
-<p align="center">
-  <a
-    href="https://raw.githubusercontent.com/openwallet-foundation/credo-ts-ext/main/LICENSE"
-    ><img
-      alt="License"
-      src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"
-  /></a>
-  <a href="https://www.typescriptlang.org/"
-    ><img
-      alt="typescript"
-      src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg"
-  /></a>
-    <a href="https://www.npmjs.com/package/credo-ts-didcomm-receipts"
-    ><img
-      alt="@2060.io/credo-ts-didcomm-receipts"
-      src="https://img.shields.io/npm/v/@2060.io/credo-ts-didcomm-receipts"
-  /></a>
+# Credo Extension Module for Message Receipts Protocol
 
-</p>
-<br />
+![Credo logo](https://github.com/openwallet-foundation/credo-ts/blob/c7886cb8377ceb8ee4efe8d264211e561a75072d/images/credo-logo.png)
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/openwallet-foundation/credo-ts-ext/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
+[![@2060.io/credo-ts-didcomm-receipts](https://img.shields.io/npm/v/@2060.io/credo-ts-didcomm-receipts)](https://www.npmjs.com/package/credo-ts-didcomm-receipts)
 
 ## Overview
 
@@ -113,9 +91,9 @@ agent.events.on(ReceiptsEventTypes.MessageReceiptsReceived, async ({ payload }: 
 
 See the [source code](./src/) for details on available classes and methods:
 
-- [`ReceiptsApi`:](./src/ReceiptsApi.ts) Main API for sending and requesting receipts.
-- [`ReceiptsService`:](./src/services/ReceiptsService.ts) Internal service for receipt logic.
-- [`ReceiptsModule`:](./src/ReceiptsModule.ts) Module integration for Credo agent.
+- [`DidCommReceiptsApi`:](./src/DidCommReceiptsApi.ts) Main API for sending and requesting receipts.
+- [`DidCommReceiptsService`:](./src/services/DidCommReceiptsService.ts) Internal service for receipt logic.
+- [`DidCommReceiptsModule`:](./src/DidCommReceiptsModule.ts) Module integration for Credo agent.
 
 ## License
 
