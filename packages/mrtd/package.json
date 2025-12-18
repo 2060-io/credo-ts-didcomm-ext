@@ -34,19 +34,19 @@
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
     "prepublishOnly": "pnpm run build",
-    "test": "pnpm deps && vitest run"
+    "test": "vitest"
   },
   "devDependencies": {
-    "@credo-ts/askar": "^0.6.0",
-    "@credo-ts/core": "^0.6.0",
-    "@credo-ts/node": "^0.6.0",
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
     "@openwallet-foundation/askar-nodejs": "^0.4.3",
     "@openwallet-foundation/askar-shared": "^0.4.3",
     "ts-node-dev": "^1.1.8"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.6.0",
-    "@credo-ts/didcomm": "^0.6.0"
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1"
   },
   "dependencies": {
     "@li0ard/tsemrtd": "^0.3.4",

@@ -26,7 +26,7 @@
     "check-types": "tsc --noEmit -p tsconfig.build.json",
     "check-format": "pnpm prettier --check",
     "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
-    "test": "vitest run --pool forks"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -48,8 +48,8 @@
     }
   },
   "devDependencies": {
-    "@credo-ts/askar": "^0.6.0",
-    "@credo-ts/node": "^0.6.0",
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
     "@openwallet-foundation/askar-nodejs": "^0.4.3",
     "@openwallet-foundation/askar-shared": "^0.4.3",
     "@types/node": "^20.11.16",
@@ -61,8 +61,8 @@
     "vitest": "^4.0.7"
   },
   "dependencies": {
-    "@credo-ts/core": "^0.6.0",
-    "@credo-ts/didcomm": "^0.6.0",
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "reflect-metadata": "^0.1.13",
