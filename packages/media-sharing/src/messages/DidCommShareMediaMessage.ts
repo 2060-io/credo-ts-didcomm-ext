@@ -6,7 +6,7 @@ import { IsDate, IsOptional, IsString } from 'class-validator'
 
 import { toDate } from '../utils/utils'
 
-interface SharedMediaItemDescriptorOptions {
+interface DidCommSharedMediaItemDescriptorOptions {
   id: string
   attachmentId: string
   description?: string
@@ -14,7 +14,7 @@ interface SharedMediaItemDescriptorOptions {
   metadata?: Record<string, unknown>
 }
 
-class SharedMediaItemDescriptor {
+class DidCommSharedMediaItemDescriptor {
   @Expose({ name: '@id' })
   public id!: string
 
@@ -26,7 +26,7 @@ class SharedMediaItemDescriptor {
 
   public metadata?: Record<string, unknown>
 
-  public constructor(options: SharedMediaItemDescriptorOptions) {
+  public constructor(options: DidCommSharedMediaItemDescriptorOptions) {
     if (options) {
       this.id = options.id
       this.attachmentId = options.attachmentId
@@ -36,7 +36,7 @@ class SharedMediaItemDescriptor {
   }
 }
 
-export interface ShareMediaMessageOptions {
+export interface DidCommShareMediaMessageOptions {
   id?: string
   threadId?: string
   parentThreadId?: string
@@ -45,8 +45,8 @@ export interface ShareMediaMessageOptions {
   items: SharedMediaItem[]
 }
 
-export class ShareMediaMessage extends DidCommMessage {
-  public constructor(options?: ShareMediaMessageOptions) {
+export class DidCommShareMediaMessage extends DidCommMessage {
+  public constructor(options?: DidCommShareMediaMessageOptions) {
     super()
 
     if (options) {
@@ -100,10 +100,10 @@ export class ShareMediaMessage extends DidCommMessage {
   @IsDate()
   public sentTime!: Date
 
-  @Type(() => SharedMediaItemDescriptor)
-  public items!: SharedMediaItemDescriptor[]
+  @Type(() => DidCommSharedMediaItemDescriptor)
+  public items!: DidCommSharedMediaItemDescriptor[]
 
   public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/share-media')
-  @IsValidMessageType(ShareMediaMessage.type)
-  public readonly type = ShareMediaMessage.type.messageTypeUri
+  @IsValidMessageType(DidCommShareMediaMessage.type)
+  public readonly type = DidCommShareMediaMessage.type.messageTypeUri
 }

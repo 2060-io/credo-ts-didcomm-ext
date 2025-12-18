@@ -4,7 +4,7 @@ import { IsDate, IsOptional, IsString } from 'class-validator'
 
 import { toDate } from '../utils/utils'
 
-export interface RequestMediaMessageOptions {
+export interface DidCommRequestMediaMessageOptions {
   id?: string
   threadId?: string
   parentThreadId?: string
@@ -13,8 +13,8 @@ export interface RequestMediaMessageOptions {
   itemIds: string[]
 }
 
-export class RequestMediaMessage extends DidCommMessage {
-  public constructor(options?: RequestMediaMessageOptions) {
+export class DidCommRequestMediaMessage extends DidCommMessage {
+  public constructor(options?: DidCommRequestMediaMessageOptions) {
     super()
 
     if (options) {
@@ -50,6 +50,6 @@ export class RequestMediaMessage extends DidCommMessage {
   public itemIds!: string[]
 
   public static readonly type = parseMessageType('https://didcomm.org/media-sharing/1.0/request-media')
-  @IsValidMessageType(RequestMediaMessage.type)
-  public readonly type = RequestMediaMessage.type.messageTypeUri
+  @IsValidMessageType(DidCommRequestMediaMessage.type)
+  public readonly type = DidCommRequestMediaMessage.type.messageTypeUri
 }

@@ -1,2 +1,2 @@
-export * from './MediaSharingRole'
-export * from './MediaSharingState'
+export * from './DidCommMediaSharingRole'
+export * from './DidCommMediaSharingState'

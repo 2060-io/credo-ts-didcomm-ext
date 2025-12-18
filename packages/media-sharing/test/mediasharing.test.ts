@@ -10,8 +10,8 @@ import { agentDependencies } from '@credo-ts/node'
 import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { firstValueFrom, ReplaySubject, Subject } from 'rxjs'
 
-import { MediaSharingModule } from '../src/MediaSharingModule'
-import { MediaSharingRecord } from '../src/repository'
+import { DidCommMediaSharingModule } from '../src/DidCommMediaSharingModule'
+import { DidCommMediaSharingRecord } from '../src/repository'
 
 import { recordsAddedByType } from './recordUtils'
 import { SubjectInboundTransport } from './transport/SubjectInboundTransport'
@@ -24,7 +24,7 @@ export type SubjectMessage = {
   replySubject?: Subject<SubjectMessage>
 }
 
-type MediaTestAgent = Agent<{ askar: AskarModule; media: MediaSharingModule; didcomm: DidCommModule }>
+type MediaTestAgent = Agent<{ askar: AskarModule; media: DidCommMediaSharingModule; didcomm: DidCommModule }>
 
 const buildAskarModule = (label: string) =>
   new AskarModuleValue({
@@ -49,7 +49,7 @@ const buildAgent = (
     dependencies: agentDependencies,
     modules: {
       askar: buildAskarModule(label),
-      media: new MediaSharingModule(),
+      media: new DidCommMediaSharingModule(),
       didcomm: new DidCommModule({
         endpoints: [endpoint],
         transports: {
@@ -127,10 +127,10 @@ describe('media test', () => {
   })
 
   test('Create media and share it', async () => {
-    const subjectAlice = new ReplaySubject<MediaSharingRecord>()
-    const subjectBob = new ReplaySubject<MediaSharingRecord>()
-    recordsAddedByType(aliceAgent, MediaSharingRecord).subscribe((record) =>
-      subjectAlice.next(record as MediaSharingRecord),
+    const subjectAlice = new ReplaySubject<DidCommMediaSharingRecord>()
+    const subjectBob = new ReplaySubject<DidCommMediaSharingRecord>()
+    recordsAddedByType(aliceAgent, DidCommMediaSharingRecord).subscribe((record) =>
+      subjectAlice.next(record as DidCommMediaSharingRecord),
     )
 
     const aliceRecord = await aliceAgent.modules.media.create({
@@ -152,8 +152,8 @@ describe('media test', () => {
       items: [{ mimeType: 'image/png', uri: 'http://blabla', metadata: { duration: 14 } }],
     })
 
-    recordsAddedByType(bobAgent, MediaSharingRecord).subscribe((record) =>
-      subjectBob.next(record as MediaSharingRecord),
+    recordsAddedByType(bobAgent, DidCommMediaSharingRecord).subscribe((record) =>
+      subjectBob.next(record as DidCommMediaSharingRecord),
     )
 
     const bobRecord = await firstValueFrom(subjectBob)

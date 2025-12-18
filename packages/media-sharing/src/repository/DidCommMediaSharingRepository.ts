@@ -3,15 +3,15 @@ import type { StorageService } from '@credo-ts/core'
 import { EventEmitter, InjectionSymbols, Repository } from '@credo-ts/core'
 import { inject, scoped, Lifecycle } from 'tsyringe'
 
-import { MediaSharingRecord } from './MediaSharingRecord'
+import { DidCommMediaSharingRecord } from './DidCommMediaSharingRecord'
 
 @scoped(Lifecycle.ContainerScoped)
-export class MediaSharingRepository extends Repository<MediaSharingRecord> {
+export class DidCommMediaSharingRepository extends Repository<DidCommMediaSharingRecord> {
   public constructor(
     @inject(InjectionSymbols.StorageService)
-    storageService: StorageService<MediaSharingRecord>,
+    storageService: StorageService<DidCommMediaSharingRecord>,
     eventEmitter: EventEmitter,
   ) {
-    super(MediaSharingRecord, storageService, eventEmitter)
+    super(DidCommMediaSharingRecord, storageService, eventEmitter)
   }
 }

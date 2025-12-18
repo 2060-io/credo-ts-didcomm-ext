@@ -1,2 +1,2 @@
-export * from './RequestMediaMessage'
-export * from './ShareMediaMessage'
+export * from './DidCommRequestMediaMessage'
+export * from './DidCommShareMediaMessage'

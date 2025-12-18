@@ -1,7 +1,7 @@
 import { CredoError, BaseRecord, utils } from '@credo-ts/core'
 import { Type } from 'class-transformer'
 
-import { MediaSharingRole, MediaSharingState } from '../model'
+import { DidCommMediaSharingRole, DidCommMediaSharingState } from '../model'
 
 export interface CipheringInfo {
   algorithm: string
@@ -43,14 +43,14 @@ export class SharedMediaItem {
   }
 }
 
-export interface MediaSharingStorageProps {
+export interface DidCommMediaSharingStorageProps {
   id?: string
   createdAt?: Date
   connectionId: string
   threadId?: string
   parentThreadId?: string
-  role: MediaSharingRole
-  state: MediaSharingState
+  role: DidCommMediaSharingRole
+  state: DidCommMediaSharingState
   description?: string
   items?: SharedMediaItem[]
   metadata?: Record<string, unknown>
@@ -58,12 +58,12 @@ export interface MediaSharingStorageProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class MediaSharingRecord extends BaseRecord<any, any, any> {
+export class DidCommMediaSharingRecord extends BaseRecord<any, any, any> {
   public connectionId!: string
   public threadId?: string
   public parentThreadId?: string
-  public role!: MediaSharingRole
-  public state!: MediaSharingState
+  public role!: DidCommMediaSharingRole
+  public state!: DidCommMediaSharingState
   public description?: string
   public sentTime?: Date
 
@@ -71,9 +71,9 @@ export class MediaSharingRecord extends BaseRecord<any, any, any> {
   public items?: SharedMediaItem[]
 
   public static readonly type = 'MediaSharingRecord'
-  public readonly type = MediaSharingRecord.type
+  public readonly type = DidCommMediaSharingRecord.type
 
-  public constructor(props: MediaSharingStorageProps) {
+  public constructor(props: DidCommMediaSharingStorageProps) {
     super()
     if (props) {
       this.id = props.id ?? utils.uuid()
@@ -105,13 +105,13 @@ export class MediaSharingRecord extends BaseRecord<any, any, any> {
     }
   }
 
-  public assertRole(expectedRole: MediaSharingRole) {
+  public assertRole(expectedRole: DidCommMediaSharingRole) {
     if (this.role !== expectedRole) {
       throw new CredoError(`Media sharing record has invalid role ${this.role}. Expected role ${expectedRole}.`)
     }
   }
 
-  public assertState(expectedStates: MediaSharingState | MediaSharingState[]) {
+  public assertState(expectedStates: DidCommMediaSharingState | DidCommMediaSharingState[]) {
     if (!Array.isArray(expectedStates)) {
       expectedStates = [expectedStates]
     }
