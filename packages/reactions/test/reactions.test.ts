@@ -1,6 +1,6 @@
 import './setup'
 
-import type { MessageReactionsReceivedEvent } from '../src'
+import type { DidCommMessageReactionsReceivedEvent } from '../src'
 import type { DidCommConnectionRecord, DidCommEncryptedMessage } from '@credo-ts/didcomm'
 
 import { AskarModule } from '@credo-ts/askar'
@@ -10,9 +10,9 @@ import { agentDependencies } from '@credo-ts/node'
 import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
 
-import { ReactionsEventTypes } from '../src'
+import { DidCommReactionsEventTypes } from '../src'
 import { DidCommReactionsModule } from '../src/DidCommReactionsModule'
-import { MessageReactionAction } from '../src/messages/MessageReactionsMessage'
+import { DidCommMessageReactionAction } from '../src/messages/DidCommMessageReactionsMessage'
 
 import { SubjectInboundTransport } from './transport/SubjectInboundTransport'
 import { SubjectOutboundTransport } from './transport/SubjectOutboundTransport'
@@ -108,16 +108,20 @@ describe('reactions test', () => {
 
   test('Send a basic message reaction', async () => {
     const receiptsReceivedPromise = firstValueFrom(
-      aliceAgent.events.observable<MessageReactionsReceivedEvent>(ReactionsEventTypes.MessageReactionsReceived).pipe(
-        filter((event: MessageReactionsReceivedEvent) => event.payload.connectionId === aliceConnectionRecord.id),
-        map((event: MessageReactionsReceivedEvent) => event.payload.reactions),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommMessageReactionsReceivedEvent>(DidCommReactionsEventTypes.DidCommMessageReactionsReceived)
+        .pipe(
+          filter(
+            (event: DidCommMessageReactionsReceivedEvent) => event.payload.connectionId === aliceConnectionRecord.id,
+          ),
+          map((event: DidCommMessageReactionsReceivedEvent) => event.payload.reactions),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.reactions.send({
       connectionId: bobConnectionRecord!.id,
-      reactions: [{ messageId: 'messageId', action: MessageReactionAction.React, emoji: '😀' }],
+      reactions: [{ messageId: 'messageId', action: DidCommMessageReactionAction.React, emoji: '😀' }],
     })
 
     const receipts = await receiptsReceivedPromise
@@ -126,7 +130,7 @@ describe('reactions test', () => {
     expect(receipts[0]).toEqual(
       expect.objectContaining({
         messageId: 'messageId',
-        action: MessageReactionAction.React,
+        action: DidCommMessageReactionAction.React,
         emoji: '😀',
       }),
     )

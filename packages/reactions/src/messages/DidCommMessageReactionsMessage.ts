@@ -4,19 +4,19 @@ import { DidCommMessage, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Transform, TransformationType, Type } from 'class-transformer'
 import { IsArray, IsEnum, IsString, IsDate, IsInstance, ValidateNested } from 'class-validator'
 
-export enum MessageReactionAction {
+export enum DidCommMessageReactionAction {
   React = 'react',
   Unreact = 'unreact',
 }
 
-export interface MessageReactionOptions {
+export interface DidCommMessageReactionOptions {
   messageId: string
   emoji: string
-  action: MessageReactionAction
+  action: DidCommMessageReactionAction
   timestamp?: Date
 }
-export class MessageReaction {
-  public constructor(options: MessageReactionOptions) {
+export class DidCommMessageReaction {
+  public constructor(options: DidCommMessageReactionOptions) {
     if (options) {
       this.messageId = options.messageId
       this.action = options.action
@@ -32,7 +32,7 @@ export class MessageReaction {
   @IsString()
   public emoji!: string
 
-  @IsEnum(MessageReactionAction)
+  @IsEnum(DidCommMessageReactionAction)
   public action!: string
 
   @Transform(({ value, type }) => {
@@ -50,7 +50,7 @@ export class MessageReaction {
 
 export interface MessageReactionsMessageOptions {
   id?: string
-  reactions: MessageReaction[]
+  reactions: DidCommMessageReaction[]
 }
 
 export class MessageReactionsMessage extends DidCommMessage {
@@ -63,11 +63,11 @@ export class MessageReactionsMessage extends DidCommMessage {
     }
   }
 
-  @Type(() => MessageReaction)
+  @Type(() => DidCommMessageReaction)
   @IsArray()
   @ValidateNested()
-  @IsInstance(MessageReaction, { each: true })
-  public reactions!: MessageReaction[]
+  @IsInstance(DidCommMessageReaction, { each: true })
+  public reactions!: DidCommMessageReaction[]
 
   public static readonly type: ParsedMessageType = parseMessageType(
     'https://didcomm.org/reactions/1.0/message-reactions',

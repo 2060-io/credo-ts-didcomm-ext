@@ -1,1 +1,1 @@
-export { MessageReactionsHandler } from './MessageReactionsHandler'
+export { DidCommMessageReactionsHandler as MessageReactionsHandler } from './DidCommMessageReactionsHandler'

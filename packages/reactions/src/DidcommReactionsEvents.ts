@@ -1,14 +1,14 @@
-import type { MessageReaction } from './messages'
+import type { DidCommMessageReaction } from './messages'
 import type { BaseEvent } from '@credo-ts/core'
 
-export enum ReactionsEventTypes {
-  MessageReactionsReceived = 'MessageReactionsReceived',
+export enum DidCommReactionsEventTypes {
+  DidCommMessageReactionsReceived = 'DidCommMessageReactionsReceived',
 }
 
-export interface MessageReactionsReceivedEvent extends BaseEvent {
-  type: ReactionsEventTypes.MessageReactionsReceived
+export interface DidCommMessageReactionsReceivedEvent extends BaseEvent {
+  type: DidCommReactionsEventTypes.DidCommMessageReactionsReceived
   payload: {
     connectionId: string
-    reactions: MessageReaction[]
+    reactions: DidCommMessageReaction[]
   }
 }
