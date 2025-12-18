@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-reactions@v0.0.2...@2060.io/credo-ts-didcomm-reactions@v0.0.3) (2025-12-18)
+
+
+### Features
+
+* Upgrade to Credo 0.6.0 and tooling ([#137](https://github.com/2060-io/credo-ts-didcomm-ext/issues/137)) ([b204b0f](https://github.com/2060-io/credo-ts-didcomm-ext/commit/b204b0faa5b59705fd676e6d6be17e9c939d7ecf))
+
 ## [0.0.2](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-reactions@v0.0.1...@2060.io/credo-ts-didcomm-reactions@v0.0.2) (2025-03-11)
 
 
