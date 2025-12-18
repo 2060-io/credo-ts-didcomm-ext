@@ -1,7 +1,8 @@
-import type { UserProfileKey } from '../messages'
+import type { DidCommUserProfileKey } from '../messages'
 import type { UserProfileData } from '../model'
 import type { UserProfileRecord } from '../repository'
-import type { BaseEvent, ConnectionRecord } from '@credo-ts/core'
+import type { BaseEvent } from '@credo-ts/core'
+import type { DidCommConnectionRecord } from '@credo-ts/didcomm'
 
 export enum ProfileEventTypes {
   UserProfileUpdated = 'UserProfileUpdated',
@@ -12,8 +13,8 @@ export enum ProfileEventTypes {
 export interface UserProfileRequestedEvent extends BaseEvent {
   type: ProfileEventTypes.UserProfileRequested
   payload: {
-    connection: ConnectionRecord
-    query?: UserProfileKey[]
+    connection: DidCommConnectionRecord
+    query?: DidCommUserProfileKey[]
     threadId: string
     parentThreadId?: string
   }
@@ -31,7 +32,7 @@ export interface ConnectionProfileUpdatedEvent extends BaseEvent {
   type: ProfileEventTypes.ConnectionProfileUpdated
   payload: {
     profile: UserProfileData
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     sendBackYoursRequested?: boolean
     threadId?: string
     parentThreadId?: string

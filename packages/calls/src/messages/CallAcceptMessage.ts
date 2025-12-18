@@ -1,4 +1,4 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 
 interface CallAcceptMessageOptions {
   id?: string
@@ -6,7 +6,7 @@ interface CallAcceptMessageOptions {
   parameters: Record<string, unknown>
 }
 
-export class CallAcceptMessage extends AgentMessage {
+export class CallAcceptMessage extends DidCommMessage {
   public constructor(options: CallAcceptMessageOptions) {
     super()
 
@@ -19,7 +19,7 @@ export class CallAcceptMessage extends AgentMessage {
 
   public parameters!: Record<string, unknown>
 
-  @IsValidMessageType(CallAcceptMessage.type)
   public static readonly type = parseMessageType('https://didcomm.org/calls/1.0/call-accept')
+  @IsValidMessageType(CallAcceptMessage.type)
   public readonly type = CallAcceptMessage.type.messageTypeUri
 }

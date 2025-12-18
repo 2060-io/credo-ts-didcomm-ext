@@ -1,4 +1,4 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 import { Expose } from 'class-transformer'
 import { IsString } from 'class-validator'
 
@@ -7,7 +7,7 @@ export interface InvalidateShortenedUrlMessageOptions {
   shortenedUrl: string
 }
 
-export class InvalidateShortenedUrlMessage extends AgentMessage {
+export class InvalidateShortenedUrlMessage extends DidCommMessage {
   public constructor(options: InvalidateShortenedUrlMessageOptions) {
     super()
     if (options) {
@@ -19,8 +19,10 @@ export class InvalidateShortenedUrlMessage extends AgentMessage {
   @IsString()
   @Expose({ name: 'shortened_url' })
   public shortenedUrl!: string
+  public static readonly type: ReturnType<typeof parseMessageType> = parseMessageType(
+    'https://didcomm.org/shorten-url/1.0/invalidate-shortened-url',
+  )
 
   @IsValidMessageType(InvalidateShortenedUrlMessage.type)
-  public static readonly type = parseMessageType('https://didcomm.org/shorten-url/1.0/invalidate-shortened-url')
   public readonly type = InvalidateShortenedUrlMessage.type.messageTypeUri
 }

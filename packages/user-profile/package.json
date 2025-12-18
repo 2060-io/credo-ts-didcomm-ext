@@ -1,8 +1,16 @@
 {
   "name": "@2060.io/credo-ts-didcomm-user-profile",
-  "main": "build/index",
-  "types": "build/index",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "version": "0.0.7",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
   "files": [
     "build"
   ],
@@ -18,21 +26,24 @@
     "directory": "packages/user-profile"
   },
   "scripts": {
-    "build": "yarn run clean && yarn run compile",
+    "build": "tsdown --config ./tsdown.config.ts",
     "clean": "rimraf -rf ./build",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "yarn run build",
-    "test": "jest"
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest"
   },
   "devDependencies": {
-    "@hyperledger/aries-askar-nodejs": "^0.2.3",
-    "@credo-ts/askar": "^0.5.13",
-    "@credo-ts/core": "^0.5.13",
-    "@credo-ts/node": "^0.5.13",
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-shared": "^0.4.3",
     "ts-node-dev": "^1.1.8"
   },
   "peerDependencies": {
-    "@credo-ts/core": "^0.5.13"
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1"
   },
   "dependencies": {
     "class-transformer": "0.5.1",

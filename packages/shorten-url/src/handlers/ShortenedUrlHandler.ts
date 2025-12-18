@@ -1,12 +1,19 @@
 import type { DidCommShortenUrlService } from '../DidCommShortenUrlService'
-import type { MessageHandler, MessageHandlerInboundMessage } from '@credo-ts/core'
+import type {
+  DidCommMessageHandler,
+  DidCommMessageHandlerInboundMessage,
+  DidCommOutboundMessageContext,
+} from '@credo-ts/didcomm'
 
 import { ShortenedUrlMessage } from '../messages'
 
-export class ShortenedUrlHandler implements MessageHandler {
+export class ShortenedUrlHandler implements DidCommMessageHandler {
   public supportedMessages = [ShortenedUrlMessage]
   public constructor(private readonly service: DidCommShortenUrlService) {}
-  public async handle(inbound: MessageHandlerInboundMessage<ShortenedUrlHandler>) {
-    return this.service.processShortenedUrl(inbound)
+  public async handle(
+    inbound: DidCommMessageHandlerInboundMessage<ShortenedUrlHandler>,
+  ): Promise<DidCommOutboundMessageContext | undefined> {
+    await this.service.processShortenedUrl(inbound)
+    return undefined
   }
 }

@@ -1,15 +1,9 @@
-import {
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-  OutboundMessageContext,
-  Query,
-  QueryOptions,
-} from '@credo-ts/core'
+import type { Query, QueryOptions } from '@credo-ts/core'
 
-import { RequestMediaHandler, ShareMediaHandler } from './handlers'
-import { MediaSharingRecord, SharedMediaItem, SharedMediaItemOptions } from './repository'
+import { AgentContext, injectable } from '@credo-ts/core'
+import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
+
+import { MediaSharingRecord, SharedMediaItem, type SharedMediaItemOptions } from './repository'
 import { MediaSharingService } from './services'
 
 export interface MediaSharingCreateOptions {
@@ -36,27 +30,12 @@ export interface MediaSharingRequestOptions {
 
 @injectable()
 export class MediaSharingApi {
-  private messageSender: MessageSender
-  private mediaSharingService: MediaSharingService
-  private connectionService: ConnectionService
-  private agentContext: AgentContext
-
   public constructor(
-    messageSender: MessageSender,
-    mediaSharingService: MediaSharingService,
-    connectionService: ConnectionService,
-    agentContext: AgentContext,
-  ) {
-    this.messageSender = messageSender
-    this.mediaSharingService = mediaSharingService
-    this.connectionService = connectionService
-    this.agentContext = agentContext
-
-    this.agentContext.dependencyManager.registerMessageHandlers([
-      new ShareMediaHandler(this.mediaSharingService),
-      new RequestMediaHandler(this.mediaSharingService),
-    ])
-  }
+    private readonly messageSender: DidCommMessageSender,
+    private readonly mediaSharingService: MediaSharingService,
+    private readonly connectionService: DidCommConnectionService,
+    private readonly agentContext: AgentContext,
+  ) {}
 
   /**
    * Sender role: create a new shared media record (no actual message will be sent)
@@ -91,7 +70,7 @@ export class MediaSharingApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(payload, {
+      new DidCommOutboundMessageContext(payload, {
         agentContext: this.agentContext,
         connection,
         associatedRecord: record,
@@ -115,7 +94,7 @@ export class MediaSharingApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(payload, {
+      new DidCommOutboundMessageContext(payload, {
         agentContext: this.agentContext,
         connection,
       }),

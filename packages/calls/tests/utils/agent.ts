@@ -1,36 +1,19 @@
-import type { InitConfig } from '@credo-ts/core'
-
 import { AskarModule } from '@credo-ts/askar'
-import { Agent, HttpOutboundTransport, WsOutboundTransport } from '@credo-ts/core'
+import { Agent } from '@credo-ts/core'
 import { agentDependencies } from '@credo-ts/node'
-import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
+import { askar } from '@openwallet-foundation/askar-nodejs'
+import { randomUUID } from 'node:crypto'
 
-import { DidCommCallsModule } from '../../src'
-
-export const setupAgent = async ({ name }: { name: string }) => {
-  const agentConfig: InitConfig = {
-    label: name,
-    walletConfig: {
-      id: name,
-      key: 'someKey',
-    },
-    autoUpdateStorageOnStartup: true,
-  }
-
-  const agent = new Agent({
-    config: agentConfig,
-    dependencies: agentDependencies,
-    modules: {
-      askar: new AskarModule({
-        ariesAskar,
-      }),
-      calls: new DidCommCallsModule(),
-    },
-  })
-
-  agent.registerOutboundTransport(new HttpOutboundTransport())
-  agent.registerOutboundTransport(new WsOutboundTransport())
-
-  await agent.initialize()
-  return agent
-}
+export const agent = new Agent({
+  dependencies: agentDependencies,
+  modules: {
+    askar: new AskarModule({
+      askar,
+      store: {
+        id: `anoncreds-${randomUUID()}`,
+        key: askar.storeGenerateRawKey({}),
+        keyDerivationMethod: 'raw',
+      },
+    }),
+  },
+})

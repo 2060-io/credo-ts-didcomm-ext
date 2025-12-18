@@ -28,7 +28,7 @@ DIDComm **Shorten URL 1.0** protocol implementation for `@credo-ts/core`. This m
 ## Installation
 
 ```bash
-yarn add @2060.io/credo-ts-didcomm-shorten-url
+pnpm add @2060.io/credo-ts-didcomm-shorten-url
 # or
 npm i @2060.io/credo-ts-didcomm-shorten-url
 ```

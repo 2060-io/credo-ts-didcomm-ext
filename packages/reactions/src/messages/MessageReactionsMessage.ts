@@ -1,4 +1,6 @@
-import { AgentMessage, parseMessageType } from '@credo-ts/core'
+import type { ParsedMessageType } from '@credo-ts/didcomm'
+
+import { DidCommMessage, parseMessageType } from '@credo-ts/didcomm'
 import { Expose, Transform, TransformationType, Type } from 'class-transformer'
 import { IsArray, IsEnum, IsString, IsDate, IsInstance, ValidateNested } from 'class-validator'
 
@@ -51,7 +53,7 @@ export interface MessageReactionsMessageOptions {
   reactions: MessageReaction[]
 }
 
-export class MessageReactionsMessage extends AgentMessage {
+export class MessageReactionsMessage extends DidCommMessage {
   public constructor(options: MessageReactionsMessageOptions) {
     super()
 
@@ -67,7 +69,8 @@ export class MessageReactionsMessage extends AgentMessage {
   @IsInstance(MessageReaction, { each: true })
   public reactions!: MessageReaction[]
 
-  //@IsValidMessageType(CallAcceptMessage.type)
-  public static readonly type = parseMessageType('https://didcomm.org/reactions/1.0/message-reactions')
+  public static readonly type: ParsedMessageType = parseMessageType(
+    'https://didcomm.org/reactions/1.0/message-reactions',
+  )
   public readonly type = MessageReactionsMessage.type.messageTypeUri
 }

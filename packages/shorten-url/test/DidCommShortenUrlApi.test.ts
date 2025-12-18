@@ -1,6 +1,9 @@
 import type { DidCommShortenUrlService } from '../src/DidCommShortenUrlService'
 import type { DidCommShortenUrlRepository } from '../src/repository'
-import type { AgentContext, ConnectionService, MessageHandlerRegistry, MessageSender } from '@credo-ts/core'
+import type { AgentContext } from '@credo-ts/core'
+import type { DidCommConnectionService, DidCommMessageSender } from '@credo-ts/didcomm'
+
+import { vi, describe } from 'vitest'
 
 import { DidCommShortenUrlApi } from '../src/DidCommShortenUrlApi'
 import { RequestShortenedUrlMessage, ShortenedUrlMessage, InvalidateShortenedUrlMessage } from '../src/messages'
@@ -12,36 +15,32 @@ describe('DidCommShortenUrlApi', () => {
   const connection = { id: 'conn-1' }
 
   const createApi = () => {
-    const messageHandlerRegistryMock = {
-      registerMessageHandler: jest.fn(),
-    }
     const messageSenderMock = {
-      sendMessage: jest.fn().mockResolvedValue(undefined),
+      sendMessage: vi.fn().mockResolvedValue(undefined),
     }
     const shortenService = {
-      createRequest: jest.fn(),
-      createShortenedUrl: jest.fn(),
-      createInvalidate: jest.fn(),
-    } as unknown as DidCommShortenUrlService
+      createRequest: vi.fn(),
+      createShortenedUrl: vi.fn(),
+      createInvalidate: vi.fn(),
+    }
     const connectionServiceMock = {
-      getById: jest.fn().mockResolvedValue(connection),
-      findById: jest.fn().mockResolvedValue(connection),
+      getById: vi.fn().mockResolvedValue(connection),
+      findById: vi.fn().mockResolvedValue(connection),
     }
     const repositoryMock = {
-      save: jest.fn().mockResolvedValue(undefined),
-      update: jest.fn().mockResolvedValue(undefined),
-      findSingleByQuery: jest.fn().mockResolvedValue(null),
-      getById: jest.fn(),
-      delete: jest.fn().mockResolvedValue(undefined),
-      deleteById: jest.fn().mockResolvedValue(undefined),
+      save: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+      findSingleByQuery: vi.fn().mockResolvedValue(null),
+      getById: vi.fn(),
+      delete: vi.fn().mockResolvedValue(undefined),
+      deleteById: vi.fn().mockResolvedValue(undefined),
     }
 
     const api = new DidCommShortenUrlApi(
-      messageHandlerRegistryMock as unknown as MessageHandlerRegistry,
-      messageSenderMock as unknown as MessageSender,
-      shortenService,
+      messageSenderMock as unknown as DidCommMessageSender,
+      shortenService as unknown as DidCommShortenUrlService,
       repositoryMock as unknown as DidCommShortenUrlRepository,
-      connectionServiceMock as unknown as ConnectionService,
+      connectionServiceMock as unknown as DidCommConnectionService,
       agentContext,
     )
 
@@ -69,7 +68,7 @@ describe('DidCommShortenUrlApi', () => {
       goalCode: 'shorten',
       requestedValiditySeconds: 3600,
     })
-    ;(shortenService.createRequest as jest.Mock).mockReturnValue(message)
+    shortenService.createRequest.mockReturnValue(message)
 
     await api.requestShortenedUrl({
       connectionId: 'conn-1',
@@ -98,7 +97,7 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    shortenService.createShortenedUrl.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -110,7 +109,7 @@ describe('DidCommShortenUrlApi', () => {
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
 
@@ -138,7 +137,7 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    shortenService.createShortenedUrl.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -149,7 +148,7 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/xyz',
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
       'Shortened URL already generated for record rec-1',
@@ -164,7 +163,7 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    shortenService.createShortenedUrl.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -175,7 +174,7 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/old',
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
       'Shortened URL already generated for record rec-1',
@@ -190,7 +189,7 @@ describe('DidCommShortenUrlApi', () => {
       threadId: 'rec-1',
       shortenedUrl: 'https://test.io/xyz',
     })
-    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    shortenService.createShortenedUrl.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -200,7 +199,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.InvalidationSent,
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
       'already invalidated',
@@ -211,7 +210,7 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
-    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+    shortenService.createInvalidate.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -222,7 +221,7 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/xyz',
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await api.invalidateShortenedUrl({ recordId: 'rec-1' })
 
@@ -237,7 +236,7 @@ describe('DidCommShortenUrlApi', () => {
 
   it('invalidateShortenedUrl should throw if record lookup fails', async () => {
     const { api, repository } = createApi()
-    ;(repository.getById as jest.Mock).mockRejectedValue(new Error('not found'))
+    repository.getById.mockRejectedValue(new Error('not found'))
 
     await expect(api.invalidateShortenedUrl({ recordId: 'missing' })).rejects.toThrow('not found')
   })
@@ -246,7 +245,7 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
-    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+    shortenService.createInvalidate.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -257,7 +256,7 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/xyz',
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already been invalidated')
   })
@@ -266,7 +265,7 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
-    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+    shortenService.createInvalidate.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -277,7 +276,7 @@ describe('DidCommShortenUrlApi', () => {
       shortenedUrl: 'https://test.io/xyz',
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already marked as invalidated')
   })
@@ -286,7 +285,7 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
-    ;(shortenService.createInvalidate as jest.Mock).mockReturnValue(message)
+    shortenService.createInvalidate.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -298,7 +297,7 @@ describe('DidCommShortenUrlApi', () => {
       expiresTime: new Date(Date.now() - 60 * 60 * 1000),
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     await api.invalidateShortenedUrl({ recordId: 'rec-1' })
     expect(repository.update).toHaveBeenCalledWith(
@@ -311,7 +310,7 @@ describe('DidCommShortenUrlApi', () => {
     const { api, shortenService, repository } = createApi()
 
     const message = new ShortenedUrlMessage({ threadId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
-    ;(shortenService.createShortenedUrl as jest.Mock).mockReturnValue(message)
+    shortenService.createShortenedUrl.mockReturnValue(message)
 
     const existingRecord = new DidCommShortenUrlRecord({
       id: 'rec-1',
@@ -321,7 +320,7 @@ describe('DidCommShortenUrlApi', () => {
       state: ShortenUrlState.RequestReceived,
       url: 'https://example.com',
     })
-    ;(repository.getById as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getById.mockResolvedValue(existingRecord)
 
     const providedExpires = new Date('2024-02-01T10:00:00.000Z')
 

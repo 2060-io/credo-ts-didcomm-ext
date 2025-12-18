@@ -1,24 +1,18 @@
-import {
-  AgentContext,
-  CredoError,
-  EventEmitter,
-  MessageHandlerInboundMessage,
-  Query,
-  QueryOptions,
-} from '@credo-ts/core'
-import { Lifecycle, scoped } from 'tsyringe'
-
-import { MediaSharingEventTypes, MediaSharingStateChangedEvent } from '../MediaSharingEvents'
-import { ShareMediaHandler } from '../handlers'
-import { ShareMediaMessage, RequestMediaMessage } from '../messages'
-import { MediaSharingRole, MediaSharingState } from '../model'
-import { MediaSharingRepository, MediaSharingRecord, SharedMediaItem } from '../repository'
-
-import {
+import type {
   CreateMediaSharingRecordOptions,
   RequestMediaSharingRecordOptions,
   ShareMediaSharingRecordOptions,
 } from './MediaSharingServiceOptions'
+import type { Query, QueryOptions } from '@credo-ts/core'
+
+import { AgentContext, CredoError, EventEmitter } from '@credo-ts/core'
+import { DidCommInboundMessageContext } from '@credo-ts/didcomm'
+import { Lifecycle, scoped } from 'tsyringe'
+
+import { MediaSharingEventTypes, type MediaSharingStateChangedEvent } from '../MediaSharingEvents'
+import { RequestMediaMessage, ShareMediaMessage } from '../messages'
+import { MediaSharingRole, MediaSharingState } from '../model'
+import { MediaSharingRepository, MediaSharingRecord, SharedMediaItem } from '../repository'
 
 @scoped(Lifecycle.ContainerScoped)
 export class MediaSharingService {
@@ -126,7 +120,7 @@ export class MediaSharingService {
     return { message }
   }
 
-  public async processShareMedia(messageContext: MessageHandlerInboundMessage<ShareMediaHandler>) {
+  public async processShareMedia(messageContext: DidCommInboundMessageContext<ShareMediaMessage>) {
     const { message } = messageContext
 
     const record = await this.findByThreadId(messageContext.agentContext, message.threadId)

@@ -1,12 +1,13 @@
 import 'reflect-metadata'
-import type { AgentMessage } from '@credo-ts/core'
+import type { DidCommMessage } from '@credo-ts/didcomm'
 
 import { JsonTransformer } from '@credo-ts/core'
+import { describe, it, expect } from 'vitest'
 
 import { RequestShortenedUrlMessage, ShortenedUrlMessage, InvalidateShortenedUrlMessage } from '../src/messages'
 
 // Type helper to project messages to DIDComm V2 format
-const toDidCommV2 = (message: AgentMessage) => {
+const toDidCommV2 = (message: DidCommMessage) => {
   const json = JsonTransformer.toJSON(message) as Record<string, unknown>
   const { ['@type']: type, ['@id']: id, ['~thread']: thread, ...body } = json
 
@@ -92,6 +93,7 @@ describe('DIDComm Shorten URL Message models', () => {
 
     it('should allow missing expires_time', () => {
       const msg = new ShortenedUrlMessage({
+        threadId: 'rec-123',
         shortenedUrl: 'https://test.io/a1b2',
       })
       const json = JsonTransformer.toJSON(msg) as Record<string, unknown>

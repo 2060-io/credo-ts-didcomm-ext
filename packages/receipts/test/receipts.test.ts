@@ -1,14 +1,16 @@
+import './setup'
+
 import type { MessageReceiptsReceivedEvent, RequestReceiptsReceivedEvent } from '../src/services'
-import type { ConnectionRecord, EncryptedMessage } from '@credo-ts/core'
+import type { DidCommConnectionRecord, DidCommEncryptedMessage } from '@credo-ts/didcomm'
 
 import { AskarModule } from '@credo-ts/askar'
-import { Agent, ConsoleLogger, DidExchangeState, LogLevel } from '@credo-ts/core'
+import { Agent, ConsoleLogger, LogLevel } from '@credo-ts/core'
+import { DidCommDidExchangeState, DidCommModule } from '@credo-ts/didcomm'
 import { agentDependencies } from '@credo-ts/node'
-import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
+import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
-import { v4 as uuid } from 'uuid'
 
-import { ReceiptsModule } from '../src/ReceiptsModule'
+import { DidCommReceiptsModule } from '../src/DidCommReceiptsModule'
 import { MessageState } from '../src/messages'
 import { ReceiptsEventTypes } from '../src/services'
 
@@ -17,24 +19,15 @@ import { SubjectOutboundTransport } from './transport/SubjectOutboundTransport'
 
 const logger = new ConsoleLogger(LogLevel.off)
 
-export type SubjectMessage = { message: EncryptedMessage; replySubject?: Subject<SubjectMessage> }
+export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 
 describe('receipts test', () => {
-  let aliceAgent: Agent<{ receipts: ReceiptsModule }>
-  let bobAgent: Agent<{ receipts: ReceiptsModule }>
-  let aliceWalletId: string
-  let aliceWalletKey: string
-  let bobWalletId: string
-  let bobWalletKey: string
-  let aliceConnectionRecord: ConnectionRecord
-  let bobConnectionRecord: ConnectionRecord
+  let aliceAgent: Agent<{ receipts: DidCommReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
+  let bobAgent: Agent<{ receipts: DidCommReceiptsModule; askar: AskarModule; didcomm: DidCommModule }>
+  let aliceConnectionRecord: DidCommConnectionRecord
+  let bobConnectionRecord: DidCommConnectionRecord
 
   beforeEach(async () => {
-    aliceWalletId = uuid()
-    aliceWalletKey = uuid()
-    bobWalletId = uuid()
-    bobWalletKey = uuid()
-
     const aliceMessages = new Subject<SubjectMessage>()
     const bobMessages = new Subject<SubjectMessage>()
 
@@ -43,73 +36,75 @@ describe('receipts test', () => {
       'rxjs:bob': bobMessages,
     }
 
-    // Initialize alice
-    aliceAgent = new Agent({
-      config: {
-        label: 'alice',
-        endpoints: ['rxjs:alice'],
-        walletConfig: { id: aliceWalletId, key: aliceWalletKey },
-        logger,
-      },
-      dependencies: agentDependencies,
-      modules: { askar: new AskarModule({ ariesAskar }), receipts: new ReceiptsModule() },
-    })
+    const buildAgent = (label: string, endpoint: string, inbound: Subject<SubjectMessage>, map: typeof subjectMap) =>
+      new Agent({
+        config: {
+          logger,
+          autoUpdateStorageOnStartup: true,
+        },
+        dependencies: agentDependencies,
+        modules: {
+          askar: new AskarModule({
+            askar: askarNodeJS,
+            store: {
+              id: `${label}-store`,
+              key: `${label}-key`,
+              database: { type: 'sqlite', config: { inMemory: true } },
+            },
+          }),
+          didcomm: new DidCommModule({
+            endpoints: [endpoint],
+            transports: {
+              inbound: [new SubjectInboundTransport(inbound)],
+              outbound: [new SubjectOutboundTransport(map)],
+            },
+            credentials: false,
+            proofs: false,
+            messagePickup: false,
+            mediator: false,
+            mediationRecipient: false,
+            basicMessages: false,
+          }),
+          receipts: new DidCommReceiptsModule(),
+        },
+      })
 
-    aliceAgent.registerOutboundTransport(new SubjectOutboundTransport(subjectMap))
-    aliceAgent.registerInboundTransport(new SubjectInboundTransport(aliceMessages))
+    // Initialize alice
+    aliceAgent = buildAgent('alice', 'rxjs:alice', aliceMessages, subjectMap)
     await aliceAgent.initialize()
 
     // Initialize bob
-    bobAgent = new Agent({
-      config: {
-        endpoints: ['rxjs:bob'],
-        label: 'bob',
-        walletConfig: { id: bobWalletId, key: bobWalletKey },
-        logger,
-      },
-      dependencies: agentDependencies,
-      modules: { askar: new AskarModule({ ariesAskar }), receipts: new ReceiptsModule() },
-    })
-
-    bobAgent.registerOutboundTransport(new SubjectOutboundTransport(subjectMap))
-    bobAgent.registerInboundTransport(new SubjectInboundTransport(bobMessages))
+    bobAgent = buildAgent('bob', 'rxjs:bob', bobMessages, subjectMap)
     await bobAgent.initialize()
 
-    const outOfBandRecord = await aliceAgent.oob.createInvitation({
+    const outOfBandRecord = await aliceAgent.didcomm.oob.createInvitation({
       autoAcceptConnection: true,
+      label: 'alice',
     })
 
-    const { connectionRecord } = await bobAgent.oob.receiveInvitationFromUrl(
+    const { connectionRecord } = await bobAgent.didcomm.oob.receiveInvitationFromUrl(
       outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'https://example.com/ssi' }),
-      { autoAcceptConnection: true },
+      { autoAcceptConnection: true, label: 'bob' },
     )
 
-    bobConnectionRecord = await bobAgent.connections.returnWhenIsConnected(connectionRecord!.id)
-    expect(bobConnectionRecord.state).toBe(DidExchangeState.Completed)
+    bobConnectionRecord = await bobAgent.didcomm.connections.returnWhenIsConnected(connectionRecord!.id)
+    expect(bobConnectionRecord.state).toBe(DidCommDidExchangeState.Completed)
 
-    aliceConnectionRecord = (await aliceAgent.connections.findAllByOutOfBandId(outOfBandRecord.id))[0]
-    aliceConnectionRecord = await aliceAgent.connections.returnWhenIsConnected(aliceConnectionRecord!.id)
-    expect(aliceConnectionRecord.state).toBe(DidExchangeState.Completed)
+    aliceConnectionRecord = (await aliceAgent.didcomm.connections.findAllByOutOfBandId(outOfBandRecord.id))[0]
+    aliceConnectionRecord = await aliceAgent.didcomm.connections.returnWhenIsConnected(aliceConnectionRecord!.id)
+    expect(aliceConnectionRecord.state).toBe(DidCommDidExchangeState.Completed)
   })
 
   afterEach(async () => {
     // Wait for messages to flush out
     await new Promise((r) => setTimeout(r, 1000))
 
-    if (aliceAgent) {
+    if (aliceAgent?.isInitialized) {
       await aliceAgent.shutdown()
-
-      if (aliceAgent.wallet.isInitialized && aliceAgent.wallet.isProvisioned) {
-        await aliceAgent.wallet.delete()
-      }
     }
 
-    if (bobAgent) {
+    if (bobAgent?.isInitialized) {
       await bobAgent.shutdown()
-
-      if (bobAgent.wallet.isInitialized && bobAgent.wallet.isProvisioned) {
-        await bobAgent.wallet.delete()
-      }
     }
   })
 

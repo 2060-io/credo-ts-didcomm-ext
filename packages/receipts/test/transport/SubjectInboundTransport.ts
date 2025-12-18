@@ -1,31 +1,42 @@
-import type { Agent, AgentContext, EncryptedMessage, InboundTransport, TransportSession } from '@credo-ts/core'
+import type { AgentContext } from '@credo-ts/core'
+import type {
+  DidCommEncryptedMessage,
+  DidCommInboundTransport,
+  DidCommMessage,
+  DidCommTransportSession,
+} from '@credo-ts/didcomm'
 import type { Subscription } from 'rxjs'
 
-import { MessageReceiver, TransportService, utils } from '@credo-ts/core'
+import { CredoError, utils } from '@credo-ts/core'
+import { DidCommMessageReceiver, DidCommTransportService } from '@credo-ts/didcomm'
 import { Subject } from 'rxjs'
 
-export type SubjectMessage = { message: EncryptedMessage; replySubject?: Subject<SubjectMessage> }
+export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 
-export class SubjectInboundTransport implements InboundTransport {
+export class SubjectInboundTransport implements DidCommInboundTransport {
   public readonly ourSubject: Subject<SubjectMessage>
   private subscription?: Subscription
+  private agentContext?: AgentContext
 
   public constructor(ourSubject = new Subject<SubjectMessage>()) {
     this.ourSubject = ourSubject
   }
 
-  public async start(agent: Agent) {
-    this.subscribe(agent)
+  public async start(agentContext: AgentContext) {
+    this.agentContext = agentContext
+    this.subscribe()
   }
 
   public async stop() {
     this.subscription?.unsubscribe()
   }
 
-  private subscribe(agent: Agent) {
-    const logger = agent.config.logger
-    const transportService = agent.dependencyManager.resolve(TransportService)
-    const messageReceiver = agent.dependencyManager.resolve(MessageReceiver)
+  private subscribe() {
+    if (!this.agentContext) throw new CredoError('SubjectInboundTransport not started')
+
+    const logger = this.agentContext.config.logger
+    const transportService = this.agentContext.dependencyManager.resolve(DidCommTransportService)
+    const messageReceiver = this.agentContext.dependencyManager.resolve(DidCommMessageReceiver)
 
     this.subscription = this.ourSubject.subscribe({
       next: async ({ message, replySubject }: SubjectMessage) => {
@@ -35,12 +46,15 @@ export class SubjectInboundTransport implements InboundTransport {
         if (replySubject) {
           session = new SubjectTransportSession(`subject-session-${utils.uuid()}`, replySubject)
 
-          // When the subject is completed (e.g. when the session is closed), we need to
-          // remove the session from the transport service so it won't be used for sending messages
-          // in the future.
           replySubject.subscribe({
-            complete: () => session && transportService.removeSession(session),
+            complete: () => {
+              if (session) {
+                transportService.removeSession(session)
+              }
+            },
           })
+
+          transportService.saveSession(session)
         }
 
         await messageReceiver.receiveMessage(message, { session })
@@ -49,17 +63,21 @@ export class SubjectInboundTransport implements InboundTransport {
   }
 }
 
-export class SubjectTransportSession implements TransportSession {
+export class SubjectTransportSession implements DidCommTransportSession {
   public id: string
   public readonly type = 'subject'
+  public keys?: DidCommTransportSession['keys']
+  public inboundMessage?: DidCommMessage
+  public connectionId?: string
   private replySubject: Subject<SubjectMessage>
 
-  public constructor(id: string, replySubject: Subject<SubjectMessage>) {
+  public constructor(id: string, replySubject: Subject<SubjectMessage>, connectionId?: string) {
     this.id = id
     this.replySubject = replySubject
+    this.connectionId = connectionId
   }
 
-  public async send(agentContext: AgentContext, encryptedMessage: EncryptedMessage): Promise<void> {
+  public async send(agentContext: AgentContext, encryptedMessage: DidCommEncryptedMessage): Promise<void> {
     this.replySubject.next({ message: encryptedMessage })
   }
 

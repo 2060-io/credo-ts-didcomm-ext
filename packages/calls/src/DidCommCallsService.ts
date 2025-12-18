@@ -1,8 +1,10 @@
+import type { DidCommCallType } from './messages/CallOfferMessage'
+
 import { Lifecycle, scoped } from 'tsyringe'
 
 import { CallAcceptMessage } from './messages/CallAcceptMessage'
 import { CallEndMessage } from './messages/CallEndMessage'
-import { CallOfferMessage, DidCommCallType } from './messages/CallOfferMessage'
+import { CallOfferMessage } from './messages/CallOfferMessage'
 import { CallRejectMessage } from './messages/CallRejectMessage'
 
 @scoped(Lifecycle.ContainerScoped)

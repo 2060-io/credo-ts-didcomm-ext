@@ -1,2 +1,2 @@
-export * from './MessageReceiptsHandler'
-export * from './RequestReceiptsHandler'
+export * from './DidCommMessageReceiptsHandler'
+export * from './DidCommRequestReceiptsHandler'

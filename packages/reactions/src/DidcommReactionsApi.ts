@@ -1,36 +1,26 @@
-import {
-  OutboundMessageContext,
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-  CredoError,
-  MessageHandlerRegistry,
-} from '@credo-ts/core'
+import { AgentContext, CredoError, injectable } from '@credo-ts/core'
+import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
 import { DidCommReactionsService } from './DidCommReactionsService'
-import { MessageReactionsHandler } from './handlers'
-import { MessageReaction, MessageReactionOptions } from './messages/MessageReactionsMessage'
+import { MessageReaction, type MessageReactionOptions } from './messages/MessageReactionsMessage'
 
 @injectable()
 export class DidCommReactionsApi {
-  private messageSender: MessageSender
+  private messageSender: DidCommMessageSender
   private reactionsService: DidCommReactionsService
-  private connectionService: ConnectionService
+  private connectionService: DidCommConnectionService
   private agentContext: AgentContext
 
   public constructor(
-    messageHandlerRegistry: MessageHandlerRegistry,
-    messageSender: MessageSender,
+    messageSender: DidCommMessageSender,
     reactionsService: DidCommReactionsService,
-    connectionService: ConnectionService,
+    connectionService: DidCommConnectionService,
     agentContext: AgentContext,
   ) {
     this.messageSender = messageSender
     this.reactionsService = reactionsService
     this.connectionService = connectionService
     this.agentContext = agentContext
-    this.registerMessageHandlers(messageHandlerRegistry)
   }
 
   public async send(options: { connectionId: string; reactions: MessageReactionOptions[] }) {
@@ -45,11 +35,7 @@ export class DidCommReactionsApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
-  }
-
-  private registerMessageHandlers(messageHandlerRegistry: MessageHandlerRegistry) {
-    messageHandlerRegistry.registerMessageHandler(new MessageReactionsHandler(this.reactionsService))
   }
 }

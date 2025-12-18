@@ -1,2 +1,2 @@
-export * from './ProfileMessage'
-export * from './RequestProfileMessage'
+export * from './DidCommProfileMessage'
+export * from './DidCommRequestProfileMessage'

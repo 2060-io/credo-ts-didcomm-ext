@@ -1,15 +1,18 @@
-import { AgentContext, EventEmitter, InboundMessageContext } from '@credo-ts/core'
-import * as Mrz from 'mrz'
-import { Lifecycle, scoped } from 'tsyringe'
-
-import {
+import type {
   EMrtdDataReceivedEvent,
   EMrtdDataRequestedEvent,
-  MrtdEventTypes,
   MrtdProblemReportEvent,
   MrzDataReceivedEvent,
   MrzDataRequestedEvent,
 } from '../DidCommMrtdEvents'
+import type { SodVerification } from '../models/SodVerification'
+import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
+
+import { AgentContext, EventEmitter } from '@credo-ts/core'
+import * as Mrz from 'mrz'
+import { Lifecycle, scoped } from 'tsyringe'
+
+import { MrtdEventTypes } from '../DidCommMrtdEvents'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
 import {
   EMrtdDataMessage,
@@ -19,7 +22,6 @@ import {
   MrzDataRequestMessage,
 } from '../messages'
 import { parseEMrtdData } from '../models'
-import { SodVerification } from '../models/SodVerification'
 
 import { CscaMasterListService } from './CscaMasterListService'
 import { SodVerifierService } from './SodVerifierService'
@@ -36,7 +38,7 @@ export class DidCommMrtdService {
     return new MrzDataRequestMessage({ parentThreadId })
   }
 
-  public async processMrzData(messageContext: InboundMessageContext<MrzDataMessage>) {
+  public async processMrzData(messageContext: DidCommInboundMessageContext<MrzDataMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 
@@ -71,7 +73,7 @@ export class DidCommMrtdService {
     return new EMrtdDataRequestMessage({ parentThreadId })
   }
 
-  public async processMrzDataRequest(messageContext: InboundMessageContext<MrzDataRequestMessage>) {
+  public async processMrzDataRequest(messageContext: DidCommInboundMessageContext<MrzDataRequestMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 
@@ -86,7 +88,7 @@ export class DidCommMrtdService {
     })
   }
 
-  public async processEMrtdData(messageContext: InboundMessageContext<EMrtdDataMessage>) {
+  public async processEMrtdData(messageContext: DidCommInboundMessageContext<EMrtdDataMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 
@@ -157,7 +159,7 @@ export class DidCommMrtdService {
     return verifier.verifySod(sodBuffer, dgMap)
   }
 
-  public async processEMrtdDataRequest(messageContext: InboundMessageContext<EMrtdDataRequestMessage>) {
+  public async processEMrtdDataRequest(messageContext: DidCommInboundMessageContext<EMrtdDataRequestMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 
@@ -183,7 +185,7 @@ export class DidCommMrtdService {
     return message
   }
 
-  public async processProblemReport(messageContext: InboundMessageContext<MrtdProblemReportMessage>) {
+  public async processProblemReport(messageContext: DidCommInboundMessageContext<MrtdProblemReportMessage>) {
     const connection = messageContext.assertReadyConnection()
     const { agentContext, message } = messageContext
 

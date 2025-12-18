@@ -4,13 +4,9 @@
     "lib": ["ES2021.Promise"],
     "baseUrl": ".",
     "paths": {
-      "@2060.io/credo-ts-didcomm-calls": ["packages/calls/src"],
-      "@2060.io/credo-ts-didcomm-mrtd": ["packages/mrtd/src"],
-      "@2060.io/credo-ts-didcomm-user-profile": ["packages/user-profile/src"],
-      "@2060.io/credo-ts-didcomm-receipts": ["packages/receipts/src"],
-      "@2060.io/credo-ts-didcomm-shorten-url": ["packages/shorten-url/src"]
+      "@2060.io/credo-ts-didcomm-*": ["packages/*/src"]
     },
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "vitest/importMeta", "node"]
   },
   "include": ["tests", "samples", "**/tests", "**/samples"],
   "exclude": ["node_modules", "build", "**/build/**"]

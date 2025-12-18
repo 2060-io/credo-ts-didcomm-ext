@@ -1,11 +1,15 @@
-import { AgentMessage, IsValidMessageType, parseMessageType } from '@credo-ts/core'
+import type { ParsedMessageType } from '@credo-ts/didcomm'
+
+import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 
 interface MrzRequestOptions {
   id?: string
   parentThreadId?: string
 }
 
-export class MrzDataRequestMessage extends AgentMessage {
+export class MrzDataRequestMessage extends DidCommMessage {
+  public static readonly type: ParsedMessageType = parseMessageType('https://didcomm.org/mrtd/1.0/mrz-data-request')
+
   public constructor(options: MrzRequestOptions) {
     super()
 
@@ -18,6 +22,5 @@ export class MrzDataRequestMessage extends AgentMessage {
   }
 
   @IsValidMessageType(MrzDataRequestMessage.type)
-  public static readonly type = parseMessageType('https://didcomm.org/mrtd/1.0/mrz-data-request')
   public readonly type = MrzDataRequestMessage.type.messageTypeUri
 }

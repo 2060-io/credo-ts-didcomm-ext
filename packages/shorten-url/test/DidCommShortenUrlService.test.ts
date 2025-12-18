@@ -1,7 +1,9 @@
 import type { DidCommShortenUrlRepository } from '../src/repository'
-import type { AgentContext, AgentMessage, EventEmitter, InboundMessageContext } from '@credo-ts/core'
+import type { AgentContext, EventEmitter } from '@credo-ts/core'
+import type { DidCommInboundMessageContext, DidCommMessage } from '@credo-ts/didcomm'
 
-import { AckStatus } from '@credo-ts/core'
+import { AckStatus } from '@credo-ts/didcomm'
+import { beforeEach, vi, type Mocked, describe } from 'vitest'
 
 import { DidCommShortenUrlEventTypes } from '../src/DidCommShortenUrlEvents'
 import { DidCommShortenUrlModuleConfig } from '../src/DidCommShortenUrlModuleConfig'
@@ -18,28 +20,28 @@ import { DidCommShortenUrlRecord } from '../src/repository'
 describe('DidCommShortenUrlService', () => {
   let moduleConfig: DidCommShortenUrlModuleConfig
   const dependencyManager = {
-    resolve: jest.fn(),
+    resolve: vi.fn(),
   }
   const agentContext = { dependencyManager } as unknown as AgentContext
   const connection = { id: 'conn-1' }
 
-  const makeCtx = <T extends AgentMessage>(message: T) =>
+  const makeCtx = <T extends DidCommMessage>(message: T) =>
     ({
       message,
       agentContext,
       assertReadyConnection: () => connection,
-    }) as unknown as InboundMessageContext<T>
+    }) as unknown as DidCommInboundMessageContext<T>
 
   const createService = () => {
-    const emit = jest.fn()
+    const emit = vi.fn()
     const eventEmitter = { emit } as unknown as EventEmitter
-    const repository: jest.Mocked<
+    const repository: Mocked<
       Pick<DidCommShortenUrlRepository, 'save' | 'update' | 'findSingleByQuery' | 'getSingleByQuery'>
     > = {
-      save: jest.fn().mockResolvedValue(undefined),
-      update: jest.fn().mockResolvedValue(undefined),
-      findSingleByQuery: jest.fn().mockResolvedValue(null),
-      getSingleByQuery: jest.fn().mockRejectedValue(new Error('not found')),
+      save: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+      findSingleByQuery: vi.fn().mockResolvedValue(null),
+      getSingleByQuery: vi.fn().mockRejectedValue(new Error('not found')),
     }
 
     const service = new DidCommShortenUrlService(eventEmitter, repository as unknown as DidCommShortenUrlRepository)
@@ -49,7 +51,7 @@ describe('DidCommShortenUrlService', () => {
 
   beforeEach(() => {
     moduleConfig = new DidCommShortenUrlModuleConfig()
-    ;(dependencyManager.resolve as jest.Mock).mockImplementation((token) => {
+    dependencyManager.resolve.mockImplementation((token) => {
       if (token === DidCommShortenUrlModuleConfig) return moduleConfig
 
       throw new Error(`Unexpected dependency request: ${token}`)
@@ -111,7 +113,7 @@ describe('DidCommShortenUrlService', () => {
     expect(emit).toHaveBeenCalledTimes(1)
     const [, event] = emit.mock.calls[0]
     expect(event.type).toBe(DidCommShortenUrlEventTypes.DidCommRequestShortenedUrlReceived)
-    const savedRecord = (repository.save as jest.Mock).mock.calls[0][1] as DidCommShortenUrlRecord
+    const savedRecord = repository.save.mock.calls[0][1] as DidCommShortenUrlRecord
     expect(event.payload.shortenUrlRecord).toBe(savedRecord)
     expect(event.payload.shortenUrlRecord.state).toBe(ShortenUrlState.RequestReceived)
   })
@@ -159,10 +161,11 @@ describe('DidCommShortenUrlService', () => {
       state: ShortenUrlState.RequestSent,
       url: 'https://example.com',
     })
-    ;(repository.getSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    repository.getSingleByQuery.mockResolvedValue(existingRecord)
 
     const expiresAt = new Date('2024-11-27T12:00:00.000Z')
     const msg = new ShortenedUrlMessage({
+      threadId: 'req-1',
       shortenedUrl: 'https://s.io/xyz',
       expiresTime: expiresAt,
     })
@@ -194,6 +197,7 @@ describe('DidCommShortenUrlService', () => {
     const { service, emit, repository } = createService()
 
     const msg = new ShortenedUrlMessage({
+      threadId: 'req-1',
       shortenedUrl: 'https://s.io/xyz',
     })
     Reflect.set(msg, 'thread', undefined)
@@ -209,13 +213,14 @@ describe('DidCommShortenUrlService', () => {
     const { service, emit, repository } = createService()
 
     const existingRecord = new DidCommShortenUrlRecord({
+      threadId: 'thread-1',
       connectionId: 'conn-1',
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.ShortenedSent,
       shortenedUrl: 'https://s.io/xyz',
       url: 'https://example.com',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    repository.findSingleByQuery.mockResolvedValue(existingRecord)
 
     const msg = new InvalidateShortenedUrlMessage({
       shortenedUrl: 'https://s.io/xyz',
@@ -236,6 +241,7 @@ describe('DidCommShortenUrlService', () => {
     const { service, repository } = createService()
 
     const existingRecord = new DidCommShortenUrlRecord({
+      threadId: 'thread-1',
       connectionId: 'conn-1',
       role: ShortenUrlRole.LongUrlProvider,
       state: ShortenUrlState.ShortenedReceived,
@@ -243,7 +249,7 @@ describe('DidCommShortenUrlService', () => {
       expiresTime: new Date(Date.now() - 5 * 60 * 1000),
       url: 'https://example.com',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    repository.findSingleByQuery.mockResolvedValue(existingRecord)
 
     const msg = new InvalidateShortenedUrlMessage({
       shortenedUrl: 'https://s.io/expired',
@@ -258,7 +264,7 @@ describe('DidCommShortenUrlService', () => {
 
   it('processInvalidate should throw when record does not exist', async () => {
     const { service, repository } = createService()
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+    repository.findSingleByQuery.mockResolvedValue(null)
 
     const msg = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://s.io/xyz' })
 
@@ -279,7 +285,7 @@ describe('DidCommShortenUrlService', () => {
       threadId: 'thread-1',
       url: 'https://example.com',
     })
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(existingRecord)
+    repository.findSingleByQuery.mockResolvedValue(existingRecord)
 
     const ack = new ShortenUrlAckMessage({ status: AckStatus.OK, threadId: 'inv-1' })
 
@@ -297,7 +303,7 @@ describe('DidCommShortenUrlService', () => {
 
   it('processAck should error when no matching record exists', async () => {
     const { service, repository } = createService()
-    ;(repository.findSingleByQuery as jest.Mock).mockResolvedValue(null)
+    repository.findSingleByQuery.mockResolvedValue(null)
 
     const ack = new ShortenUrlAckMessage({ status: AckStatus.OK, threadId: 'unknown' })
     await expect(service.processAck(makeCtx(ack))).rejects.toThrow(

@@ -1,4 +1,6 @@
-import { AgentContext, FileSystem, inject, injectable, InjectionSymbols, type Logger } from '@credo-ts/core'
+import type { FileSystem, Logger } from '@credo-ts/core'
+
+import { AgentContext, inject, injectable, InjectionSymbols } from '@credo-ts/core'
 import { X509Certificate } from '@peculiar/x509'
 import { fromBER, Sequence, Set } from 'asn1js'
 import { ContentInfo, SignedData, Certificate } from 'pkijs'
@@ -53,7 +55,7 @@ export class CscaMasterListService {
 
     this.logger.info(`[CscaMasterListService] Initialized with source: ${this.sourceLocation}`)
 
-    this.fileSystem = this.agentContext.dependencyManager.resolve<FileSystem>(InjectionSymbols.FileSystem)
+    this.fileSystem = this.agentContext.dependencyManager.resolve(InjectionSymbols.FileSystem)
     const expectedFileName = this.getMasterListFileName(this.sourceLocation)
 
     let ldifContent: string

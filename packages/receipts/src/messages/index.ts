@@ -1,3 +1,3 @@
-export * from './MessageReceiptsMessage'
+export * from './DidCommMessageReceiptsMessage'
 export * from './MessageState'
-export * from './RequestReceiptsMessage'
+export * from './DidCommRequestReceiptsMessage'

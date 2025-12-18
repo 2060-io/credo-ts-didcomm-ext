@@ -1,35 +1,19 @@
-import {
-  OutboundMessageContext,
-  AgentContext,
-  ConnectionService,
-  injectable,
-  MessageSender,
-  MessageHandlerRegistry,
-  CredoError,
-} from '@credo-ts/core'
+import { AgentContext, injectable, CredoError } from '@credo-ts/core'
+import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
 import { DidCommShortenUrlService } from './DidCommShortenUrlService'
-import {
-  RequestShortenedUrlHandler,
-  ShortenedUrlHandler,
-  InvalidateShortenedUrlHandler,
-  AckShortenUrlHandler,
-} from './handlers'
 import { ShortenUrlRole, ShortenUrlState } from './models'
 import { DidCommShortenUrlRecord, DidCommShortenUrlRepository } from './repository'
 
 @injectable()
 export class DidCommShortenUrlApi {
   public constructor(
-    private readonly messageHandlerRegistry: MessageHandlerRegistry,
-    private readonly messageSender: MessageSender,
+    private readonly messageSender: DidCommMessageSender,
     private readonly shortenService: DidCommShortenUrlService,
     private readonly shortenUrlRepository: DidCommShortenUrlRepository,
-    private readonly connectionService: ConnectionService,
+    private readonly connectionService: DidCommConnectionService,
     private readonly agentContext: AgentContext,
-  ) {
-    this.registerMessageHandlers()
-  }
+  ) {}
 
   /**
    * Sends a RequestShortenedUrlMessage to the specified connection.
@@ -73,7 +57,7 @@ export class DidCommShortenUrlApi {
     await this.shortenUrlRepository.save(this.agentContext, record)
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
     return { messageId: message.id }
   }
@@ -140,7 +124,7 @@ export class DidCommShortenUrlApi {
     })
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
     return { messageId: message.id }
   }
@@ -177,7 +161,7 @@ export class DidCommShortenUrlApi {
     await this.shortenUrlRepository.update(this.agentContext, record)
 
     await this.messageSender.sendMessage(
-      new OutboundMessageContext(message, { agentContext: this.agentContext, connection }),
+      new DidCommOutboundMessageContext(message, { agentContext: this.agentContext, connection }),
     )
     return { messageId: message.id }
   }
@@ -190,12 +174,5 @@ export class DidCommShortenUrlApi {
   public async deleteById(options: { recordId: string }) {
     await this.shortenUrlRepository.deleteById(this.agentContext, options.recordId)
     return { recordId: options.recordId }
-  }
-
-  private registerMessageHandlers() {
-    this.messageHandlerRegistry.registerMessageHandler(new RequestShortenedUrlHandler(this.shortenService))
-    this.messageHandlerRegistry.registerMessageHandler(new ShortenedUrlHandler(this.shortenService))
-    this.messageHandlerRegistry.registerMessageHandler(new InvalidateShortenedUrlHandler(this.shortenService))
-    this.messageHandlerRegistry.registerMessageHandler(new AckShortenUrlHandler(this.shortenService))
   }
 }

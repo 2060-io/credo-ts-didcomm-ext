@@ -1,5 +1,6 @@
 import type { MrzData, EMrtdData } from './models'
-import type { BaseEvent, ConnectionRecord, DescriptionOptions } from '@credo-ts/core'
+import type { BaseEvent } from '@credo-ts/core'
+import type { DidCommConnectionRecord, DescriptionOptions } from '@credo-ts/didcomm'
 
 export enum MrtdEventTypes {
   EMrtdDataReceived = 'EMrtdDataReceived',
@@ -12,7 +13,7 @@ export enum MrtdEventTypes {
 export interface MrzDataReceivedEvent extends BaseEvent {
   type: MrtdEventTypes.MrzDataReceived
   payload: {
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     mrzData: MrzData
     threadId: string
   }
@@ -21,7 +22,7 @@ export interface MrzDataReceivedEvent extends BaseEvent {
 export interface MrzDataRequestedEvent extends BaseEvent {
   type: MrtdEventTypes.MrzDataRequested
   payload: {
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     threadId: string
     parentThreadId?: string
   }
@@ -30,7 +31,7 @@ export interface MrzDataRequestedEvent extends BaseEvent {
 export interface EMrtdDataReceivedEvent extends BaseEvent {
   type: MrtdEventTypes.EMrtdDataReceived
   payload: {
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     dataGroups: EMrtdData
     threadId: string
   }
@@ -39,7 +40,7 @@ export interface EMrtdDataReceivedEvent extends BaseEvent {
 export interface EMrtdDataRequestedEvent extends BaseEvent {
   type: MrtdEventTypes.EMrtdDataRequested
   payload: {
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     threadId: string
     parentThreadId?: string
   }
@@ -48,7 +49,7 @@ export interface EMrtdDataRequestedEvent extends BaseEvent {
 export interface MrtdProblemReportEvent extends BaseEvent {
   type: MrtdEventTypes.MrtdProblemReport
   payload: {
-    connection: ConnectionRecord
+    connection: DidCommConnectionRecord
     description: DescriptionOptions
     threadId: string
     parentThreadId?: string

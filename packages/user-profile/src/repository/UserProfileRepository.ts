@@ -1,4 +1,4 @@
-import { EventEmitter, InjectionSymbols, Repository, StorageService } from '@credo-ts/core'
+import { EventEmitter, InjectionSymbols, Repository, type StorageService } from '@credo-ts/core'
 import { inject, scoped, Lifecycle } from 'tsyringe'
 
 import { UserProfileRecord } from './UserProfileRecord'

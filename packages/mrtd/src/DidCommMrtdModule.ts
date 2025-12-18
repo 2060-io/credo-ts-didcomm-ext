@@ -1,10 +1,17 @@
 import type { DidCommMrtdModuleConfigOptions } from './config/DidCommMrtdModuleConfig'
-import type { AgentContext, DependencyManager, FeatureRegistry, Module } from '@credo-ts/core'
+import type { AgentContext, DependencyManager, Module } from '@credo-ts/core'
 
-import { Protocol } from '@credo-ts/core'
+import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { DidCommMrtdApi } from './DidCommMrtdApi'
 import { DidCommMrtdModuleConfig } from './config/DidCommMrtdModuleConfig'
+import {
+  EMrtdDataHandler,
+  EMrtdDataRequestHandler,
+  MrtdProblemReportHandler,
+  MrzDataHandler,
+  MrzDataRequestHandler,
+} from './handlers'
 import { DidCommMrtdRole } from './models'
 import { CscaMasterListService, SodVerifierService } from './services'
 import { DidCommMrtdService } from './services/DidCommMrtdService'
@@ -26,7 +33,7 @@ export class DidCommMrtdModule implements Module {
   /**
    * Registers services and protocol definitions with the dependency manager.
    */
-  public register(dependencyManager: DependencyManager, featureRegistry: FeatureRegistry): void {
+  public register(dependencyManager: DependencyManager): void {
     // Register API
     dependencyManager.registerContextScoped(DidCommMrtdApi)
 
@@ -39,10 +46,19 @@ export class DidCommMrtdModule implements Module {
 
     // Register primary service
     dependencyManager.registerSingleton(DidCommMrtdService)
+  }
+
+  /**
+   * Initializes the module (e.g. by pre-loading the CSCA Master List if configured).
+   */
+  public async initialize(agentContext: AgentContext): Promise<void> {
+    const featureRegistry = agentContext.dependencyManager.resolve(DidCommFeatureRegistry)
+    const messageHandlerRegistry = agentContext.dependencyManager.resolve(DidCommMessageHandlerRegistry)
+    const mrtdService = agentContext.dependencyManager.resolve(DidCommMrtdService)
 
     // Register DIDComm MRTD protocol and roles
     featureRegistry.register(
-      new Protocol({
+      new DidCommProtocol({
         id: 'https://didcomm.org/mrtd/1.0',
         roles: [
           DidCommMrtdRole.MrzRequester,
@@ -52,12 +68,15 @@ export class DidCommMrtdModule implements Module {
         ],
       }),
     )
-  }
 
-  /**
-   * Initializes the module (e.g. by pre-loading the CSCA Master List if configured).
-   */
-  public async initialize(agentContext: AgentContext): Promise<void> {
+    messageHandlerRegistry.registerMessageHandlers([
+      new MrzDataHandler(mrtdService),
+      new MrzDataRequestHandler(mrtdService),
+      new EMrtdDataHandler(mrtdService),
+      new EMrtdDataRequestHandler(mrtdService),
+      new MrtdProblemReportHandler(mrtdService),
+    ])
+
     const logger = agentContext.config.logger
 
     if (!this.config.masterListCscaLocation) {

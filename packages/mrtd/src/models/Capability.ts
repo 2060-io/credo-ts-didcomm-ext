@@ -1,12 +1,12 @@
-import type { FeatureOptions } from '@credo-ts/core'
+import type { DidCommFeatureOptions } from '@credo-ts/didcomm'
 
-import { Feature } from '@credo-ts/core'
+import { DidCommFeature } from '@credo-ts/didcomm'
 
-export interface CapabilityOptions extends Omit<FeatureOptions, 'type'> {
+export interface CapabilityOptions extends Omit<DidCommFeatureOptions, 'type'> {
   value: unknown
 }
 
-export class Capability extends Feature {
+export class Capability extends DidCommFeature {
   public constructor(props: CapabilityOptions) {
     super({ ...props, type: Capability.type })
 

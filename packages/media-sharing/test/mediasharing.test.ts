@@ -1,9 +1,13 @@
-import type { ConnectionRecord, EncryptedMessage } from '@credo-ts/core'
+import './setup'
 
-import { AskarModule } from '@credo-ts/askar'
-import { Agent, ConsoleLogger, LogLevel, utils } from '@credo-ts/core'
+import type { AskarModule } from '@credo-ts/askar'
+import type { DidCommConnectionRecord, DidCommEncryptedMessage } from '@credo-ts/didcomm'
+
+import { AskarModule as AskarModuleValue } from '@credo-ts/askar'
+import { Agent, ConsoleLogger, LogLevel } from '@credo-ts/core'
+import { DidCommModule } from '@credo-ts/didcomm'
 import { agentDependencies } from '@credo-ts/node'
-import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
+import { askarNodeJS } from '@openwallet-foundation/askar-nodejs'
 import { firstValueFrom, ReplaySubject, Subject } from 'rxjs'
 
 import { MediaSharingModule } from '../src/MediaSharingModule'
@@ -16,79 +20,93 @@ import { SubjectOutboundTransport } from './transport/SubjectOutboundTransport'
 const logger = new ConsoleLogger(LogLevel.off)
 
 export type SubjectMessage = {
-  message: EncryptedMessage
+  message: DidCommEncryptedMessage
   replySubject?: Subject<SubjectMessage>
 }
 
+type MediaTestAgent = Agent<{ askar: AskarModule; media: MediaSharingModule; didcomm: DidCommModule }>
+
+const buildAskarModule = (label: string) =>
+  new AskarModuleValue({
+    askar: askarNodeJS,
+    store: {
+      id: `${label}-store`,
+      key: `${label}-key`,
+      database: { type: 'sqlite', config: { inMemory: true } },
+    },
+  })
+
+const buildAgent = (
+  label: string,
+  endpoint: string,
+  transports: { inbound: SubjectInboundTransport; outbound: SubjectOutboundTransport },
+): MediaTestAgent =>
+  new Agent({
+    config: {
+      logger,
+      autoUpdateStorageOnStartup: true,
+    },
+    dependencies: agentDependencies,
+    modules: {
+      askar: buildAskarModule(label),
+      media: new MediaSharingModule(),
+      didcomm: new DidCommModule({
+        endpoints: [endpoint],
+        transports: {
+          inbound: [transports.inbound],
+          outbound: [transports.outbound],
+        },
+        credentials: false,
+        proofs: false,
+        messagePickup: false,
+        mediator: false,
+        mediationRecipient: false,
+        basicMessages: false,
+      }),
+    },
+  })
+
 describe('media test', () => {
-  let aliceAgent: Agent<{ askar: AskarModule; media: MediaSharingModule }>
-  let bobAgent: Agent<{ askar: AskarModule; media: MediaSharingModule }>
-  let aliceWalletId: string
-  let aliceWalletKey: string
-  let bobWalletId: string
-  let bobWalletKey: string
-  let aliceConnectionRecord: ConnectionRecord | undefined
+  let aliceAgent: MediaTestAgent
+  let bobAgent: MediaTestAgent
+  let subjectMap: Record<string, Subject<SubjectMessage>>
+  let aliceConnectionRecord: DidCommConnectionRecord | undefined
 
   beforeEach(async () => {
-    aliceWalletId = utils.uuid()
-    aliceWalletKey = utils.uuid()
-    bobWalletId = utils.uuid()
-    bobWalletKey = utils.uuid()
-
     const aliceMessages = new Subject<SubjectMessage>()
     const bobMessages = new Subject<SubjectMessage>()
-
-    const subjectMap = {
+    subjectMap = {
       'rxjs:alice': aliceMessages,
       'rxjs:bob': bobMessages,
     }
 
-    // Initialize alice
-    aliceAgent = new Agent({
-      config: {
-        label: 'alice',
-        endpoints: ['rxjs:alice'],
-        walletConfig: { id: aliceWalletId, key: aliceWalletKey },
-        logger,
-      },
-      dependencies: agentDependencies,
-      modules: { askar: new AskarModule({ ariesAskar }), media: new MediaSharingModule() },
+    aliceAgent = buildAgent('alice', 'rxjs:alice', {
+      inbound: new SubjectInboundTransport(aliceMessages),
+      outbound: new SubjectOutboundTransport(subjectMap),
     })
-
-    aliceAgent.registerOutboundTransport(new SubjectOutboundTransport(subjectMap))
-    aliceAgent.registerInboundTransport(new SubjectInboundTransport(aliceMessages))
     await aliceAgent.initialize()
 
-    // Initialize bob
-    bobAgent = new Agent({
-      config: {
-        endpoints: ['rxjs:bob'],
-        label: 'bob',
-        walletConfig: { id: bobWalletId, key: bobWalletKey },
-        logger,
-      },
-      dependencies: agentDependencies,
-      modules: { askar: new AskarModule({ ariesAskar }), media: new MediaSharingModule() },
+    bobAgent = buildAgent('bob', 'rxjs:bob', {
+      inbound: new SubjectInboundTransport(bobMessages),
+      outbound: new SubjectOutboundTransport(subjectMap),
     })
-
-    bobAgent.registerOutboundTransport(new SubjectOutboundTransport(subjectMap))
-    bobAgent.registerInboundTransport(new SubjectInboundTransport(bobMessages))
     await bobAgent.initialize()
 
-    const outOfBandRecord = await aliceAgent.oob.createInvitation({
+    const outOfBandRecord = await aliceAgent.didcomm.oob.createInvitation({
       autoAcceptConnection: true,
+      label: 'alice',
     })
 
-    const { connectionRecord } = await bobAgent.oob.receiveInvitationFromUrl(
+    const { connectionRecord } = await bobAgent.didcomm.oob.receiveInvitationFromUrl(
       outOfBandRecord.outOfBandInvitation.toUrl({
         domain: 'https://example.com/ssi',
       }),
-      { autoAcceptConnection: true },
+      { autoAcceptConnection: true, label: 'bob' },
     )
 
-    await bobAgent.connections.returnWhenIsConnected(connectionRecord!.id)
-    aliceConnectionRecord = (await aliceAgent.connections.findAllByOutOfBandId(outOfBandRecord.id))[0]
-    aliceConnectionRecord = await aliceAgent.connections.returnWhenIsConnected(aliceConnectionRecord!.id)
+    await bobAgent.didcomm.connections.returnWhenIsConnected(connectionRecord!.id)
+    aliceConnectionRecord = (await aliceAgent.didcomm.connections.findAllByOutOfBandId(outOfBandRecord.id))[0]
+    aliceConnectionRecord = await aliceAgent.didcomm.connections.returnWhenIsConnected(aliceConnectionRecord!.id)
   })
 
   afterEach(async () => {
@@ -96,18 +114,14 @@ describe('media test', () => {
     await new Promise((r) => setTimeout(r, 1000))
 
     if (aliceAgent) {
-      await aliceAgent.shutdown()
-
-      if (aliceAgent.wallet.isInitialized && aliceAgent.wallet.isProvisioned) {
-        await aliceAgent.wallet.delete()
+      if (aliceAgent.isInitialized) {
+        await aliceAgent.shutdown()
       }
     }
 
     if (bobAgent) {
-      await bobAgent.shutdown()
-
-      if (bobAgent.wallet.isInitialized && bobAgent.wallet.isProvisioned) {
-        await bobAgent.wallet.delete()
+      if (bobAgent.isInitialized) {
+        await bobAgent.shutdown()
       }
     }
   })
@@ -115,7 +129,9 @@ describe('media test', () => {
   test('Create media and share it', async () => {
     const subjectAlice = new ReplaySubject<MediaSharingRecord>()
     const subjectBob = new ReplaySubject<MediaSharingRecord>()
-    recordsAddedByType(aliceAgent, MediaSharingRecord).pipe().subscribe(subjectAlice)
+    recordsAddedByType(aliceAgent, MediaSharingRecord).subscribe((record) =>
+      subjectAlice.next(record as MediaSharingRecord),
+    )
 
     const aliceRecord = await aliceAgent.modules.media.create({
       connectionId: aliceConnectionRecord!.id,
@@ -136,9 +152,9 @@ describe('media test', () => {
       items: [{ mimeType: 'image/png', uri: 'http://blabla', metadata: { duration: 14 } }],
     })
 
-    recordsAddedByType(bobAgent, MediaSharingRecord)
-      //.pipe(filter((e) => e.state === MediaSharingState.MediaShared))
-      .subscribe(subjectBob)
+    recordsAddedByType(bobAgent, MediaSharingRecord).subscribe((record) =>
+      subjectBob.next(record as MediaSharingRecord),
+    )
 
     const bobRecord = await firstValueFrom(subjectBob)
     await firstValueFrom(subjectAlice)
