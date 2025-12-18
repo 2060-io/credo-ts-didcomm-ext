@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.12](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.11...@2060.io/credo-ts-didcomm-shorten-url@v0.0.12) (2025-12-18)
+
+
+### Features
+
+* Upgrade to Credo 0.6.0 and tooling ([#137](https://github.com/2060-io/credo-ts-didcomm-ext/issues/137)) ([b204b0f](https://github.com/2060-io/credo-ts-didcomm-ext/commit/b204b0faa5b59705fd676e6d6be17e9c939d7ecf))
+
 ## [0.0.11](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-shorten-url@v0.0.10...@2060.io/credo-ts-didcomm-shorten-url@v0.0.11) (2025-12-02)
 
 
