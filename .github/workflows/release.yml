@@ -45,11 +45,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Release to NPM (user-profile)
+        run: pnpm publish ./packages/user-profile --access public --provenance --no-git-checks
+
       - name: Release to NPM (reactions)
         run: pnpm publish ./packages/reactions --access public --provenance --no-git-checks
 
       - name: Release to NPM (media-sharing)
-        run: pnpm publish ./packages/media-sharing --access public --provenance --no-git-checks
-
-      - name: Release to NPM (user-profile)
         run: pnpm publish ./packages/media-sharing --access public --provenance --no-git-checks
