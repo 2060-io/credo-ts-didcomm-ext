@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.0.5...@2060.io/credo-ts-didcomm-media-sharing@v0.0.6) (2025-12-18)
+
+
+### Bug Fixes
+
+* **media-sharing:** publish config and prefix classes with DidComm ([#147](https://github.com/2060-io/credo-ts-didcomm-ext/issues/147)) ([42068cd](https://github.com/2060-io/credo-ts-didcomm-ext/commit/42068cddbfad201352f7e08614c4ec00271dd338))
+
 ## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.0.4...@2060.io/credo-ts-didcomm-media-sharing@v0.0.5) (2025-12-18)
 
 
