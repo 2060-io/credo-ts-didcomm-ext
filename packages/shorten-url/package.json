@@ -1,0 +1,54 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-shorten-url",
+  "version": "0.0.12",
+  "description": "DIDComm Shorten URL protocol implementation for @credo-ts/core",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsdown --config ./tsdown.config.ts",
+    "clean": "rimraf -rf ./build",
+    "types:check": "tsc --noEmit -p tsconfig.build.json",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/shorten-url"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
+    "@hyperledger/aries-askar-nodejs": "^0.2.3",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^3.10.1",
+    "typescript": "~5.9.3"
+  },
+  "peerDependencies": {
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1"
+  },
+  "dependencies": {
+    "@credo-ts/didcomm": "^0.6.1",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.8.0"
+  }
+}

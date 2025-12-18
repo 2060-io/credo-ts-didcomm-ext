@@ -1,0 +1,66 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-mrtd",
+  "type": "module",
+  "version": "0.0.20",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
+  "files": [
+    "build"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "description": "DIDComm Machine Readable Travel Documents extension module for Credo",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/mrtd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/mrtd"
+  },
+  "scripts": {
+    "deps": "rm -f src/esm/bundle.js && pnpm esbuild --platform=node --format=esm src/esm/index.ts --bundle --outfile=src/esm/bundle.js",
+    "prebuild": "pnpm run deps",
+    "pretest": "pnpm run deps",
+    "copy-esm": "mkdir -p build/esm && cp src/esm/bundle.js build/esm/bundle.js",
+    "build": "tsdown --config ./tsdown.config.ts",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-shared": "^0.4.3",
+    "ts-node-dev": "^1.1.8"
+  },
+  "peerDependencies": {
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1"
+  },
+  "dependencies": {
+    "@li0ard/tsemrtd": "^0.3.4",
+    "@peculiar/x509": "^1.13.0",
+    "@peculiar/asn1-x509": "^2.6.0",
+    "@types/pkijs": "^3.0.1",
+    "asn1js": "^3.0.6",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
+    "esbuild": "^0.24.0",
+    "mrz": "^4.2.0",
+    "pkijs": "^3.2.5",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "tsyringe": "^4.8.0"
+  }
+}

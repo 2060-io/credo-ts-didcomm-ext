@@ -22,10 +22,85 @@
     <a href="https://www.npmjs.com/package/@2060.io/credo-ts-didcomm-calls"
     ><img
       alt="@2060.io/credo-ts-didcomm-calls version"
-      src="https://img.shield.io/npm/v/@2060.io/credo-ts-didcomm-calls"
+      src="https://img.shields.io/npm/v/@2060.io/credo-ts-didcomm-calls"
   /></a>
 
 </p>
 <br />
 
-DIDComm Calls extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git).
+## Overview
+
+The **DIDComm Calls** extension module for [Credo](https://github.com/openwallet-foundation/credo-ts.git) enables secure, decentralized call signaling using the DIDComm protocol. It provides APIs, message handlers, and services to initiate, accept, and manage call offers between agents.
+
+## Installation
+
+```bash
+npm install @2060.io/credo-ts-didcomm-calls
+```
+
+## Usage
+
+### Adding the Module to Your Agent
+
+To use the DIDComm Calls module, add it to your agent's modules configuration:
+
+```typescript
+import { DidCommCallsModule } from '@2060.io/credo-ts-didcomm-calls'
+
+const agent = new Agent({
+  modules: {
+    // ...other modules
+    calls: new DidCommCallsModule(),
+  },
+})
+```
+
+### Sending a Call Offer
+
+To initiate a call, send a `CallOfferRequestMessage` using the API:
+
+```typescript
+const msg = JsonTransformer.fromJSON(message, CallOfferRequestMessage)
+const callOffer = await agent.modules.calls.offer({
+  connectionId: connection.id,
+  offerExpirationTime: msg.offerExpirationTime,
+  offerStartTime: msg.offerStartTime,
+  description: msg.description,
+  callType: 'service',
+  parameters: msg.parameters,
+})
+```
+
+### Handling Call Events
+
+The module emits events for call offers, acceptances, and terminations. Subscribe to these events to handle call workflows in your application.
+
+## Features
+
+- **Call Offer**: Initiate a call with another agent using DIDComm messages.
+- **Call Accept/Reject**: Respond to incoming call offers.
+- **Call Termination**: End an ongoing call.
+- **Threading and Expiration**: Support for threading and offer expiration times.
+
+## API Reference
+
+See the [source code](./src/) for details on available classes and methods:
+
+- `DidCommCallsApi`: Main API for call operations.
+- `DidCommCallsService`: Internal service for call logic.
+- `DidCommCallsModule`: Module integration for Credo agent.
+
+## Message Types
+
+- `CallOfferMessage`
+- `CallOfferRequestMessage`
+- `CallAcceptMessage`
+- `CallTerminateMessage`
+
+## License
+
+Apache 2.0
+
+---
+
+For more information, see the [Credo documentation](https://github.com/openwallet-foundation/credo-ts.git).

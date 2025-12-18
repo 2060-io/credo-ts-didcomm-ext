@@ -1,0 +1,7 @@
+export * from './DidCommUserProfileApi'
+export * from './DidCommUserProfileModule'
+export * from './DidCommUserProfileModuleConfig'
+export * from './messages'
+export * from './repository'
+export * from './services'
+export * from './model'

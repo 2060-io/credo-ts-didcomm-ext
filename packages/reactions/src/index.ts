@@ -1,0 +1,6 @@
+export { DidCommReactionsApi } from './DidcommReactionsApi'
+export { DidCommReactionsModule } from './DidCommReactionsModule'
+export * from './models'
+export * from './messages'
+export * from './DidcommReactionsEvents'
+export * from './DidCommReactionsService'

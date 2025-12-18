@@ -1,0 +1,55 @@
+{
+  "name": "@2060.io/credo-ts-didcomm-user-profile",
+  "type": "module",
+  "main": "./build/index.mjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.mts",
+  "version": "0.0.8",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.mts",
+      "default": "./build/index.mjs"
+    }
+  },
+  "files": [
+    "build"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "description": "DIDComm User Profile protocol extension module for Credo",
+  "homepage": "https://github.com/2060-io/credo-ts-didcomm-ext/tree/main/packages/user-profile",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2060-io/credo-ts-didcomm-ext",
+    "directory": "packages/user-profile"
+  },
+  "scripts": {
+    "build": "tsdown --config ./tsdown.config.ts",
+    "clean": "rimraf -rf ./build",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1",
+    "@credo-ts/node": "^0.6.1",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-shared": "^0.4.3",
+    "ts-node-dev": "^1.1.8"
+  },
+  "peerDependencies": {
+    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1"
+  },
+  "dependencies": {
+    "class-transformer": "0.5.1",
+    "class-validator": "0.14.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0",
+    "tsyringe": "^4.8.0"
+  }
+}

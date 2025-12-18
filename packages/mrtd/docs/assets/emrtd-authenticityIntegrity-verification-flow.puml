@@ -1,0 +1,21 @@
+@startuml  eMRTD Authenticity & Integrity Verification Flow
+title eMRTD Authenticity & Integrity Verification Flow
+
+actor "AGENT" as C
+
+participant "MasterListService" as MLS
+participant "SodVerifierService" as SVS
+
+C -> MLS: initialize(masterListPath or URL)
+MLS -> MLS: Load & parse LDIF Master List\nExtract CSCA certificates
+MLS -> C: trustAnchors[]
+
+C -> SVS: verifySod(sodBuffer, dataGroups)
+SVS -> SVS: Check if SOD is TLV-wrapped (0x77)\nExtract DER if needed
+SVS -> SVS: Parse SOD ASN.1 (CMS SignedData)
+SVS -> SVS: Extract LDS Security Object & DataGroup hashes
+SVS -> SVS: For each DG provided:\n - Remove TLV if present\n - Hash and compare to SOD hash
+SVS -> SVS: Select signer cert from SOD
+SVS -> SVS: Validate signature chain using trustAnchors
+SVS -> C: { authenticity, integrity, details }
+@enduml

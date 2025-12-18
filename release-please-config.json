@@ -1,0 +1,32 @@
+{
+  "include-component-in-tag": true,
+  "include-v-in-tag": true,
+  "tag-separator": "@",
+  "separate-pull-requests": true,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "packages": {
+    "packages/calls": {
+      "release-type": "node"
+    },
+    "packages/media-sharing": {
+      "release-type": "node"
+    },
+    "packages/mrtd": {
+      "release-type": "node"
+    },
+    "packages/reactions": {
+      "release-type": "node"
+    },
+    "packages/receipts": {
+      "release-type": "node"
+    },
+    "packages/shorten-url": {
+      "release-type": "node"
+    },
+    "packages/user-profile": {
+      "release-type": "node"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

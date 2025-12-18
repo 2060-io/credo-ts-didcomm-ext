@@ -1,0 +1,347 @@
+import type { DidCommShortenUrlService } from '../src/DidCommShortenUrlService'
+import type { DidCommShortenUrlRepository } from '../src/repository'
+import type { AgentContext } from '@credo-ts/core'
+import type { DidCommConnectionService, DidCommMessageSender } from '@credo-ts/didcomm'
+
+import { vi, describe } from 'vitest'
+
+import { DidCommShortenUrlApi } from '../src/DidCommShortenUrlApi'
+import { RequestShortenedUrlMessage, ShortenedUrlMessage, InvalidateShortenedUrlMessage } from '../src/messages'
+import { ShortenUrlRole, ShortenUrlState } from '../src/models'
+import { DidCommShortenUrlRecord } from '../src/repository'
+
+describe('DidCommShortenUrlApi', () => {
+  const agentContext = {} as AgentContext
+  const connection = { id: 'conn-1' }
+
+  const createApi = () => {
+    const messageSenderMock = {
+      sendMessage: vi.fn().mockResolvedValue(undefined),
+    }
+    const shortenService = {
+      createRequest: vi.fn(),
+      createShortenedUrl: vi.fn(),
+      createInvalidate: vi.fn(),
+    }
+    const connectionServiceMock = {
+      getById: vi.fn().mockResolvedValue(connection),
+      findById: vi.fn().mockResolvedValue(connection),
+    }
+    const repositoryMock = {
+      save: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+      findSingleByQuery: vi.fn().mockResolvedValue(null),
+      getById: vi.fn(),
+      delete: vi.fn().mockResolvedValue(undefined),
+      deleteById: vi.fn().mockResolvedValue(undefined),
+    }
+
+    const api = new DidCommShortenUrlApi(
+      messageSenderMock as unknown as DidCommMessageSender,
+      shortenService as unknown as DidCommShortenUrlService,
+      repositoryMock as unknown as DidCommShortenUrlRepository,
+      connectionServiceMock as unknown as DidCommConnectionService,
+      agentContext,
+    )
+
+    return {
+      api,
+      messageSender: messageSenderMock,
+      shortenService,
+      connectionService: connectionServiceMock,
+      repository: repositoryMock,
+    }
+  }
+
+  it('deleteById should forward to repository', async () => {
+    const { api, repository } = createApi()
+
+    await expect(api.deleteById({ recordId: 'rec-1' })).resolves.toEqual({ recordId: 'rec-1' })
+    expect(repository.deleteById).toHaveBeenCalledWith(agentContext, 'rec-1')
+  })
+
+  it('requestShortenedUrl should store record and send message', async () => {
+    const { api, shortenService, repository, messageSender } = createApi()
+
+    const message = new RequestShortenedUrlMessage({
+      url: 'https://example.com',
+      goalCode: 'shorten',
+      requestedValiditySeconds: 3600,
+    })
+    shortenService.createRequest.mockReturnValue(message)
+
+    await api.requestShortenedUrl({
+      connectionId: 'conn-1',
+      url: 'https://example.com',
+      goalCode: 'shorten',
+      requestedValiditySeconds: 3600,
+    })
+
+    expect(repository.save).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({
+        connectionId: 'conn-1',
+        threadId: message.id,
+        role: ShortenUrlRole.LongUrlProvider,
+        state: ShortenUrlState.RequestSent,
+      }),
+    )
+    expect(messageSender.sendMessage).toHaveBeenCalled()
+  })
+
+  it('sendShortenedUrl should update existing record', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({
+      id: 'msg-1',
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    shortenService.createShortenedUrl.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.RequestReceived,
+      requestedValiditySeconds: 300,
+      createdAt: new Date('2024-01-01T00:00:00.000Z'),
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
+
+    const expectedExpires = new Date(existingRecord.createdAt!.getTime() + 300 * 1000)
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({
+        state: ShortenUrlState.ShortenedSent,
+        shortenedUrl: 'https://test.io/xyz',
+        expiresTime: expectedExpires,
+      }),
+    )
+    expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: expectedExpires,
+    })
+  })
+
+  it('sendShortenedUrl should error if shortened already sent', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({
+      id: 'msg-1',
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    shortenService.createShortenedUrl.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.ShortenedSent,
+      shortenedUrl: 'https://test.io/xyz',
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'Shortened URL already generated for record rec-1',
+    )
+  })
+
+  it('sendShortenedUrl should error if record already contains shortenedUrl', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({
+      id: 'msg-1',
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    shortenService.createShortenedUrl.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.RequestReceived,
+      shortenedUrl: 'https://test.io/old',
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'Shortened URL already generated for record rec-1',
+    )
+  })
+
+  it('sendShortenedUrl should error if the record was invalidated', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({
+      id: 'msg-1',
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+    })
+    shortenService.createShortenedUrl.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.InvalidationSent,
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await expect(api.sendShortenedUrl({ recordId: 'rec-1', shortenedUrl: 'https://test.io/new' })).rejects.toThrow(
+      'already invalidated',
+    )
+  })
+
+  it('invalidateShortenedUrl should require existing record', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    shortenService.createInvalidate.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.ShortenedReceived,
+      shortenedUrl: 'https://test.io/xyz',
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await api.invalidateShortenedUrl({ recordId: 'rec-1' })
+
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({
+        state: ShortenUrlState.InvalidationSent,
+        invalidationMessageId: message.id,
+      }),
+    )
+  })
+
+  it('invalidateShortenedUrl should throw if record lookup fails', async () => {
+    const { api, repository } = createApi()
+    repository.getById.mockRejectedValue(new Error('not found'))
+
+    await expect(api.invalidateShortenedUrl({ recordId: 'missing' })).rejects.toThrow('not found')
+  })
+
+  it('invalidateShortenedUrl should error if already invalidated', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    shortenService.createInvalidate.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.InvalidationSent,
+      shortenedUrl: 'https://test.io/xyz',
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already been invalidated')
+  })
+
+  it('invalidateShortenedUrl should error if already marked invalidated', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    shortenService.createInvalidate.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.Invalidated,
+      shortenedUrl: 'https://test.io/xyz',
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await expect(api.invalidateShortenedUrl({ recordId: 'rec-1' })).rejects.toThrow('already marked as invalidated')
+  })
+
+  it('invalidateShortenedUrl should allow invalidation even if the record is already expired', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new InvalidateShortenedUrlMessage({ shortenedUrl: 'https://test.io/xyz' })
+    shortenService.createInvalidate.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.LongUrlProvider,
+      state: ShortenUrlState.ShortenedReceived,
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: new Date(Date.now() - 60 * 60 * 1000),
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    await api.invalidateShortenedUrl({ recordId: 'rec-1' })
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({ state: ShortenUrlState.InvalidationSent }),
+    )
+  })
+
+  it('sendShortenedUrl should store provided expiresTime on existing record', async () => {
+    const { api, shortenService, repository } = createApi()
+
+    const message = new ShortenedUrlMessage({ threadId: 'rec-1', shortenedUrl: 'https://test.io/xyz' })
+    shortenService.createShortenedUrl.mockReturnValue(message)
+
+    const existingRecord = new DidCommShortenUrlRecord({
+      id: 'rec-1',
+      connectionId: 'conn-1',
+      threadId: 'rec-1',
+      role: ShortenUrlRole.UrlShortener,
+      state: ShortenUrlState.RequestReceived,
+      url: 'https://example.com',
+    })
+    repository.getById.mockResolvedValue(existingRecord)
+
+    const providedExpires = new Date('2024-02-01T10:00:00.000Z')
+
+    await api.sendShortenedUrl({
+      recordId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: providedExpires,
+    })
+
+    expect(repository.update).toHaveBeenCalledWith(
+      agentContext,
+      expect.objectContaining({
+        expiresTime: providedExpires,
+        shortenedUrl: 'https://test.io/xyz',
+      }),
+    )
+    expect(repository.save).not.toHaveBeenCalled()
+    expect(shortenService.createShortenedUrl).toHaveBeenCalledWith({
+      threadId: 'rec-1',
+      shortenedUrl: 'https://test.io/xyz',
+      expiresTime: providedExpires,
+    })
+  })
+})

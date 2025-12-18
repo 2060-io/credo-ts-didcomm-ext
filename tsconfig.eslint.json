@@ -7,12 +7,14 @@
   "include": [
     "packages",
     "./.eslintrc.js",
-    "./jest.config.ts",
-    "./jest.config.base.ts",
+    "./vitest.config.mts",
+    "./vitest.config.base.ts",
     "types",
     "tests",
     "samples",
-    "scripts"
+    "scripts",
+    "packages/*/vitest.config.mts",
+    "packages/*/tsdown.config.ts"
   ],
   "exclude": ["node_modules", "build"]
 }
