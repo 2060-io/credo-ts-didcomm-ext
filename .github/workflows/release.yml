@@ -60,6 +60,12 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Corepack pnpm
+        # OIDC publishing requires a very up to date npm version
+        run: |
+          npm install -g npm@latest
+          corepack enable
+
       # Ignore scripts so we don't need libindy setup
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
