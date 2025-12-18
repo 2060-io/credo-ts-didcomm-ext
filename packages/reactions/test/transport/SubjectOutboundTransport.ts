@@ -66,7 +66,12 @@ export class SubjectOutboundTransport implements DidCommOutboundTransport {
       next: async ({ message }: SubjectMessage) => {
         this.logger?.test('Received message')
 
-        await this.messageReceiver!.receiveMessage(message, { session })
+        const receiver = this.messageReceiver
+        if (!receiver) {
+          throw new CredoError('Outbound transport not ready: message receiver missing')
+        }
+
+        await receiver.receiveMessage(message, { session })
       },
       complete: cleanup,
     })
