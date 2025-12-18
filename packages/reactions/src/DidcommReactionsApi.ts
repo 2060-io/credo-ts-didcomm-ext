@@ -2,7 +2,7 @@ import { AgentContext, CredoError, injectable } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
 import { DidCommReactionsService } from './DidCommReactionsService'
-import { MessageReaction, type MessageReactionOptions } from './messages/MessageReactionsMessage'
+import { DidCommMessageReaction, type DidCommMessageReactionOptions } from './messages/DidCommMessageReactionsMessage'
 
 @injectable()
 export class DidCommReactionsApi {
@@ -23,7 +23,7 @@ export class DidCommReactionsApi {
     this.agentContext = agentContext
   }
 
-  public async send(options: { connectionId: string; reactions: MessageReactionOptions[] }) {
+  public async send(options: { connectionId: string; reactions: DidCommMessageReactionOptions[] }) {
     const connection = await this.connectionService.findById(this.agentContext, options.connectionId)
 
     if (!connection) {
@@ -31,7 +31,7 @@ export class DidCommReactionsApi {
     }
 
     const message = await this.reactionsService.createReactionsMessage({
-      reactions: options.reactions.map((item) => new MessageReaction(item)),
+      reactions: options.reactions.map((item) => new DidCommMessageReaction(item)),
     })
 
     await this.messageSender.sendMessage(

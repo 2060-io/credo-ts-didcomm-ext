@@ -59,12 +59,12 @@ const agent = new Agent({
 To send message reactions (e.g., emoji reactions or to remove a reaction):
 
 ```typescript
-const didcommReactions = [{ messageId: associatedMessageId ?? '', action: MessageReactionAction.React, emoji }]
+const didcommReactions = [{ messageId: associatedMessageId ?? '', action: DidCommMessageReactionAction.React, emoji }]
 
 // To remove a previous reaction:
 didcommReactions.push({
   messageId: associatedMessageId ?? '',
-  action: MessageReactionAction.Unreact,
+  action: DidCommMessageReactionAction.Unreact,
   emoji: myPreviousReaction.emoji,
 })
 
@@ -82,7 +82,7 @@ if (action.type === AgentActionType.SendReaction) {
     didcommConnectionId: string
     didcommReactions: {
       messageId: string
-      action: MessageReactionAction
+      action: DidCommMessageReactionAction
       emoji: string
     }[]
   }
@@ -94,7 +94,7 @@ if (action.type === AgentActionType.SendReaction) {
       connectionId: didcommConnectionId,
       reactions: didcommReactions,
     })
-    return { outgoingMessageType: MessageReactionsMessage.type.messageTypeUri }
+    return { outgoingMessageType: DidCommMessageReactionsMessage.type.messageTypeUri }
   }
 }
 ```
@@ -132,7 +132,7 @@ const messageReactionsReceivedListener = async (data: MessageReactionsReceivedEv
 }
 
 // Subscribe to the event
-agent.events.on('MessageReactionsReceived', messageReactionsReceivedListener)
+agent.events.on('DidCommMessageReactionsReceived', messageReactionsReceivedListener)
 ```
 
 ## Features
