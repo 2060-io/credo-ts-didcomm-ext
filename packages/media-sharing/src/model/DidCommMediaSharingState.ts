@@ -3,7 +3,7 @@
  * https://github.com/genaris/didcomm.org/tree/feat/media-sharing/site/content/protocols/media-sharing/1.0#states
  */
 
-export enum MediaSharingState {
+export enum DidCommMediaSharingState {
   Init = 'init',
   MediaRequested = 'media-requested',
   MediaShared = 'media-shared',

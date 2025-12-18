@@ -1,2 +1,2 @@
-export * from './RequestMediaHandler'
-export * from './ShareMediaHandler'
+export * from './DidCommRequestMediaHandler'
+export * from './DidCommShareMediaHandler'

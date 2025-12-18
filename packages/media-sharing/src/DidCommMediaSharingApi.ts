@@ -3,10 +3,10 @@ import type { Query, QueryOptions } from '@credo-ts/core'
 import { AgentContext, injectable } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
 
-import { MediaSharingRecord, SharedMediaItem, type SharedMediaItemOptions } from './repository'
-import { MediaSharingService } from './services'
+import { DidCommMediaSharingRecord, SharedMediaItem, type SharedMediaItemOptions } from './repository'
+import { DidCommMediaSharingService } from './services'
 
-export interface MediaSharingCreateOptions {
+export interface DidCommMediaSharingCreateOptions {
   connectionId: string
   parentThreadId?: string
   description?: string
@@ -14,14 +14,14 @@ export interface MediaSharingCreateOptions {
   items?: SharedMediaItem[]
 }
 
-export interface MediaSharingShareOptions {
+export interface DidCommMediaSharingShareOptions {
   recordId: string
   parentThreadId?: string
   description?: string
   items?: SharedMediaItemOptions[]
 }
 
-export interface MediaSharingRequestOptions {
+export interface DidCommMediaSharingRequestOptions {
   connectionId: string
   parentThreadId?: string
   description?: string
@@ -29,10 +29,10 @@ export interface MediaSharingRequestOptions {
 }
 
 @injectable()
-export class MediaSharingApi {
+export class DidCommMediaSharingApi {
   public constructor(
     private readonly messageSender: DidCommMessageSender,
-    private readonly mediaSharingService: MediaSharingService,
+    private readonly mediaSharingService: DidCommMediaSharingService,
     private readonly connectionService: DidCommConnectionService,
     private readonly agentContext: AgentContext,
   ) {}
@@ -41,7 +41,7 @@ export class MediaSharingApi {
    * Sender role: create a new shared media record (no actual message will be sent)
    *
    */
-  public async create(options: MediaSharingCreateOptions) {
+  public async create(options: DidCommMediaSharingCreateOptions) {
     const connection = await this.connectionService.getById(this.agentContext, options.connectionId)
 
     const record = await this.mediaSharingService.createRecord(this.agentContext, {
@@ -58,7 +58,7 @@ export class MediaSharingApi {
   /**
    * Sender role: share media, providing actual file description details
    */
-  public async share(options: MediaSharingShareOptions) {
+  public async share(options: DidCommMediaSharingShareOptions) {
     const record = await this.mediaSharingService.getById(this.agentContext, options.recordId)
     const connection = await this.connectionService.getById(this.agentContext, record.connectionId)
 
@@ -83,7 +83,7 @@ export class MediaSharingApi {
   /**
    * Receiver role: request media
    */
-  public async request(options: MediaSharingRequestOptions) {
+  public async request(options: DidCommMediaSharingRequestOptions) {
     const connection = await this.connectionService.getById(this.agentContext, options.connectionId)
 
     const { message: payload } = await this.mediaSharingService.createMediaRequest(this.agentContext, {
@@ -112,7 +112,7 @@ export class MediaSharingApi {
    *
    * @returns List containing all records
    */
-  public getAll(): Promise<MediaSharingRecord[]> {
+  public getAll(): Promise<DidCommMediaSharingRecord[]> {
     return this.mediaSharingService.getAll(this.agentContext)
   }
 
@@ -124,9 +124,9 @@ export class MediaSharingApi {
    * @returns  array containing all matching records
    */
   public async findAllByQuery(
-    query: Query<MediaSharingRecord>,
+    query: Query<DidCommMediaSharingRecord>,
     queryOptions?: QueryOptions,
-  ): Promise<MediaSharingRecord[]> {
+  ): Promise<DidCommMediaSharingRecord[]> {
     return this.mediaSharingService.findAllByQuery(this.agentContext, query, queryOptions)
   }
 
@@ -136,7 +136,7 @@ export class MediaSharingApi {
    * @param recordId the record id
    * @returns  the record or null if not found
    */
-  public findById(recordId: string): Promise<MediaSharingRecord | null> {
+  public findById(recordId: string): Promise<DidCommMediaSharingRecord | null> {
     return this.mediaSharingService.findById(this.agentContext, recordId)
   }
 
@@ -146,7 +146,7 @@ export class MediaSharingApi {
    * @param recordId the record id
    * @returns  the record or null if not found
    */
-  public findByThreadId(recordId: string): Promise<MediaSharingRecord | null> {
+  public findByThreadId(recordId: string): Promise<DidCommMediaSharingRecord | null> {
     return this.mediaSharingService.findByThreadId(this.agentContext, recordId)
   }
 }

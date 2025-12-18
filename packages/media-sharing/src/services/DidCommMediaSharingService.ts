@@ -1,25 +1,25 @@
 import type {
-  CreateMediaSharingRecordOptions,
-  RequestMediaSharingRecordOptions,
-  ShareMediaSharingRecordOptions,
-} from './MediaSharingServiceOptions'
+  DidCommCreateMediaSharingRecordOptions,
+  DidCommRequestMediaSharingRecordOptions,
+  DidCommShareMediaSharingRecordOptions,
+} from './DidCommMediaSharingServiceOptions'
 import type { Query, QueryOptions } from '@credo-ts/core'
 
 import { AgentContext, CredoError, EventEmitter } from '@credo-ts/core'
 import { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 import { Lifecycle, scoped } from 'tsyringe'
 
-import { MediaSharingEventTypes, type MediaSharingStateChangedEvent } from '../MediaSharingEvents'
-import { RequestMediaMessage, ShareMediaMessage } from '../messages'
-import { MediaSharingRole, MediaSharingState } from '../model'
-import { MediaSharingRepository, MediaSharingRecord, SharedMediaItem } from '../repository'
+import { DidCommMediaSharingEventTypes, type DidCommMediaSharingStateChangedEvent } from '../DidCommMediaSharingEvents'
+import { DidCommRequestMediaMessage, DidCommShareMediaMessage } from '../messages'
+import { DidCommMediaSharingRole, DidCommMediaSharingState } from '../model'
+import { DidCommMediaSharingRepository, DidCommMediaSharingRecord, SharedMediaItem } from '../repository'
 
 @scoped(Lifecycle.ContainerScoped)
-export class MediaSharingService {
-  private mediaSharingRepository: MediaSharingRepository
+export class DidCommMediaSharingService {
+  private mediaSharingRepository: DidCommMediaSharingRepository
   private eventEmitter: EventEmitter
 
-  public constructor(mediaSharingRepository: MediaSharingRepository, eventEmitter: EventEmitter) {
+  public constructor(mediaSharingRepository: DidCommMediaSharingRepository, eventEmitter: EventEmitter) {
     this.mediaSharingRepository = mediaSharingRepository
     this.eventEmitter = eventEmitter
   }
@@ -30,13 +30,13 @@ export class MediaSharingService {
    * @param options
    * @returns
    */
-  public async createRecord(agentContext: AgentContext, options: CreateMediaSharingRecordOptions) {
+  public async createRecord(agentContext: AgentContext, options: DidCommCreateMediaSharingRecordOptions) {
     // Create record
-    const record = new MediaSharingRecord({
+    const record = new DidCommMediaSharingRecord({
       connectionId: options.connectionRecord.id,
       parentThreadId: options.parentThreadId,
-      role: MediaSharingRole.Sender,
-      state: MediaSharingState.Init,
+      role: DidCommMediaSharingRole.Sender,
+      state: DidCommMediaSharingState.Init,
       description: options.description,
       items: options.items,
       metadata: options.metadata,
@@ -44,8 +44,8 @@ export class MediaSharingService {
 
     await this.mediaSharingRepository.save(agentContext, record)
 
-    this.eventEmitter.emit<MediaSharingStateChangedEvent>(agentContext, {
-      type: MediaSharingEventTypes.StateChanged,
+    this.eventEmitter.emit<DidCommMediaSharingStateChangedEvent>(agentContext, {
+      type: DidCommMediaSharingEventTypes.StateChanged,
       payload: {
         mediaSharingRecord: record,
         previousState: null,
@@ -60,7 +60,7 @@ export class MediaSharingService {
    * @param options
    * @returns
    */
-  public async createMediaShare(agentContext: AgentContext, options: ShareMediaSharingRecordOptions) {
+  public async createMediaShare(agentContext: AgentContext, options: DidCommShareMediaSharingRecordOptions) {
     const record = options.record
     const previousState = options.record.state
 
@@ -81,7 +81,7 @@ export class MediaSharingService {
     }
 
     // Create message
-    const message = new ShareMediaMessage({
+    const message = new DidCommShareMediaMessage({
       parentThreadId: record.parentThreadId,
       description: record.description,
       items: record.items,
@@ -89,12 +89,12 @@ export class MediaSharingService {
 
     // Update record
     record.threadId = message.id
-    record.state = MediaSharingState.MediaShared
+    record.state = DidCommMediaSharingState.MediaShared
 
     await this.mediaSharingRepository.update(agentContext, record)
 
-    this.eventEmitter.emit<MediaSharingStateChangedEvent>(agentContext, {
-      type: MediaSharingEventTypes.StateChanged,
+    this.eventEmitter.emit<DidCommMediaSharingStateChangedEvent>(agentContext, {
+      type: DidCommMediaSharingEventTypes.StateChanged,
       payload: {
         mediaSharingRecord: record,
         previousState: previousState,
@@ -109,9 +109,9 @@ export class MediaSharingService {
    * @param options
    * @returns
    */
-  public async createMediaRequest(agentContext: AgentContext, options: RequestMediaSharingRecordOptions) {
+  public async createMediaRequest(agentContext: AgentContext, options: DidCommRequestMediaSharingRecordOptions) {
     // Create message
-    const message = new RequestMediaMessage({
+    const message = new DidCommRequestMediaMessage({
       parentThreadId: options.parentThreadId,
       description: options.description,
       itemIds: options.itemIds,
@@ -120,7 +120,7 @@ export class MediaSharingService {
     return { message }
   }
 
-  public async processShareMedia(messageContext: DidCommInboundMessageContext<ShareMediaMessage>) {
+  public async processShareMedia(messageContext: DidCommInboundMessageContext<DidCommShareMediaMessage>) {
     const { message } = messageContext
 
     const record = await this.findByThreadId(messageContext.agentContext, message.threadId)
@@ -165,12 +165,12 @@ export class MediaSharingService {
       }
 
       // New record
-      const record = new MediaSharingRecord({
+      const record = new DidCommMediaSharingRecord({
         connectionId: connection.id,
         threadId: message.id,
         parentThreadId: messageContext.message.thread?.parentThreadId,
-        state: MediaSharingState.MediaShared,
-        role: MediaSharingRole.Receiver,
+        state: DidCommMediaSharingState.MediaShared,
+        role: DidCommMediaSharingRole.Receiver,
         items,
         description: message.description,
         sentTime: message.sentTime,
@@ -178,8 +178,8 @@ export class MediaSharingService {
 
       await this.mediaSharingRepository.save(messageContext.agentContext, record)
 
-      this.eventEmitter.emit<MediaSharingStateChangedEvent>(messageContext.agentContext, {
-        type: MediaSharingEventTypes.StateChanged,
+      this.eventEmitter.emit<DidCommMediaSharingStateChangedEvent>(messageContext.agentContext, {
+        type: DidCommMediaSharingEventTypes.StateChanged,
         payload: {
           mediaSharingRecord: record,
           previousState: null,
@@ -195,7 +195,7 @@ export class MediaSharingService {
    *
    * @returns List containing all auth code records
    */
-  public getAll(agentContext: AgentContext): Promise<MediaSharingRecord[]> {
+  public getAll(agentContext: AgentContext): Promise<DidCommMediaSharingRecord[]> {
     return this.mediaSharingRepository.getAll(agentContext)
   }
 
@@ -206,7 +206,7 @@ export class MediaSharingService {
    */
   public async findAllByQuery(
     agentContext: AgentContext,
-    mediaQuery: Query<MediaSharingRecord>,
+    mediaQuery: Query<DidCommMediaSharingRecord>,
     queryOptions?: QueryOptions,
   ) {
     return this.mediaSharingRepository.findByQuery(agentContext, mediaQuery, queryOptions)
@@ -220,7 +220,7 @@ export class MediaSharingService {
    * @return The record
    *
    */
-  public getById(agentContext: AgentContext, recordId: string): Promise<MediaSharingRecord> {
+  public getById(agentContext: AgentContext, recordId: string): Promise<DidCommMediaSharingRecord> {
     return this.mediaSharingRepository.getById(agentContext, recordId)
   }
 
@@ -230,7 +230,7 @@ export class MediaSharingService {
    * @param recordId record id
    * @returns The record or null if not found
    */
-  public findById(agentContext: AgentContext, recordId: string): Promise<MediaSharingRecord | null> {
+  public findById(agentContext: AgentContext, recordId: string): Promise<DidCommMediaSharingRecord | null> {
     return this.mediaSharingRepository.findById(agentContext, recordId)
   }
 
@@ -252,7 +252,7 @@ export class MediaSharingService {
    * @throws {RecordDuplicateError} If multiple records are found
    * @returns The media sharing record
    */
-  public async findByThreadId(agentContext: AgentContext, threadId: string): Promise<MediaSharingRecord | null> {
+  public async findByThreadId(agentContext: AgentContext, threadId: string): Promise<DidCommMediaSharingRecord | null> {
     return this.mediaSharingRepository.findSingleByQuery(agentContext, {
       threadId,
     })
@@ -267,7 +267,10 @@ export class MediaSharingService {
    * @throws {RecordDuplicateError} If multiple records are found
    * @returns The media sharing record
    */
-  public async findAllByConnectionId(agentContext: AgentContext, connectionId: string): Promise<MediaSharingRecord[]> {
+  public async findAllByConnectionId(
+    agentContext: AgentContext,
+    connectionId: string,
+  ): Promise<DidCommMediaSharingRecord[]> {
     return this.mediaSharingRepository.findByQuery(agentContext, {
       connectionId,
     })
@@ -279,7 +282,7 @@ export class MediaSharingService {
    * @param record
    * @returns
    */
-  public async update(agentContext: AgentContext, record: MediaSharingRecord) {
+  public async update(agentContext: AgentContext, record: DidCommMediaSharingRecord) {
     return await this.mediaSharingRepository.update(agentContext, record)
   }
 }

@@ -1,2 +1,2 @@
-export * from './MediaSharingRecord'
-export * from './MediaSharingRepository'
+export * from './DidCommMediaSharingRecord'
+export * from './DidCommMediaSharingRepository'
