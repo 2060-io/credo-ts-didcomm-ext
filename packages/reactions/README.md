@@ -6,7 +6,7 @@
     height="250px"
   />
 </p>
-<h1 align="center"><b>Credo extension module for Message Reactions protocol</b></h1>
+<h1 align="center"><b>Credo extension module for DIDComm Message Reactions protocol</b></h1>
 <p align="center">
   <a
     href="https://raw.githubusercontent.com/openwallet-foundation/credo-ts-ext/main/LICENSE"
