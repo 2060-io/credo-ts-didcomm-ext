@@ -4,7 +4,7 @@
   "main": "./build/index.mjs",
   "module": "./build/index.mjs",
   "types": "./build/index.d.mts",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "exports": {
     ".": {
       "types": "./build/index.d.mts",
