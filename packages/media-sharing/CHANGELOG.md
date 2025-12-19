@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.0.6...@2060.io/credo-ts-didcomm-media-sharing@v0.0.5) (2025-12-19)
+
+
+### Bug Fixes
+
+* force release ([ed33f37](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ed33f371a436e26d05ead13ba1cd9d4b92a63a4a))
+
 ## [0.0.6](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.0.5...@2060.io/credo-ts-didcomm-media-sharing@v0.0.6) (2025-12-18)
 
 
