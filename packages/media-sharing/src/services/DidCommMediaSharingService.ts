@@ -3,9 +3,10 @@ import type {
   DidCommRequestMediaSharingRecordOptions,
   DidCommShareMediaSharingRecordOptions,
 } from './DidCommMediaSharingServiceOptions'
+import type { Query, QueryOptions } from '@credo-ts/core'
 import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 
-import { Query, QueryOptions, AgentContext, EventEmitter, CredoError, injectable } from '@credo-ts/core'
+import { AgentContext, EventEmitter, CredoError, injectable } from '@credo-ts/core'
 
 import { DidCommMediaSharingEventTypes, type DidCommMediaSharingStateChangedEvent } from '../DidCommMediaSharingEvents'
 import { DidCommRequestMediaMessage, DidCommShareMediaMessage } from '../messages'
