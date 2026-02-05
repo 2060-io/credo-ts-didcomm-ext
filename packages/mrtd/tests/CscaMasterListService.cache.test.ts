@@ -1,7 +1,6 @@
-import type { FileSystem } from '@credo-ts/core/'
-import type { InjectionToken } from 'tsyringe'
+import type { FileSystem, InjectionToken, DependencyManager, AgentContext, Logger } from '@credo-ts/core'
 
-import { type DependencyManager, InjectionSymbols, LogLevel, type AgentContext, type Logger } from '@credo-ts/core'
+import { InjectionSymbols, LogLevel } from '@credo-ts/core'
 import { afterEach, describe, expect, test, vi, type Mock } from 'vitest'
 
 import { DidCommMrtdModuleConfig } from '../src/config/DidCommMrtdModuleConfig'

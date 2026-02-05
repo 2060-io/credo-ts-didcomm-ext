@@ -6,11 +6,11 @@ import type {
   MrzDataRequestedEvent,
 } from '../DidCommMrtdEvents'
 import type { SodVerification } from '../models/SodVerification'
+import type { AgentContext } from '@credo-ts/core'
 import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 
-import { AgentContext, EventEmitter } from '@credo-ts/core'
+import { EventEmitter } from '@credo-ts/core'
 import * as Mrz from 'mrz'
-import { Lifecycle, scoped } from 'tsyringe'
 
 import { MrtdEventTypes } from '../DidCommMrtdEvents'
 import { DidCommMrtdModuleConfig } from '../config/DidCommMrtdModuleConfig'
@@ -26,7 +26,6 @@ import { parseEMrtdData } from '../models'
 import { CscaMasterListService } from './CscaMasterListService'
 import { SodVerifierService } from './SodVerifierService'
 
-@scoped(Lifecycle.ContainerScoped)
 export class DidCommMrtdService {
   public createMrzData(options: { mrzData: string | string[]; threadId?: string }) {
     const { mrzData, threadId } = options

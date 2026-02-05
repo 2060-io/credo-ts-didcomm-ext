@@ -5,19 +5,17 @@ import type {
   UserProfileRequestedEvent,
   UserProfileUpdatedEvent,
 } from './UserProfileEvents'
-
-import { AgentContext, EventEmitter } from '@credo-ts/core'
-import { DidCommConnectionService, DidCommInboundMessageContext, DidCommConnectionRecord } from '@credo-ts/didcomm'
-import { Lifecycle, scoped } from 'tsyringe'
+import type { UserProfileRepository } from '../repository'
+import type { AgentContext, EventEmitter } from '@credo-ts/core'
+import type { DidCommConnectionService, DidCommInboundMessageContext, DidCommConnectionRecord } from '@credo-ts/didcomm'
 
 import { UserProfileModuleConfig } from '../DidCommUserProfileModuleConfig'
 import { DidCommRequestProfileMessage, DidCommProfileMessage } from '../messages'
 import { getConnectionProfile, setConnectionProfile } from '../model'
-import { UserProfileRepository, UserProfileRecord } from '../repository'
+import { UserProfileRecord } from '../repository'
 
 import { ProfileEventTypes } from './UserProfileEvents'
 
-@scoped(Lifecycle.ContainerScoped)
 export class DidCommUserProfileService {
   private userProfileRepository: UserProfileRepository
   private connectionService: DidCommConnectionService

@@ -1,9 +1,7 @@
-import { EventEmitter, InjectionSymbols, Repository, type StorageService } from '@credo-ts/core'
-import { inject, scoped, Lifecycle } from 'tsyringe'
+import { EventEmitter, InjectionSymbols, Repository, type StorageService, inject } from '@credo-ts/core'
 
 import { UserProfileRecord } from './UserProfileRecord'
 
-@scoped(Lifecycle.ContainerScoped)
 export class UserProfileRepository extends Repository<UserProfileRecord> {
   public readonly DEFAULT_USER_PROFILE_RECORD = 'DEFAULT_USER_PROFILE_RECORD'
 
