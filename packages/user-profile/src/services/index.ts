@@ -1,2 +1,2 @@
-export * from './UserProfileEvents'
-export * from './UserProfileService'
+export * from './DidCommUserProfileEvents'
+export * from './DidCommUserProfileService'

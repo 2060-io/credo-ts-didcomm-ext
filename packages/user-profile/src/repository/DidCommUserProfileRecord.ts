@@ -1,14 +1,14 @@
-import type { UserProfileData, PictureData } from '../model'
+import type { DidCommUserProfileData, PictureData } from '../model'
 
 import { BaseRecord, utils, type TagsBase } from '@credo-ts/core'
 
-export interface UserProfileStorageProps extends UserProfileData {
+export interface UserProfileStorageProps extends DidCommUserProfileData {
   id?: string
   createdAt?: Date
 }
 
 // TODO: Store more data than display name, display picture and description
-export class UserProfileRecord extends BaseRecord implements UserProfileStorageProps {
+export class DidCommUserProfileRecord extends BaseRecord implements UserProfileStorageProps {
   public displayName?: string
   public displayPicture?: PictureData | null | ''
   public displayIcon?: PictureData | null | ''
@@ -16,7 +16,7 @@ export class UserProfileRecord extends BaseRecord implements UserProfileStorageP
   public preferredLanguage?: string
 
   public static readonly type = 'UserProfileRecord'
-  public readonly type = UserProfileRecord.type
+  public readonly type = DidCommUserProfileRecord.type
 
   public constructor(props: UserProfileStorageProps) {
     super()

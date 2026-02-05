@@ -1,6 +1,6 @@
 import './setup'
 
-import type { ConnectionProfileUpdatedEvent, UserProfileRequestedEvent } from '../src/services'
+import type { DidCommConnectionProfileUpdatedEvent, DidCommUserProfileRequestedEvent } from '../src/services'
 import type { DidCommConnectionRecord, DidCommEncryptedMessage } from '@credo-ts/didcomm'
 
 import { AskarModule } from '@credo-ts/askar'
@@ -12,7 +12,7 @@ import { filter, firstValueFrom, map, Subject, timeout } from 'rxjs'
 
 import { DidCommUserProfileModule } from '../src/DidCommUserProfileModule'
 import { getConnectionProfile } from '../src/model'
-import { ProfileEventTypes } from '../src/services'
+import { DidCommProfileEventTypes } from '../src/services'
 
 import { SubjectInboundTransport } from './transport/SubjectInboundTransport'
 import { SubjectOutboundTransport } from './transport/SubjectOutboundTransport'
@@ -110,11 +110,15 @@ describe('profile test', () => {
 
   test('Send stored profile', async () => {
     const profileReceivedPromise = firstValueFrom(
-      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
-        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
-        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommConnectionProfileUpdatedEvent>(DidCommProfileEventTypes.ConnectionProfileUpdated)
+        .pipe(
+          filter(
+            (event: DidCommConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id,
+          ),
+          map((event: DidCommConnectionProfileUpdatedEvent) => event.payload.profile),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.profile.updateUserProfileData({
@@ -137,11 +141,15 @@ describe('profile test', () => {
 
   test('Send stored profile with removed displayPicture and displayIcon', async () => {
     const profileReceivedPromise = firstValueFrom(
-      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
-        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
-        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommConnectionProfileUpdatedEvent>(DidCommProfileEventTypes.ConnectionProfileUpdated)
+        .pipe(
+          filter(
+            (event: DidCommConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id,
+          ),
+          map((event: DidCommConnectionProfileUpdatedEvent) => event.payload.profile),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.profile.updateUserProfileData({
@@ -166,11 +174,15 @@ describe('profile test', () => {
 
   test('Send stored profile with no changes in displayPicture and displayIcon', async () => {
     const profileReceivedPromise = firstValueFrom(
-      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
-        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
-        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommConnectionProfileUpdatedEvent>(DidCommProfileEventTypes.ConnectionProfileUpdated)
+        .pipe(
+          filter(
+            (event: DidCommConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id,
+          ),
+          map((event: DidCommConnectionProfileUpdatedEvent) => event.payload.profile),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.profile.updateUserProfileData({
@@ -193,11 +205,15 @@ describe('profile test', () => {
 
   test('Send custom profile', async () => {
     const profileReceivedPromise = firstValueFrom(
-      aliceAgent.events.observable<ConnectionProfileUpdatedEvent>(ProfileEventTypes.ConnectionProfileUpdated).pipe(
-        filter((event: ConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
-        map((event: ConnectionProfileUpdatedEvent) => event.payload.profile),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommConnectionProfileUpdatedEvent>(DidCommProfileEventTypes.ConnectionProfileUpdated)
+        .pipe(
+          filter(
+            (event: DidCommConnectionProfileUpdatedEvent) => event.payload.connection.id === aliceConnectionRecord.id,
+          ),
+          map((event: DidCommConnectionProfileUpdatedEvent) => event.payload.profile),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.profile.sendUserProfile({
@@ -231,11 +247,13 @@ describe('profile test', () => {
 
   test('Request profile', async () => {
     const profileRequestedPromise = firstValueFrom(
-      aliceAgent.events.observable<UserProfileRequestedEvent>(ProfileEventTypes.UserProfileRequested).pipe(
-        filter((event: UserProfileRequestedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
-        map((event: UserProfileRequestedEvent) => event.payload.query),
-        timeout(5000),
-      ),
+      aliceAgent.events
+        .observable<DidCommUserProfileRequestedEvent>(DidCommProfileEventTypes.UserProfileRequested)
+        .pipe(
+          filter((event: DidCommUserProfileRequestedEvent) => event.payload.connection.id === aliceConnectionRecord.id),
+          map((event: DidCommUserProfileRequestedEvent) => event.payload.query),
+          timeout(5000),
+        ),
     )
 
     await bobAgent.modules.profile.requestUserProfile({ connectionId: bobConnectionRecord.id })

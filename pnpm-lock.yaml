@@ -79,7 +79,7 @@ importers:
         specifier: 0.14.1
         version: 0.14.1
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
     devDependencies:
       '@credo-ts/askar':
@@ -134,7 +134,7 @@ importers:
         specifier: ^7.2.0
         version: 7.8.2
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
       uuid:
         specifier: ^9.0.0
@@ -178,10 +178,10 @@ importers:
     dependencies:
       '@credo-ts/didcomm':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@li0ard/tsemrtd':
         specifier: ^0.3.4
-        version: 0.3.4(typescript@5.3.3)
+        version: 0.3.4(typescript@5.9.3)
       '@peculiar/asn1-x509':
         specifier: ^2.6.0
         version: 2.6.0
@@ -216,18 +216,18 @@ importers:
         specifier: ^7.2.0
         version: 7.8.2
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
     devDependencies:
       '@credo-ts/askar':
         specifier: ^0.6.1
-        version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.3.3)
+        version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.9.3)
       '@credo-ts/core':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/node':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@openwallet-foundation/askar-nodejs':
         specifier: ^0.4.3
         version: 0.4.3
@@ -236,7 +236,7 @@ importers:
         version: 0.4.3
       ts-node-dev:
         specifier: ^1.1.8
-        version: 1.1.8(typescript@5.3.3)
+        version: 1.1.8(typescript@5.9.3)
 
   packages/reactions:
     dependencies:
@@ -302,7 +302,7 @@ importers:
         specifier: ^7.2.0
         version: 7.8.2
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
       uuid:
         specifier: ^9.0.0
@@ -345,7 +345,7 @@ importers:
         specifier: ^0.1.13
         version: 0.1.14
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
     devDependencies:
       '@credo-ts/askar':
@@ -382,21 +382,21 @@ importers:
         specifier: ^7.2.0
         version: 7.8.2
       tsyringe:
-        specifier: ^4.8.0
+        specifier: ^4.10.0
         version: 4.10.0
     devDependencies:
       '@credo-ts/askar':
         specifier: ^0.6.1
-        version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.3.3)
+        version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.9.3)
       '@credo-ts/core':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/didcomm':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/node':
         specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
+        version: 0.6.1(typescript@5.9.3)
       '@openwallet-foundation/askar-nodejs':
         specifier: ^0.4.3
         version: 0.4.3
@@ -405,7 +405,7 @@ importers:
         version: 0.4.3
       ts-node-dev:
         specifier: ^1.1.8
-        version: 1.1.8(typescript@5.3.3)
+        version: 1.1.8(typescript@5.9.3)
 
 packages:
 
@@ -1074,6 +1074,7 @@ packages:
 
   '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.26':
     resolution: {integrity: sha512-QXJ6R8ENiZV2rPMbn06cw5JKwqUYN1kzVRbYfONqE1PEXx1noQ4md7uxr2zSczi0ubKkNcbyYDNtIMTZIhGzmQ==}
+    bundledDependencies: []
 
   '@sphereon/pex-models@2.3.2':
     resolution: {integrity: sha512-foFxfLkRwcn/MOp/eht46Q7wsvpQGlO7aowowIIb5Tz9u97kYZ2kz6K2h2ODxWuv5CRA7Q0MY8XUBGE2lfOhOQ==}
@@ -4070,17 +4071,17 @@ snapshots:
     dependencies:
       '@js-joda/core': 5.6.3
 
-  '@li0ard/tinytlv@0.1.1(typescript@5.3.3)':
+  '@li0ard/tinytlv@0.1.1(typescript@5.9.3)':
     dependencies:
-      typescript: 5.3.3
+      typescript: 5.9.3
 
-  '@li0ard/tsemrtd@0.3.4(typescript@5.3.3)':
+  '@li0ard/tsemrtd@0.3.4(typescript@5.9.3)':
     dependencies:
-      '@li0ard/tinytlv': 0.1.1(typescript@5.3.3)
+      '@li0ard/tinytlv': 0.1.1(typescript@5.9.3)
       '@peculiar/asn1-cms': 2.6.0
       '@peculiar/asn1-schema': 2.6.0
       '@peculiar/asn1-x509': 2.6.0
-      typescript: 5.3.3
+      typescript: 5.9.3
 
   '@mapbox/node-pre-gyp@1.0.11':
     dependencies:
@@ -6817,7 +6818,7 @@ snapshots:
     dependencies:
       typescript: 5.3.3
 
-  ts-node-dev@1.1.8(typescript@5.3.3):
+  ts-node-dev@1.1.8(typescript@5.9.3):
     dependencies:
       chokidar: 3.6.0
       dynamic-dedupe: 0.3.0
@@ -6827,9 +6828,9 @@ snapshots:
       rimraf: 2.7.1
       source-map-support: 0.5.21
       tree-kill: 1.2.2
-      ts-node: 9.1.1(typescript@5.3.3)
+      ts-node: 9.1.1(typescript@5.9.3)
       tsconfig: 7.0.0
-      typescript: 5.3.3
+      typescript: 5.9.3
 
   ts-node-dev@2.0.0(@types/node@18.19.130)(typescript@5.9.3):
     dependencies:
@@ -6885,14 +6886,14 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  ts-node@9.1.1(typescript@5.3.3):
+  ts-node@9.1.1(typescript@5.9.3):
     dependencies:
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
       source-map-support: 0.5.21
-      typescript: 5.3.3
+      typescript: 5.9.3
       yn: 3.1.1
 
   tsconfig-paths@3.15.0:

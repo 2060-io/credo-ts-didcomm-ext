@@ -6,7 +6,7 @@ export interface PictureData {
   base64?: string
 }
 
-export interface UserProfileData {
+export interface DidCommUserProfileData {
   displayName?: string
   displayPicture?: PictureData | null | ''
   displayIcon?: PictureData | null | ''
@@ -14,6 +14,6 @@ export interface UserProfileData {
   preferredLanguage?: string
 }
 
-export interface GetUserProfileDataReturnType extends UserProfileData {
+export interface GetUserProfileDataReturnType extends DidCommUserProfileData {
   updatedAt: BaseRecord['updatedAt']
 }

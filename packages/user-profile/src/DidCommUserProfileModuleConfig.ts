@@ -2,7 +2,7 @@
  * UserProfileModuleConfigOptions defines the interface for the options of the UserProfileModuleConfig class.
  * This can contain optional parameters that have default values in the config class itself.
  */
-export interface UserProfileModuleConfigOptions {
+export interface DidCommUserProfileModuleConfigOptions {
   /**
    * Whether to automatically send our profile when asked to do so.
    *
@@ -11,17 +11,17 @@ export interface UserProfileModuleConfigOptions {
   autoSendProfile?: boolean
 }
 
-export class UserProfileModuleConfig {
+export class DidCommUserProfileModuleConfig {
   #autoSendProfile?: boolean
 
-  private options: UserProfileModuleConfigOptions
+  private options: DidCommUserProfileModuleConfigOptions
 
-  public constructor(options?: UserProfileModuleConfigOptions) {
+  public constructor(options?: DidCommUserProfileModuleConfigOptions) {
     this.options = options ?? {}
     this.#autoSendProfile = this.options.autoSendProfile
   }
 
-  /** See {@link UserProfileModuleConfigOptions.autoSendProfile} */
+  /** See {@link DidCommUserProfileModuleConfigOptions.autoSendProfile} */
   public get autoSendProfile() {
     return this.#autoSendProfile ?? true
   }
