@@ -3,16 +3,16 @@ import type { DependencyManager, Module, AgentContext } from '@credo-ts/core'
 import { DidCommFeatureRegistry, DidCommMessageHandlerRegistry, DidCommProtocol } from '@credo-ts/didcomm'
 
 import { DidCommUserProfileApi } from './DidCommUserProfileApi'
-import { UserProfileModuleConfig } from './DidCommUserProfileModuleConfig'
+import { DidCommUserProfileModuleConfig } from './DidCommUserProfileModuleConfig'
 import { DidCommProfileHandler, DidCommRequestProfileHandler } from './handlers'
 import { DidCommUserProfileService } from './services'
 
 export class DidCommUserProfileModule implements Module {
-  public readonly config: UserProfileModuleConfig
+  public readonly config: DidCommUserProfileModuleConfig
   public readonly api = DidCommUserProfileApi
 
-  public constructor(config?: UserProfileModuleConfig) {
-    this.config = new UserProfileModuleConfig(config)
+  public constructor(config?: DidCommUserProfileModuleConfig) {
+    this.config = new DidCommUserProfileModuleConfig(config)
   }
 
   /**
@@ -23,7 +23,7 @@ export class DidCommUserProfileModule implements Module {
     dependencyManager.registerContextScoped(DidCommUserProfileApi)
 
     // Config
-    dependencyManager.registerInstance(UserProfileModuleConfig, this.config)
+    dependencyManager.registerInstance(DidCommUserProfileModuleConfig, this.config)
 
     // Services
     dependencyManager.registerSingleton(DidCommUserProfileService)

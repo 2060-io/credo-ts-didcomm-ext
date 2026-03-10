@@ -4,17 +4,16 @@ import type {
   DidCommShareMediaSharingRecordOptions,
 } from './DidCommMediaSharingServiceOptions'
 import type { Query, QueryOptions } from '@credo-ts/core'
+import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 
-import { AgentContext, CredoError, EventEmitter } from '@credo-ts/core'
-import { DidCommInboundMessageContext } from '@credo-ts/didcomm'
-import { Lifecycle, scoped } from 'tsyringe'
+import { AgentContext, EventEmitter, CredoError, injectable } from '@credo-ts/core'
 
 import { DidCommMediaSharingEventTypes, type DidCommMediaSharingStateChangedEvent } from '../DidCommMediaSharingEvents'
 import { DidCommRequestMediaMessage, DidCommShareMediaMessage } from '../messages'
 import { DidCommMediaSharingRole, DidCommMediaSharingState } from '../model'
-import { DidCommMediaSharingRepository, DidCommMediaSharingRecord, SharedMediaItem } from '../repository'
+import { DidCommMediaSharingRepository, SharedMediaItem, DidCommMediaSharingRecord } from '../repository'
 
-@scoped(Lifecycle.ContainerScoped)
+@injectable()
 export class DidCommMediaSharingService {
   private mediaSharingRepository: DidCommMediaSharingRepository
   private eventEmitter: EventEmitter

@@ -1,9 +1,9 @@
-import type { UserProfileData } from '../model'
+import type { DidCommUserProfileData } from '../model'
 import type { ParsedMessageType } from '@credo-ts/didcomm'
 
 import { DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
 
-export type DidCommUserProfileKey = string | keyof UserProfileData
+export type DidCommUserProfileKey = string | keyof DidCommUserProfileData
 
 export interface DidCommGetProfileMessageOptions {
   id?: string

@@ -1,4 +1,4 @@
-import type { UserProfileData, GetUserProfileDataReturnType } from './model'
+import type { DidCommUserProfileData, GetUserProfileDataReturnType } from './model'
 
 import { AgentContext, injectable } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommMessageSender, DidCommOutboundMessageContext } from '@credo-ts/didcomm'
@@ -43,7 +43,7 @@ export class DidCommUserProfileApi {
     connectionId: string
     threadId?: string
     parentThreadId?: string
-    profileData?: Partial<UserProfileData> | Record<string, unknown>
+    profileData?: Partial<DidCommUserProfileData> | Record<string, unknown>
     sendBackYours?: boolean
   }) {
     const { connectionId, profileData, sendBackYours, threadId, parentThreadId } = options
@@ -76,7 +76,7 @@ export class DidCommUserProfileApi {
    *
    * @returns updated User Profile data
    */
-  public async updateUserProfileData(props: Partial<UserProfileData>) {
+  public async updateUserProfileData(props: Partial<DidCommUserProfileData>) {
     await this.userProfileService.updateUserProfile(this.agentContext, props)
     return await this.getUserProfileData()
   }

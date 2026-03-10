@@ -1,8 +1,7 @@
 import type { MessageReceiptsReceivedEvent, RequestReceiptsReceivedEvent } from './ReceiptsEvents'
 import type { DidCommInboundMessageContext } from '@credo-ts/didcomm'
 
-import { EventEmitter } from '@credo-ts/core'
-import { Lifecycle, scoped } from 'tsyringe'
+import { injectable, EventEmitter } from '@credo-ts/core'
 
 import {
   DidCommMessageReceiptsMessage,
@@ -13,7 +12,7 @@ import {
 
 import { ReceiptsEventTypes } from './ReceiptsEvents'
 
-@scoped(Lifecycle.ContainerScoped)
+@injectable()
 export class DidCommReceiptsService {
   private eventEmitter: EventEmitter
 

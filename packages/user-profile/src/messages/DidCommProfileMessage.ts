@@ -1,4 +1,4 @@
-import type { PictureData, UserProfileData } from '../model'
+import type { PictureData, DidCommUserProfileData } from '../model'
 import type { ParsedMessageType } from '@credo-ts/didcomm'
 
 import { DidCommAttachment, DidCommMessage, IsValidMessageType, parseMessageType } from '@credo-ts/didcomm'
@@ -7,7 +7,7 @@ import { IsBoolean, IsOptional } from 'class-validator'
 
 export interface DidCommProfileMessageOptions {
   id?: string
-  profile: Partial<UserProfileData> | Record<string, unknown>
+  profile: Partial<DidCommUserProfileData> | Record<string, unknown>
   threadId?: string
   parentThreadId?: string
   sendBackYours?: boolean

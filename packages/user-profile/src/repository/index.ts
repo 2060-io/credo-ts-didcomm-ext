@@ -1,2 +1,2 @@
-export * from './UserProfileRecord'
-export * from './UserProfileRepository'
+export * from './DidCommUserProfileRecord'
+export * from './DidCommUserProfileRepository'

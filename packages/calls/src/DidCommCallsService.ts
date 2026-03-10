@@ -1,13 +1,10 @@
 import type { DidCommCallType } from './messages/CallOfferMessage'
 
-import { Lifecycle, scoped } from 'tsyringe'
-
 import { CallAcceptMessage } from './messages/CallAcceptMessage'
 import { CallEndMessage } from './messages/CallEndMessage'
 import { CallOfferMessage } from './messages/CallOfferMessage'
 import { CallRejectMessage } from './messages/CallRejectMessage'
 
-@scoped(Lifecycle.ContainerScoped)
 export class DidCommCallsService {
   public createOffer(options: {
     callType: DidCommCallType

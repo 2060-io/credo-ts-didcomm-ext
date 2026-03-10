@@ -1,30 +1,29 @@
 import type { DidCommGetProfileMessageOptions, DidCommProfileMessageOptions } from '../messages'
-import type { UserProfileData } from '../model'
+import type { DidCommUserProfileData } from '../model'
 import type {
-  ConnectionProfileUpdatedEvent,
-  UserProfileRequestedEvent,
-  UserProfileUpdatedEvent,
-} from './UserProfileEvents'
+  DidCommConnectionProfileUpdatedEvent,
+  DidCommUserProfileRequestedEvent,
+  DidCommUserProfileUpdatedEvent,
+} from './DidCommUserProfileEvents'
 
-import { AgentContext, EventEmitter } from '@credo-ts/core'
+import { injectable, AgentContext, EventEmitter } from '@credo-ts/core'
 import { DidCommConnectionService, DidCommInboundMessageContext, DidCommConnectionRecord } from '@credo-ts/didcomm'
-import { Lifecycle, scoped } from 'tsyringe'
 
-import { UserProfileModuleConfig } from '../DidCommUserProfileModuleConfig'
+import { DidCommUserProfileModuleConfig } from '../DidCommUserProfileModuleConfig'
 import { DidCommRequestProfileMessage, DidCommProfileMessage } from '../messages'
 import { getConnectionProfile, setConnectionProfile } from '../model'
-import { UserProfileRepository, UserProfileRecord } from '../repository'
+import { DidCommUserProfileRepository, DidCommUserProfileRecord } from '../repository'
 
-import { ProfileEventTypes } from './UserProfileEvents'
+import { DidCommProfileEventTypes } from './DidCommUserProfileEvents'
 
-@scoped(Lifecycle.ContainerScoped)
+@injectable()
 export class DidCommUserProfileService {
-  private userProfileRepository: UserProfileRepository
+  private userProfileRepository: DidCommUserProfileRepository
   private connectionService: DidCommConnectionService
   private eventEmitter: EventEmitter
 
   public constructor(
-    userProfileRepository: UserProfileRepository,
+    userProfileRepository: DidCommUserProfileRepository,
     connectionService: DidCommConnectionService,
     eventEmitter: EventEmitter,
   ) {
@@ -40,7 +39,7 @@ export class DidCommUserProfileService {
    *
    * @returns updated User Profile Record
    */
-  public async updateUserProfile(agentContext: AgentContext, props: Partial<UserProfileData>) {
+  public async updateUserProfile(agentContext: AgentContext, props: Partial<DidCommUserProfileData>) {
     const userProfile = await this.getUserProfile(agentContext)
     const previousUserProfileData = {
       displayName: userProfile.displayName,
@@ -51,8 +50,8 @@ export class DidCommUserProfileService {
     Object.assign(userProfile, props)
     await this.userProfileRepository.update(agentContext, userProfile)
 
-    this.eventEmitter.emit<UserProfileUpdatedEvent>(agentContext, {
-      type: ProfileEventTypes.UserProfileUpdated,
+    this.eventEmitter.emit<DidCommUserProfileUpdatedEvent>(agentContext, {
+      type: DidCommProfileEventTypes.UserProfileUpdated,
       payload: {
         userProfile,
         previousUserProfileData,
@@ -68,7 +67,7 @@ export class DidCommUserProfileService {
    *
    * @returns User Profile Record
    */
-  public async getUserProfile(agentContext: AgentContext): Promise<UserProfileRecord> {
+  public async getUserProfile(agentContext: AgentContext): Promise<DidCommUserProfileRecord> {
     let userProfileRecord = await this.userProfileRepository.findById(
       agentContext,
       this.userProfileRepository.DEFAULT_USER_PROFILE_RECORD,
@@ -76,7 +75,7 @@ export class DidCommUserProfileService {
 
     // If we don't have an user profile record yet, create it
     if (!userProfileRecord) {
-      userProfileRecord = new UserProfileRecord({
+      userProfileRecord = new DidCommUserProfileRecord({
         id: this.userProfileRepository.DEFAULT_USER_PROFILE_RECORD,
       })
       await this.userProfileRepository.save(agentContext, userProfileRecord)
@@ -102,7 +101,7 @@ export class DidCommUserProfileService {
       : undefined
 
     // TODO: use composed objects
-    const newProfile: UserProfileData = {
+    const newProfile: DidCommUserProfileData = {
       ...receivedProfile,
       displayPicture: displayPictureData
         ? {
@@ -133,8 +132,8 @@ export class DidCommUserProfileService {
 
     await this.connectionService.update(agentContext, connection)
 
-    this.eventEmitter.emit<ConnectionProfileUpdatedEvent>(agentContext, {
-      type: ProfileEventTypes.ConnectionProfileUpdated,
+    this.eventEmitter.emit<DidCommConnectionProfileUpdatedEvent>(agentContext, {
+      type: DidCommProfileEventTypes.ConnectionProfileUpdated,
       payload: {
         connection,
         profile: getConnectionProfile(connection) ?? {},
@@ -143,7 +142,7 @@ export class DidCommUserProfileService {
         parentThreadId: messageContext.message.thread?.parentThreadId,
       },
     })
-    const config = messageContext.agentContext.dependencyManager.resolve(UserProfileModuleConfig)
+    const config = messageContext.agentContext.dependencyManager.resolve(DidCommUserProfileModuleConfig)
     if (messageContext.message.sendBackYours && config.autoSendProfile) {
       return this.createProfileMessageAsReply(agentContext, connection, messageContext.message.threadId)
     }
@@ -164,8 +163,8 @@ export class DidCommUserProfileService {
   public async processRequestProfile(messageContext: DidCommInboundMessageContext<DidCommRequestProfileMessage>) {
     const connection = messageContext.assertReadyConnection()
 
-    this.eventEmitter.emit<UserProfileRequestedEvent>(messageContext.agentContext, {
-      type: ProfileEventTypes.UserProfileRequested,
+    this.eventEmitter.emit<DidCommUserProfileRequestedEvent>(messageContext.agentContext, {
+      type: DidCommProfileEventTypes.UserProfileRequested,
       payload: {
         connection,
         query: messageContext.message.query,
@@ -174,7 +173,7 @@ export class DidCommUserProfileService {
       },
     })
 
-    const config = messageContext.agentContext.dependencyManager.resolve(UserProfileModuleConfig)
+    const config = messageContext.agentContext.dependencyManager.resolve(DidCommUserProfileModuleConfig)
 
     if (config.autoSendProfile) {
       return await this.createProfileMessageAsReply(
@@ -191,7 +190,7 @@ export class DidCommUserProfileService {
     threadId: string,
   ) {
     const userProfile = await this.getUserProfile(agentContext)
-    const profile: UserProfileData = {
+    const profile: DidCommUserProfileData = {
       displayName: userProfile.displayName,
       displayPicture: userProfile.displayPicture,
       displayIcon: userProfile.displayIcon,
