@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-reactions@v0.0.5...@2060.io/credo-ts-didcomm-reactions@v0.1.0) (2026-03-10)
+
+
+### Miscellaneous Chores
+
+* release 0.1.0 ([8467a7d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/8467a7d9fb7f0ce3ad745803793d56d48351e3b6))
+
 ## [0.0.5](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-reactions@v0.0.4...@2060.io/credo-ts-didcomm-reactions@v0.0.5) (2025-12-19)
 
 
