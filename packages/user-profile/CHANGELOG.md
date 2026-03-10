@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.0](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.8...@2060.io/credo-ts-didcomm-user-profile@v0.1.0) (2026-03-10)
+
+
+### Bug Fixes
+
+* force release ([ed33f37](https://github.com/2060-io/credo-ts-didcomm-ext/commit/ed33f371a436e26d05ead13ba1cd9d4b92a63a4a))
+* tsyringe imports ([#158](https://github.com/2060-io/credo-ts-didcomm-ext/issues/158)) ([6acee41](https://github.com/2060-io/credo-ts-didcomm-ext/commit/6acee41a59cb2a9f964454e7ca95c3f6a612037e))
+
+
+### Miscellaneous Chores
+
+* release 0.1.0 ([8467a7d](https://github.com/2060-io/credo-ts-didcomm-ext/commit/8467a7d9fb7f0ce3ad745803793d56d48351e3b6))
+
 ## [0.0.8](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-user-profile@v0.0.7...@2060.io/credo-ts-didcomm-user-profile@v0.0.8) (2025-12-18)
 
 
