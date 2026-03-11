@@ -39,6 +39,7 @@
   "devDependencies": {
     "@credo-ts/askar": "^0.6.1",
     "@credo-ts/core": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1",
     "@credo-ts/node": "^0.6.1",
     "@openwallet-foundation/askar-nodejs": "^0.4.3",
     "@openwallet-foundation/askar-shared": "^0.4.3",

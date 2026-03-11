@@ -115,12 +115,6 @@ importers:
 
   packages/media-sharing:
     dependencies:
-      '@credo-ts/core':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
-      '@credo-ts/didcomm':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -143,6 +137,12 @@ importers:
       '@credo-ts/askar':
         specifier: ^0.6.1
         version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.9.3)
+      '@credo-ts/core':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.9.3)
+      '@credo-ts/didcomm':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/node':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.9.3)
@@ -176,9 +176,6 @@ importers:
 
   packages/mrtd:
     dependencies:
-      '@credo-ts/didcomm':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
       '@li0ard/tsemrtd':
         specifier: ^0.3.4
         version: 0.3.4(typescript@5.9.3)
@@ -225,6 +222,9 @@ importers:
       '@credo-ts/core':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.9.3)
+      '@credo-ts/didcomm':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/node':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.9.3)
@@ -240,12 +240,6 @@ importers:
 
   packages/reactions:
     dependencies:
-      '@credo-ts/core':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
-      '@credo-ts/didcomm':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -265,6 +259,12 @@ importers:
       '@credo-ts/askar':
         specifier: ^0.6.1
         version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.3.3)
+      '@credo-ts/core':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.3.3)
+      '@credo-ts/didcomm':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.3.3)
       '@credo-ts/node':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.3.3)
@@ -283,12 +283,6 @@ importers:
 
   packages/receipts:
     dependencies:
-      '@credo-ts/core':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
-      '@credo-ts/didcomm':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.3.3)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -311,6 +305,12 @@ importers:
       '@credo-ts/askar':
         specifier: ^0.6.1
         version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.3.3)
+      '@credo-ts/core':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.3.3)
+      '@credo-ts/didcomm':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.3.3)
       '@credo-ts/node':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.3.3)
@@ -329,12 +329,6 @@ importers:
 
   packages/shorten-url:
     dependencies:
-      '@credo-ts/core':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
-      '@credo-ts/didcomm':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -351,6 +345,12 @@ importers:
       '@credo-ts/askar':
         specifier: ^0.6.1
         version: 0.6.1(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.9.3)
+      '@credo-ts/core':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.9.3)
+      '@credo-ts/didcomm':
+        specifier: ^0.6.1
+        version: 0.6.1(typescript@5.9.3)
       '@credo-ts/node':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.9.3)
