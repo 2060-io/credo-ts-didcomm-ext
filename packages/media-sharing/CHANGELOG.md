@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.1.0...@2060.io/credo-ts-didcomm-media-sharing@v0.1.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* credo-ts as peerDependency ([fb5d663](https://github.com/2060-io/credo-ts-didcomm-ext/commit/fb5d663a9b77d69229d208eef0a0c36d0933eead))
+
 ## [0.1.0](https://github.com/2060-io/credo-ts-didcomm-ext/compare/@2060.io/credo-ts-didcomm-media-sharing@v0.0.6...@2060.io/credo-ts-didcomm-media-sharing@v0.1.0) (2026-03-10)
 
 
