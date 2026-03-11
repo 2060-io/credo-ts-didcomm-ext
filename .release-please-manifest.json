@@ -2,7 +2,7 @@
   "packages/calls": "0.1.0",
   "packages/user-profile": "0.1.0",
   "packages/media-sharing": "0.1.0",
-  "packages/mrtd": "0.1.0",
+  "packages/mrtd": "0.1.1",
   "packages/reactions": "0.1.0",
   "packages/receipts": "0.1.0",
   "packages/shorten-url": "0.1.0"
