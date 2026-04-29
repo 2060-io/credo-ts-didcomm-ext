@@ -23,7 +23,7 @@ jobs:
       releases_created: ${{ steps.release-please.outputs.releases_created }}
       paths_released: ${{ steps.release-please.outputs.paths_released }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release-please
         with:
           path: ./packages
@@ -52,7 +52,7 @@ jobs:
       - name: Checkout credo-ts-didcomm-ext
         uses: actions/checkout@v6
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Setup node v22
         uses: actions/setup-node@v6
         with:
