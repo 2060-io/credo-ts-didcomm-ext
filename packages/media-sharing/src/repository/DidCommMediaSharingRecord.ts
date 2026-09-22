@@ -1,3 +1,5 @@
+import type { JsonValue } from '@credo-ts/core'
+
 import { CredoError, BaseRecord, utils } from '@credo-ts/core'
 import { Type } from 'class-transformer'
 
@@ -10,7 +12,8 @@ export interface CipheringInfo {
 
 export interface SharedMediaItemOptions {
   id?: string
-  uri: string
+  uri?: string
+  json?: JsonValue
   mimeType: string
   description?: string
   byteCount?: number
@@ -21,7 +24,8 @@ export interface SharedMediaItemOptions {
 
 export class SharedMediaItem {
   public id!: string
-  public uri!: string
+  public uri?: string
+  public json?: JsonValue
   public mimeType!: string
   public description?: string
   public byteCount?: number
@@ -31,8 +35,13 @@ export class SharedMediaItem {
 
   public constructor(options: SharedMediaItemOptions) {
     if (options) {
+      if ((options.uri === undefined) === (options.json === undefined)) {
+        throw new CredoError('A shared media item must carry either uri or json')
+      }
+
       this.id = options.id ?? utils.uuid()
       this.uri = options.uri
+      this.json = options.json
       this.mimeType = options.mimeType
       this.description = options.description
       this.byteCount = options.byteCount

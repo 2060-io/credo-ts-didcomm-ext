@@ -147,8 +147,11 @@ export class DidCommMediaSharingService {
           throw new CredoError(`Missing MIME type for shared item ${item.id}`)
         }
 
-        if (!relatedAttachment.data.links || !relatedAttachment.data.links.length) {
-          throw new CredoError(`Missing URI for for shared item ${item.id}`)
+        const uri = relatedAttachment.data.links?.[0]
+        const json = relatedAttachment.data.json
+
+        if (uri === undefined && json === undefined) {
+          continue
         }
 
         items.push({
@@ -156,7 +159,8 @@ export class DidCommMediaSharingService {
           ciphering: item.ciphering,
           metadata: item.metadata,
           mimeType: relatedAttachment.mimeType,
-          uri: relatedAttachment.data.links[0],
+          uri,
+          json,
           byteCount: relatedAttachment.byteCount,
           description: relatedAttachment.description,
           fileName: relatedAttachment.filename,
