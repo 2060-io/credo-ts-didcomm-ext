@@ -74,7 +74,7 @@ export class DidCommShareMediaMessage extends DidCommMessage {
         this.addAppendedAttachment(
           new DidCommAttachment({
             id: i.toString(),
-            data: { links: [item.uri] },
+            data: item.uri !== undefined ? { links: [item.uri] } : { json: item.json },
             byteCount: item.byteCount,
             filename: item.fileName,
             description: item.description,

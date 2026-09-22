@@ -174,4 +174,45 @@ describe('media test', () => {
     expect(item.uri).toBe('http://blabla')
     expect(item.metadata!.duration).toBe(14)
   })
+
+  test('Share media inline as json', async () => {
+    const subjectBob = new ReplaySubject<DidCommMediaSharingRecord>()
+
+    const aliceRecord = await aliceAgent.modules.media.create({ connectionId: aliceConnectionRecord!.id })
+
+    const json = { type: 'https://didcomm.org/out-of-band/2.0/invitation', id: 'inv-1' }
+    await aliceAgent.modules.media.share({
+      recordId: aliceRecord.id,
+      items: [{ mimeType: 'application/didcomm-plain+json', json }],
+    })
+
+    recordsAddedByType(bobAgent, DidCommMediaSharingRecord).subscribe((record) =>
+      subjectBob.next(record as DidCommMediaSharingRecord),
+    )
+
+    const bobRecord = await firstValueFrom(subjectBob)
+
+    expect(bobRecord.items?.length).toBe(1)
+    expect(bobRecord.items![0].mimeType).toBe('application/didcomm-plain+json')
+    expect(bobRecord.items![0].json).toEqual(json)
+    expect(bobRecord.items![0].uri).toBeUndefined()
+  })
+
+  test('Refuse an item that carries both uri and json, or neither', async () => {
+    const aliceRecord = await aliceAgent.modules.media.create({ connectionId: aliceConnectionRecord!.id })
+
+    await expect(
+      aliceAgent.modules.media.share({
+        recordId: aliceRecord.id,
+        items: [{ mimeType: 'image/png', uri: 'http://blabla', json: { a: 1 } }],
+      }),
+    ).rejects.toThrow('A shared media item must carry either uri or json')
+
+    await expect(
+      aliceAgent.modules.media.share({
+        recordId: aliceRecord.id,
+        items: [{ mimeType: 'image/png' }],
+      }),
+    ).rejects.toThrow('A shared media item must carry either uri or json')
+  })
 })
